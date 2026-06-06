@@ -1,0 +1,3827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Algebra · A Visual Journey · v2</title>
+<style>
+:root{
+  --bg:#04061a;
+  --bg-2:#080d28;
+  --canvas-bg-1:#0a1130;
+  --canvas-bg-2:#02030f;
+  --text:#eef2ff;
+  --muted:#7c87b3;
+  --accent:#5fe3ff;
+  --accent-2:#ff5fa2;
+  --accent-3:#ffd45f;
+  --accent-4:#5fffb0;
+  --accent-5:#b29bff;
+  --i-color:#ff5fa2;
+  --j-color:#ffd45f;
+  --k-color:#5fffb0;
+  --grid-faint:rgba(255,255,255,0.04);
+  --grid-axis:rgba(255,255,255,0.18);
+  --panel-bg:rgba(4,6,26,0.5);
+  --panel-border:rgba(255,255,255,0.06);
+}
+body.light-theme{
+  --bg:#fdfcf6;
+  --bg-2:#f0eee2;
+  --canvas-bg-1:#ffffff;
+  --canvas-bg-2:#f6f4eb;
+  --text:#1a1f3a;
+  --muted:#5b6582;
+  --accent:#1d6fdc;
+  --accent-2:#d6266a;
+  --accent-3:#c79205;
+  --accent-4:#0a8f5a;
+  --accent-5:#6f4fc4;
+  --i-color:#d6266a;
+  --j-color:#c79205;
+  --k-color:#0a8f5a;
+  --grid-faint:rgba(0,0,0,0.04);
+  --grid-axis:rgba(0,0,0,0.25);
+  --panel-bg:rgba(255,255,255,0.65);
+  --panel-border:rgba(0,0,0,0.08);
+}
+body.light-theme::before{
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(29,111,220,0.06), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(214,38,106,0.05), transparent 60%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html, body{height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-weight:300;
+  letter-spacing:0.01em;
+  overflow-x:hidden;
+}
+
+/* ========== Subtle ambient gradient ========== */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(95,227,255,0.08), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(255,95,162,0.07), transparent 60%);
+}
+
+/* ========== Layout ========== */
+.scene{
+  position:relative;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:60px 24px;
+  z-index:1;
+  overflow:hidden;
+}
+.scene-inner{
+  width:100%;
+  max-width:1180px;
+  position:relative;
+  z-index:2;
+}
+.hero-bg{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+.hero-bg canvas{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+}
+.full-canvas{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  background:radial-gradient(ellipse at center, var(--canvas-bg-1) 0%, var(--canvas-bg-2) 100%);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 40px 100px rgba(0,0,0,0.7), inset 0 0 0 1px var(--panel-border);
+}
+body.light-theme .full-canvas{
+  box-shadow:0 20px 50px rgba(0,0,0,0.12), inset 0 0 0 1px var(--panel-border);
+}
+@media (max-width:760px){
+  .full-canvas{aspect-ratio:4/5;}
+}
+.full-canvas canvas{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+}
+
+/* ========== Section header ========== */
+.eyebrow{
+  font-family:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--accent);opacity:0.85;margin-bottom:14px;
+}
+h1{
+  font-size:clamp(42px,7.5vw,96px);
+  font-weight:200;line-height:0.98;letter-spacing:-2px;
+  margin-bottom:24px;
+}
+h1 em{
+  font-style:normal;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--accent-3));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-weight:400;
+}
+h2{
+  font-size:clamp(30px,4.5vw,52px);
+  font-weight:200;line-height:1.05;letter-spacing:-1px;
+  margin-bottom:18px;
+  max-width:18ch;
+}
+h2 em{
+  font-style:normal;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-weight:400;
+}
+.lede{
+  font-size:18px;line-height:1.55;color:var(--muted);
+  max-width:54ch;font-weight:300;
+}
+.lede strong{color:var(--text);font-weight:500}
+
+/* ========== Caption overlay over the canvas ========== */
+.caption{
+  position:absolute;
+  pointer-events:none;
+  background:rgba(4,6,26,0.6);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:12px;
+  padding:14px 18px;
+  font-size:13px;
+  color:var(--text);
+  max-width:340px;
+  line-height:1.5;
+  font-weight:300;
+}
+.caption b{color:var(--accent);font-weight:500}
+.caption .small{color:var(--muted);font-size:12px;margin-top:6px;display:block}
+
+/* ========== HUD inside canvas ========== */
+.hud{
+  position:absolute;
+  font-family:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+  font-size:12px;color:var(--muted);
+  letter-spacing:1px;
+  padding:8px 12px;
+  border-radius:8px;
+  background:rgba(4,6,26,0.4);
+  backdrop-filter:blur(8px);
+}
+
+/* ========== Slim controls ========== */
+.controls{
+  position:absolute;left:24px;bottom:24px;
+  display:flex;flex-direction:column;gap:10px;
+  background:rgba(4,6,26,0.5);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:14px 16px;
+  min-width:240px;
+}
+.ctrl{display:flex;align-items:center;gap:12px}
+.ctrl label{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:11px;color:var(--muted);min-width:30px;
+  letter-spacing:1px;
+}
+.ctrl input[type=range]{
+  flex:1;-webkit-appearance:none;appearance:none;
+  height:2px;background:rgba(255,255,255,0.1);
+  border-radius:2px;outline:none;
+}
+.ctrl input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:12px;height:12px;border-radius:50%;
+  background:var(--accent);cursor:pointer;
+  box-shadow:0 0 14px var(--accent);
+}
+.ctrl input[type=range]::-moz-range-thumb{
+  width:12px;height:12px;border-radius:50%;
+  background:var(--accent);cursor:pointer;border:none;
+}
+.ctrl .v{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:11px;color:var(--accent);min-width:42px;text-align:right;
+}
+.btn-row{
+  position:absolute;right:24px;bottom:24px;
+  display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;
+  max-width:60%;
+}
+.btn{
+  background:rgba(4,6,26,0.5);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.08);
+  color:var(--text);
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:11px;
+  letter-spacing:1px;
+  padding:8px 14px;border-radius:100px;
+  cursor:pointer;
+  transition:all 0.2s ease;
+}
+.btn:hover{
+  background:rgba(95,227,255,0.12);
+  border-color:rgba(95,227,255,0.3);
+  color:var(--accent);
+}
+.btn.primary{
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#001020;font-weight:600;border:none;
+}
+.btn.primary:hover{
+  filter:brightness(1.15);
+}
+.btn.active{
+  background:var(--accent);color:#001020;font-weight:600;border-color:var(--accent);
+}
+
+/* ========== Scroll progress ========== */
+.progress{
+  position:fixed;top:0;left:0;height:2px;width:0;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  z-index:100;transition:width 0.1s;
+  box-shadow:0 0 14px var(--accent);
+}
+
+/* ========== Presenter toolbar ========== */
+.toolbar{
+  position:fixed;top:14px;left:14px;z-index:100;
+  display:flex;gap:6px;
+  background:var(--panel-bg);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--panel-border);
+  border-radius:100px;padding:5px;
+}
+.toolbar button{
+  width:34px;height:34px;border-radius:50%;
+  border:none;background:transparent;color:var(--muted);
+  cursor:pointer;font-size:14px;font-family:'JetBrains Mono',ui-monospace,monospace;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;
+}
+.toolbar button:hover{background:rgba(95,227,255,0.12);color:var(--accent);}
+.toolbar .ch-counter{
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;
+  color:var(--muted);
+  display:flex;align-items:center;padding:0 8px;
+  letter-spacing:1px;min-width:50px;justify-content:center;
+}
+.toolbar-tip{
+  position:fixed;top:60px;left:18px;z-index:100;
+  background:var(--panel-bg);backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--panel-border);border-radius:10px;
+  padding:8px 12px;font-size:11px;font-family:'JetBrains Mono',ui-monospace,monospace;
+  color:var(--muted);letter-spacing:1px;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.toolbar-tip.show{opacity:1}
+.toolbar-tip kbd{
+  background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;
+  margin:0 2px;color:var(--text);font-size:10px;
+}
+
+/* ========== Side nav (chapters) ========== */
+.chapters{
+  position:fixed;right:24px;top:50%;transform:translateY(-50%);
+  z-index:50;display:flex;flex-direction:column;gap:10px;
+}
+.chapters a{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,0.2);
+  transition:all 0.3s;
+  display:block;text-decoration:none;
+}
+.chapters a:hover{background:var(--accent)}
+.chapters a.active{
+  width:6px;height:24px;border-radius:3px;
+  background:var(--accent);
+  box-shadow:0 0 10px var(--accent);
+}
+@media (max-width:760px){.chapters{display:none}}
+
+/* ========== Scroll cue ========== */
+.scroll-cue{
+  position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;
+  letter-spacing:3px;color:var(--muted);text-transform:uppercase;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  animation:scrollDown 2s ease infinite;
+}
+@keyframes scrollDown{
+  0%,100%{transform:translate(-50%,0);opacity:0.5}
+  50%{transform:translate(-50%,8px);opacity:1}
+}
+
+/* ========== Kbd matrix ========== */
+.eq{
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:14px;color:var(--text);
+  display:inline-flex;gap:6px;align-items:center;
+}
+.eq .var-i{color:var(--i-color)}
+.eq .var-j{color:var(--j-color)}
+.eq .var-k{color:var(--k-color)}
+
+.foot{
+  text-align:center;padding:80px 24px 60px;color:var(--muted);font-size:12px;
+  letter-spacing:2px;text-transform:uppercase;
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+}
+
+/* ========== Dual-canvas split ========== */
+.split-canvas{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;
+  width:100%;
+}
+.split-canvas .full-canvas{aspect-ratio:1/1}
+@media (max-width:760px){.split-canvas{grid-template-columns:1fr}}
+
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity 0.8s ease, transform 0.8s ease;}
+.fade-in.visible{opacity:1;transform:translateY(0);}
+
+/* a small inline matrix display */
+.mini-matrix{
+  display:inline-grid;
+  grid-template-columns:auto auto;gap:6px 14px;
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:14px;
+  padding:6px 14px;border-left:1px solid var(--accent);border-right:1px solid var(--accent);
+  background:rgba(95,227,255,0.06);
+  border-radius:4px;
+}
+
+/* Big display number */
+.big-number{
+  position:absolute;
+  font-family:'JetBrains Mono',ui-monospace,monospace;
+  font-size:60px;font-weight:200;
+  letter-spacing:-2px;
+  color:var(--text);
+  pointer-events:none;
+}
+.big-number .label{
+  display:block;font-size:11px;color:var(--muted);
+  letter-spacing:3px;text-transform:uppercase;font-weight:300;margin-bottom:4px;
+}
+
+/* tabs */
+.tabs{
+  position:absolute;top:24px;left:24px;
+  display:flex;gap:4px;background:rgba(4,6,26,0.55);
+  backdrop-filter:blur(12px);
+  padding:4px;border-radius:100px;border:1px solid rgba(255,255,255,0.06);
+}
+.tabs button{
+  background:transparent;border:none;color:var(--muted);
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;
+  padding:6px 14px;border-radius:100px;cursor:pointer;letter-spacing:1px;
+  transition:all 0.2s;
+}
+.tabs button.active{background:var(--accent);color:#001020;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="toolbar" id="toolbar">
+  <button id="prevBtn" title="Previous chapter (←)">‹</button>
+  <div class="ch-counter" id="chCounter">1 / 21</div>
+  <button id="nextBtn" title="Next chapter (→)">›</button>
+  <button id="playBtn" title="Play current animation (Space)">▶</button>
+  <button id="themeBtn" title="Toggle light/dark (T)">◐</button>
+  <button id="helpBtn" title="Show shortcuts (?)">?</button>
+</div>
+<div class="toolbar-tip" id="toolbarTip">
+  <kbd>←</kbd> <kbd>→</kbd> chapters &nbsp; <kbd>Space</kbd> play &nbsp; <kbd>T</kbd> theme &nbsp; <kbd>1</kbd>–<kbd>9</kbd>,<kbd>0</kbd> jump
+</div>
+
+<nav class="chapters">
+  <a href="#hero" data-i="0"></a>
+  <a href="#vector" data-i="1"></a>
+  <a href="#scale" data-i="2"></a>
+  <a href="#add" data-i="3"></a>
+  <a href="#span" data-i="4"></a>
+  <a href="#three-d" data-i="5"></a>
+  <a href="#matrix" data-i="6"></a>
+  <a href="#data" data-i="7"></a>
+  <a href="#factory" data-i="8"></a>
+  <a href="#transform" data-i="9"></a>
+  <a href="#axb" data-i="10"></a>
+  <a href="#solutions" data-i="11"></a>
+  <a href="#det" data-i="12"></a>
+  <a href="#det-3d" data-i="13"></a>
+  <a href="#transpose" data-i="14"></a>
+  <a href="#inverse" data-i="15"></a>
+  <a href="#gauss" data-i="16"></a>
+  <a href="#ref" data-i="17"></a>
+  <a href="#rref" data-i="18"></a>
+  <a href="#particular" data-i="19"></a>
+  <a href="#close" data-i="20"></a>
+</nav>
+
+<!-- ============================================================
+     SCENE 0 — HERO
+     ============================================================ -->
+<section class="scene" id="hero">
+  <div class="hero-bg"><canvas id="heroC"></canvas></div>
+  <div class="scene-inner">
+    <div style="text-align:center">
+      <div class="eyebrow">MFML · BITS PILANI WILP · A 14-chapter visual journey</div>
+      <h1>Linear algebra<br>isn't equations.<br><em>It's the geometry of thought.</em></h1>
+      <div class="lede" style="margin:0 auto;max-width:58ch">We'll start with a single arrow. Add a second. Combine them into a plane. Pack them into a matrix. Watch that matrix move space. Then ask the inverse question — and follow the thread all the way to the undo button. <strong>One story. Fourteen chapters.</strong> No memorization. We will <em>see</em> all of it.</div>
+    </div>
+  </div>
+  <div class="scroll-cue">scroll to begin</div>
+</section>
+
+<!-- ============================================================
+     SCENE 1 — A VECTOR IS THREE THINGS AT ONCE
+     ============================================================ -->
+<section class="scene" id="vector">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 1 · Meet v</div>
+    <h2>Our story begins with <em>a single arrow.</em></h2>
+    <div class="lede" style="margin-bottom:30px">Before matrices, before equations, before machine learning — there is one object. We call it <strong>v</strong>. And the first thing to know is: <strong>v is three things at once</strong>. An arrow. A list of numbers. A recipe of basis vectors. Drag the tip — and watch all three views update in lockstep. They are not three things; they are <em>one</em> thing seen from three angles.</div>
+    <div class="full-canvas">
+      <canvas id="vecC"></canvas>
+      <div class="hud" style="top:18px;left:18px">drag the tip ↻</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 2 — SCALING (auto-sweep then user takes over)
+     ============================================================ -->
+<section class="scene" id="scale">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 2 · Now do something to it</div>
+    <h2>One number. <em>Stretches, squishes, flips.</em></h2>
+    <div class="lede" style="margin-bottom:30px">We have v. The simplest possible thing we can do to it is multiply by a number — a <strong>scalar</strong> λ. Direction never changes. Only length stretches, squishes, or flips through the origin. Notice the dotted line: every λ·v lives on it. This line is the <strong>span of v</strong> — the entire universe one vector and one number can reach. To break free of this line, we'll need a second arrow.</div>
+    <div class="full-canvas">
+      <canvas id="scaleC"></canvas>
+      <div class="controls">
+        <div class="ctrl"><label>λ</label><input type="range" id="lam" min="-3" max="3" step="0.01" value="1.5"><span class="v" id="lamV">1.50</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 3 — ADDITION
+     ============================================================ -->
+<section class="scene" id="add">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 3 · Bring in a second arrow</div>
+    <h2>Two arrows. <em>One walk.</em></h2>
+    <div class="lede" style="margin-bottom:30px">A second vector w lets us escape the line. Place v and w tip-to-tail and the total displacement is <strong>v + w</strong> — the gold arrow. Notice that the parallelogram closes either way: v→w lands at the same point as w→v. <em>Addition is commutative.</em> But the deeper observation: adding two vectors gives a vector. Scaling gives a vector. <strong>You cannot escape the space using its own operations.</strong> That property has a name — <em>closure</em> — and it is the entire definition of a vector space.</div>
+    <div class="full-canvas">
+      <canvas id="addC"></canvas>
+      <div class="hud" style="top:18px;left:18px">drag <span style="color:#5fe3ff">v</span> or <span style="color:#ff5fa2">w</span> ↻</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 4 — LINEAR COMBINATION & SPAN — THE MAGIC MOMENT
+     ============================================================ -->
+<section class="scene" id="span">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 4 · Now combine the two moves</div>
+    <h2>From two arrows, <em>the entire plane.</em></h2>
+    <div class="lede" style="margin-bottom:30px">We've learned to scale (Chapter 2) and to add (Chapter 3). Combine both: <span class="eq">α<span style="color:#5fe3ff">v</span> + β<span style="color:#ff5fa2">w</span></span>. That's a <strong>linear combination</strong>. Hit "Paint reachable points" and watch every α-β pair fill the plane with reachable destinations. <strong>Two arrows generated all of 2D.</strong> But — toggle to "Dependent" — when v and w point along the same line, the painted plane collapses back to a single line. Two arrows that don't add information. <em>That is linear dependence, made visible.</em></div>
+    <div class="full-canvas">
+      <canvas id="spanC"></canvas>
+      <div class="tabs">
+        <button class="active" id="spIndep" onclick="setSpanCase('indep')">Independent</button>
+        <button id="spDep" onclick="setSpanCase('dep')">Dependent (parallel)</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="paintSpan()">▶ Paint reachable points</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 5 — 3D
+     ============================================================ -->
+<section class="scene" id="three-d">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 5 · Step out of the page</div>
+    <h2>Everything we've said <em>scales up.</em></h2>
+    <div class="lede" style="margin-bottom:30px">Two arrows gave us a plane. Add a third, and we get all of 3D. The story doesn't change — we just have one more basis direction (k̂), and one more number per vector. <strong>Linear algebra doesn't care about dimension.</strong> The same closure, the same span, the same independence. And that is why the moment you understand 2D, you also understand ℝ⁷⁸⁴ — where a single MNIST image lives as <em>one point</em>.</div>
+    <div class="full-canvas">
+      <canvas id="threeC"></canvas>
+      <div class="hud" style="top:18px;left:18px">drag to orbit · scroll to zoom</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 6 — MATRIX = WHERE BASIS VECTORS LAND
+     ============================================================ -->
+<section class="scene" id="matrix">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 6 · Now bundle the arrows</div>
+    <h2>Two vectors, side by side. <em>That's a matrix.</em></h2>
+    <div class="lede" style="margin-bottom:30px">We've been working with vectors one at a time. Now bundle two of them into a single object — write them as columns next to each other — and you have a <strong>matrix</strong>. But here is the reframe that changes everything: each column isn't just data. It says <em>"this is where one basis vector lands."</em> Slide the controls and watch — the red arrow always shows where î goes; the yellow always shows where ĵ goes. The grid follows. <strong>A matrix is a packed instruction for moving the basis vectors</strong> — and once those move, the whole space moves with them.</div>
+    <div class="full-canvas">
+      <canvas id="matC"></canvas>
+      <div class="controls" style="min-width:280px">
+        <div class="ctrl" style="margin-bottom:4px"><label style="color:var(--i-color)">î →</label></div>
+        <div class="ctrl"><label>x</label><input type="range" id="m11" min="-3" max="3" step="0.01" value="2"><span class="v" id="m11V">2.00</span></div>
+        <div class="ctrl"><label>y</label><input type="range" id="m21" min="-3" max="3" step="0.01" value="0.5"><span class="v" id="m21V">0.50</span></div>
+        <div class="ctrl" style="margin:8px 0 4px"><label style="color:var(--j-color)">ĵ →</label></div>
+        <div class="ctrl"><label>x</label><input type="range" id="m12" min="-3" max="3" step="0.01" value="0.5"><span class="v" id="m12V">0.50</span></div>
+        <div class="ctrl"><label>y</label><input type="range" id="m22" min="-3" max="3" step="0.01" value="1.5"><span class="v" id="m22V">1.50</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 7 — MATRICES ARE EVERYWHERE
+     ============================================================ -->
+<section class="scene" id="data">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 7 · Pause — why does this matter?</div>
+    <h2>Your photo. Your dataset. <em>Your model.</em> All matrices.</h2>
+    <div class="lede" style="margin-bottom:30px">Before we discover what matrices <em>do</em>, let's see what they <em>store</em>. An image — a matrix of pixel intensities. A dataset — a matrix of features. Every neural network layer — a matrix of weights. The reason we are spending today on this is simple: in ML, <strong>everything you touch is a matrix or a vector</strong>. Linear algebra isn't a topic in machine learning — it's the carrier wave. Now back to the magic — what does a matrix actually do?</div>
+    <div class="full-canvas">
+      <canvas id="dataC"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 7.5 — THE FURNITURE FACTORY (real-world Ax=b)
+     ============================================================ -->
+<section class="scene" id="factory">
+  <div class="scene-inner">
+    <div class="eyebrow">Interlude · Why this isn't abstract</div>
+    <h2>A furniture factory. <em>Solving Ax = b for real.</em></h2>
+    <div class="lede" style="margin-bottom:30px">Before we go geometric, let's ground all this in something concrete from the slide deck. A factory makes three kit types — chairs, tables, cabinets. Each consumes wood, labor, machine time, and shipping. Resources are limited. The question — <em>how many of each kit should we make to use every resource exactly?</em> — is literally <strong>Ax = b</strong>. Drag the sliders. Watch the resource bars fill. There is exactly one combination that hits every target. Find it.</div>
+    <div class="full-canvas" style="aspect-ratio:16/9">
+      <canvas id="factoryC"></canvas>
+      <div class="controls" style="min-width:300px">
+        <div class="ctrl"><label>Chair x₁</label><input type="range" id="fx1" min="0" max="5" step="0.1" value="0"><span class="v" id="fx1V">0.0</span></div>
+        <div class="ctrl"><label>Table x₂</label><input type="range" id="fx2" min="0" max="5" step="0.1" value="0"><span class="v" id="fx2V">0.0</span></div>
+        <div class="ctrl"><label>Cabinet x₃</label><input type="range" id="fx3" min="0" max="5" step="0.1" value="0"><span class="v" id="fx3V">0.0</span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="solveFactory()">▶ Reveal solution</button>
+        <button class="btn" onclick="resetFactory()">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 8 — MATRIX AS TRANSFORMATION (the centerpiece)
+     ============================================================ -->
+<section class="scene" id="transform">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 8 · The moment everything clicks</div>
+    <h2>A matrix <em>moves space.</em></h2>
+    <div class="lede" style="margin-bottom:30px">Chapter 6 told us a matrix says where the basis vectors land. Watch what that <em>means</em>. The left half is input space — the home of x. The right half is output space — and as A is applied, the entire grid <strong>warps</strong>. Every green dot you see takes a journey to its destination. Compute A·x and you compute that journey. <strong>x is just a passenger; A is the road.</strong> Try Collapse — det = 0 — and see a whole dimension disappear in front of you. We'll come back to that.</div>
+    <div class="full-canvas" style="aspect-ratio:16/8">
+      <canvas id="trC"></canvas>
+      <div class="btn-row">
+        <button class="btn" onclick="setTransformPreset('rotate')">Rotate</button>
+        <button class="btn" onclick="setTransformPreset('shear')">Shear</button>
+        <button class="btn" onclick="setTransformPreset('stretch')">Stretch</button>
+        <button class="btn" onclick="setTransformPreset('reflect')">Reflect</button>
+        <button class="btn" onclick="setTransformPreset('collapse')">Collapse (det = 0)</button>
+        <button class="btn" onclick="clearTrClicks()">Clear traces</button>
+        <button class="btn primary" onclick="setTransformPreset('reset')">Reset</button>
+      </div>
+      <div class="hud" style="top:18px;left:18px">click on input space ← to follow a point through A</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 9 — Ax = b. Follow the point.
+     ============================================================ -->
+<section class="scene" id="axb">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 9 · Now flip the question</div>
+    <h2>Given the destination, <em>find the start.</em></h2>
+    <div class="lede" style="margin-bottom:30px">In Chapter 8, A took an x and produced Ax. Now reverse it: <em>"I see where I landed — call it b. What x got me there?"</em> &nbsp; That is <strong>Ax = b</strong>. And there are two beautiful ways to see the same answer.<br><br><strong>Row picture (left):</strong> each equation is a line. The solution is where the lines cross.<br><strong>Column picture (right):</strong> b is built by stacking copies of A's columns. The solution tells us how many of each.<br><br>Hit play and watch both pictures find the answer <em>simultaneously</em>.</div>
+    <div class="full-canvas" style="aspect-ratio:16/8">
+      <canvas id="axbC"></canvas>
+      <div class="btn-row">
+        <button class="btn primary" onclick="playAxb()">▶ Send x through A</button>
+        <button class="btn" onclick="resetAxb()">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 10 — Three fates
+     ============================================================ -->
+<section class="scene" id="solutions">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 10 · But does a solution always exist?</div>
+    <h2>Every system ends in <em>exactly three ways.</em></h2>
+    <div class="lede" style="margin-bottom:30px">In Chapter 9 our journey landed cleanly on b. But what if no x exists that gets us there? What if many do? It turns out — no matter how complicated a system is — it can only end in one of three geometric fates. <strong>One. None. Or infinite.</strong> &nbsp; Look at the lines. When they cross — one solution. When they're parallel — none. When they're the same line — infinite. The geometry tells you everything; the algebra is just bookkeeping.</div>
+    <div class="full-canvas">
+      <canvas id="solC"></canvas>
+      <div class="tabs">
+        <button class="active" id="solT1" onclick="setSolutionCase(1)">One</button>
+        <button id="solT2" onclick="setSolutionCase(2)">None</button>
+        <button id="solT3" onclick="setSolutionCase(3)">Infinite</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 11 — DETERMINANT = AREA
+     ============================================================ -->
+<section class="scene" id="det">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 11 · So how do we tell which fate?</div>
+    <h2>Measure how much space <em>stretched.</em></h2>
+    <div class="lede" style="margin-bottom:30px">In Chapter 10 we saw that "no solution" and "infinite solutions" share something — both happen when A has crushed a dimension. We need a single number that detects this collapse. Take the unit square — area 1. Apply A. The new area <strong>is</strong> det(A). When det &gt; 0, space stretched cleanly. When det &lt; 0, space flipped through its mirror. When det = 0, <strong>a dimension just died</strong> — and Chapter 14's "undo button" will not exist.</div>
+    <div class="full-canvas">
+      <canvas id="detC"></canvas>
+      <div class="controls">
+        <div class="ctrl"><label>a</label><input type="range" id="da" min="-2.5" max="2.5" step="0.01" value="1.5"><span class="v" id="daV">1.50</span></div>
+        <div class="ctrl"><label>b</label><input type="range" id="db" min="-2.5" max="2.5" step="0.01" value="0.4"><span class="v" id="dbV">0.40</span></div>
+        <div class="ctrl"><label>c</label><input type="range" id="dc" min="-2.5" max="2.5" step="0.01" value="0.3"><span class="v" id="dcV">0.30</span></div>
+        <div class="ctrl"><label>d</label><input type="range" id="dd" min="-2.5" max="2.5" step="0.01" value="1.2"><span class="v" id="ddV">1.20</span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="animateDet()">▶ Sweep det → 0</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 12 — DET in 3D = VOLUME
+     ============================================================ -->
+<section class="scene" id="det-3d">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 12 · And in 3D?</div>
+    <h2>Same number. <em>Now it's volume.</em></h2>
+    <div class="lede" style="margin-bottom:30px">Just as Chapter 5 told us our 2D rules carry to higher dimensions, so does the determinant. In 2D it measured area. In 3D it measures the <strong>volume</strong> of the parallelepiped formed by the three columns of A. Det = 0 still means collapse — only now the three columns lie in a flat plane instead of filling space. Same intuition, one dimension up.</div>
+    <div class="full-canvas">
+      <canvas id="det3dC"></canvas>
+      <div class="hud" style="top:18px;left:18px">drag to orbit</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 13 — TRANSPOSE
+     ============================================================ -->
+<section class="scene" id="transpose">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 13 · A small but important detour</div>
+    <h2>Flip rows and columns. <em>That's a transpose.</em></h2>
+    <div class="lede" style="margin-bottom:30px">Before our final question, one quick move you'll see everywhere. Take A. Write its rows as columns instead. The new matrix is <strong>Aᵀ</strong>. Geometrically: a reflection across the main diagonal. The cell at (i,j) ends up at (j,i). And one fact worth remembering: <span class="eq">(AB)ᵀ = BᵀAᵀ</span> — the order reverses, like undoing socks-then-shoes. We'll need this thinking for Chapter 14.</div>
+    <div class="full-canvas">
+      <canvas id="transC"></canvas>
+      <div class="btn-row">
+        <button class="btn primary" onclick="playTranspose()">▶ Flip</button>
+        <button class="btn" onclick="resetTranspose()">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 14 — INVERSE = UNDO
+     ============================================================ -->
+<section class="scene" id="inverse">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 14 · The final question</div>
+    <h2>Can we <em>undo</em> a matrix?</h2>
+    <div class="lede" style="margin-bottom:30px">Our journey closes here. A moved space (Chapter 8). Ax = b asked us to rewind it (Chapter 9). The determinant told us when rewinding is possible (Chapter 11). Now we make it explicit: the matrix that perfectly reverses A is its <strong>inverse, A⁻¹</strong>. Apply A. Apply A⁻¹. The grid lands precisely where it started. <em>Nothing changed.</em> Information was preserved. But — when det(A) = 0, a dimension was destroyed in the squash, and no inverse exists. The undo button is gray. Hit play and watch the round trip.</div>
+    <div class="full-canvas">
+      <canvas id="invC"></canvas>
+      <div class="btn-row">
+        <button class="btn primary" onclick="playInverse()">▶ Apply A, then A⁻¹</button>
+        <button class="btn" onclick="resetInverse()">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CH 15 — ELEMENTARY ROW OPERATIONS (Gaussian Elimination)
+     ============================================================ -->
+<section class="scene" id="gauss">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 15 · Elementary row operations</div>
+    <h2>Three legal moves. <em>Solution set never changes.</em></h2>
+    <div class="lede" style="margin-bottom:30px">In Chapter 9 we said "find x such that Ax = b" — but how, when guessing fails? <strong>Gaussian elimination.</strong> Three <em>elementary row operations</em> on the augmented matrix [A | b]:<br><br>① Swap two rows&nbsp;&nbsp;<span style="color:#7c87b3">(R<sub>i</sub> ↔ R<sub>j</sub>)</span><br>② Multiply a row by non-zero λ&nbsp;&nbsp;<span style="color:#7c87b3">(R<sub>i</sub> ← λ·R<sub>i</sub>, λ ≠ 0)</span><br>③ Add a multiple of one row to another&nbsp;&nbsp;<span style="color:#7c87b3">(R<sub>i</sub> ← R<sub>i</sub> + λ·R<sub>j</sub>)</span><br><br>Each move rewrites the equations into a simpler form, but <strong>the solution set is preserved exactly</strong>. The intersection point (2, 1) below never moves — every legal step keeps it pinned.</div>
+    <div class="full-canvas">
+      <canvas id="gaussC"></canvas>
+      <div class="btn-row">
+        <button class="btn primary" onclick="gaussNextStep()">▶ Next step</button>
+        <button class="btn" onclick="gaussReset()">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CH 16 — ROW ECHELON FORM & THE STAIRCASE
+     ============================================================ -->
+<section class="scene" id="ref">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 16 · Row-echelon form</div>
+    <h2>The pivots fall in <em>a staircase.</em></h2>
+    <div class="lede" style="margin-bottom:30px">After enough row ops, the matrix takes a special shape — <strong>row-echelon form (REF)</strong>. The first non-zero entry of each row is called the <em>pivot</em>. Rule: each pivot must lie strictly to the <strong>right</strong> of the pivot in the row above. That single rule produces a staircase pattern descending from upper-left to lower-right. Pivot columns own <strong>basic variables</strong>; the others are <strong>free variables</strong>.</div>
+    <div class="full-canvas">
+      <canvas id="refC"></canvas>
+      <div class="btn-row">
+        <button class="btn" onclick="setRefExample(0)">Example A</button>
+        <button class="btn" onclick="setRefExample(1)">Example B</button>
+        <button class="btn" onclick="setRefExample(2)">Example C</button>
+        <button class="btn" onclick="setRefExample(3)">Not REF ✗</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CH 17 — REDUCED ROW-ECHELON FORM
+     ============================================================ -->
+<section class="scene" id="rref">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 17 · Reduced row-echelon form</div>
+    <h2>Take REF further. <em>Each pivot becomes 1, alone in its column.</em></h2>
+    <div class="lede" style="margin-bottom:30px">REF was good. <strong>Reduced row-echelon form (RREF)</strong> is canonical. Two extra rules: every pivot equals <strong>1</strong>, and every pivot column has <strong>only zeros</strong> above and below the pivot. The pivot columns become standard basis vectors of ℝᵐ. Once a system is in RREF, the answer is sitting on the right side of the bar — no back-substitution needed.</div>
+    <div class="full-canvas">
+      <canvas id="rrefC"></canvas>
+      <div class="btn-row">
+        <button class="btn primary" onclick="rrefNextStep()">▶ Next reduction</button>
+        <button class="btn" onclick="rrefReset()">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CH 18 — PARTICULAR SOLUTION + GENERAL SOLUTION
+     ============================================================ -->
+<section class="scene" id="particular">
+  <div class="scene-inner">
+    <div class="eyebrow">Chapter 18 · Particular & general solutions</div>
+    <h2>One answer. <em>Plus all the ways to wiggle.</em></h2>
+    <div class="lede" style="margin-bottom:30px">When a system has free variables, infinitely many x satisfy Ax = b — but every one of them has the same recipe: a <strong>particular solution</strong> (one specific x that works), <em>plus</em> any combination of <strong>solutions to Ax = 0</strong> (the wiggle room).<br><br>The example from the slide deck — a 2×4 system in RREF: <span style="font-family:'JetBrains Mono',ui-monospace,monospace;background:rgba(255,255,255,0.04);padding:2px 6px;border-radius:4px">[1 0 8 −4 | 42] · [0 1 2 12 | 8]</span>. Two pivots, two free variables. Watch the particular solution emerge by setting free vars to zero — then watch it wiggle.</div>
+    <div class="full-canvas">
+      <canvas id="partC"></canvas>
+      <div class="btn-row">
+        <button class="btn primary" onclick="partNextStep()">▶ Next step</button>
+        <button class="btn" onclick="partReset()">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCENE 16 — CLOSING
+     ============================================================ -->
+<section class="scene" id="close">
+  <div class="scene-inner" style="text-align:center">
+    <div class="eyebrow">End of the journey</div>
+    <h1 style="margin-bottom:30px">One arrow became <em>a plane</em>.<br>A plane became <em>a matrix</em>.<br>A matrix became <em>everything</em>.</h1>
+    <div class="lede" style="margin:0 auto 30px;max-width:64ch;font-size:20px">We started with a single arrow v. We learned to scale it, add it, combine it. We discovered that two such arrows can build all of 2D — and three, all of 3D. We packed them into matrices, and watched a matrix move space. We flipped the question to Ax = b. We measured the stretch with the determinant. And we learned when the journey can be reversed.<br><br>Every neural network, every embedding, every gradient step in every model — is matrices doing what you just watched them do. <strong>You don't memorize linear algebra now. You see it.</strong></div>
+    <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:#5fe3ff;letter-spacing:2px;margin-top:40px">— now let's go build models with it.</div>
+  </div>
+</section>
+
+<div class="foot">Built as a teaching aid · MFML · BITS Pilani WILP</div>
+
+<script>
+/* ============================================================
+   GLOBAL HELPERS
+   ============================================================ */
+const TAU = Math.PI * 2;
+const easeOutCubic = t => 1 - Math.pow(1-t, 3);
+const easeInOutCubic = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+const lerp = (a,b,t) => a + (b-a)*t;
+
+// Theme-aware color helpers — read by canvas at draw time.
+function isLight(){ return document.body.classList.contains('light-theme'); }
+const COL = {
+  get gridFaint(){ return isLight() ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.04)'; },
+  get gridAxis(){ return isLight() ? 'rgba(0,0,0,0.32)' : 'rgba(255,255,255,0.18)'; },
+  get text(){ return isLight() ? '#1a1f3a' : '#eef2ff'; },
+  get muted(){ return isLight() ? '#5b6582' : '#7c87b3'; },
+  get faint(){ return isLight() ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.4)'; },
+  get veryFaint(){ return isLight() ? 'rgba(0,0,0,0.18)' : 'rgba(255,255,255,0.22)'; },
+  get bgFill(){ return isLight() ? '#ffffff' : 'transparent'; }
+};
+
+function fitCanvas(canvas){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = Math.max(2, rect.width * dpr);
+  canvas.height = Math.max(2, rect.height * dpr);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, w: rect.width, h: rect.height};
+}
+
+function drawGrid(ctx, cx, cy, scale, w, h, opts={}){
+  const {color=COL.gridFaint, axColor=COL.gridAxis, minor=true, minorEvery=1} = opts;
+  ctx.save();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = color;
+  if (minor){
+    ctx.beginPath();
+    const step = scale*minorEvery;
+    for(let x = cx % step; x < w; x += step){ ctx.moveTo(x,0); ctx.lineTo(x,h); }
+    for(let x = cx % step - step; x > 0; x -= step){ ctx.moveTo(x,0); ctx.lineTo(x,h); }
+    for(let y = cy % step; y < h; y += step){ ctx.moveTo(0,y); ctx.lineTo(w,y); }
+    for(let y = cy % step - step; y > 0; y -= step){ ctx.moveTo(0,y); ctx.lineTo(w,y); }
+    ctx.stroke();
+  }
+  ctx.strokeStyle = axColor;
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(0,cy); ctx.lineTo(w,cy);
+  ctx.moveTo(cx,0); ctx.lineTo(cx,h);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawTransformedGrid(ctx, cx, cy, scale, w, h, M, opacity=0.18){
+  // M = {a,b,c,d}: x' = ax+by, y' = cx+dy
+  ctx.save();
+  ctx.strokeStyle = `rgba(95,227,255,${opacity})`;
+  ctx.lineWidth = 1;
+  const range = 14;
+  for(let i=-range;i<=range;i++){
+    // vertical input line x=i
+    ctx.beginPath();
+    const xs = i, ys1 = -range, ys2 = range;
+    ctx.moveTo(cx + (M.a*xs + M.b*ys1)*scale, cy - (M.c*xs + M.d*ys1)*scale);
+    ctx.lineTo(cx + (M.a*xs + M.b*ys2)*scale, cy - (M.c*xs + M.d*ys2)*scale);
+    ctx.stroke();
+    // horizontal input line y=i
+    ctx.beginPath();
+    ctx.moveTo(cx + (M.a*-range + M.b*i)*scale, cy - (M.c*-range + M.d*i)*scale);
+    ctx.lineTo(cx + (M.a*range + M.b*i)*scale, cy - (M.c*range + M.d*i)*scale);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawArrow(ctx, x0, y0, x1, y1, color, lw=2.5, head=10, glow=true){
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = lw;
+  ctx.lineCap = 'round';
+  if (glow){ ctx.shadowColor = color; ctx.shadowBlur = 10; }
+  ctx.beginPath();
+  ctx.moveTo(x0,y0); ctx.lineTo(x1,y1);
+  ctx.stroke();
+  const ang = Math.atan2(y1-y0, x1-x0);
+  const len = Math.hypot(x1-x0, y1-y0);
+  if (len > head){
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x1 - head*Math.cos(ang-0.4), y1 - head*Math.sin(ang-0.4));
+    ctx.lineTo(x1 - head*Math.cos(ang+0.4), y1 - head*Math.sin(ang+0.4));
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawText(ctx, text, x, y, color, font='12px JetBrains Mono, ui-monospace, monospace', align='left'){
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.font = font;
+  ctx.textAlign = align;
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
+
+/* ============================================================
+   PROGRESS BAR + CHAPTER NAV
+   ============================================================ */
+addEventListener('scroll', ()=>{
+  const sc = scrollY;
+  const dh = document.documentElement.scrollHeight - innerHeight;
+  document.getElementById('progress').style.width = (sc/dh*100)+'%';
+});
+const sections = document.querySelectorAll('section.scene');
+const navLinks = document.querySelectorAll('.chapters a');
+let _activeIdx = 0;
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if (e.isIntersecting){
+      const id = e.target.id;
+      navLinks.forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+id));
+      _activeIdx = [...sections].indexOf(e.target);
+      const cnt = document.getElementById('chCounter');
+      if (cnt) cnt.textContent = `${_activeIdx+1} / ${sections.length}`;
+    }
+  });
+},{threshold:0.5});
+sections.forEach(s=>obs.observe(s));
+
+/* ============================================================
+   PRESENTER MODE — keyboard nav, theme toggle, play current
+   ============================================================ */
+function gotoChapter(i){
+  i = Math.max(0, Math.min(sections.length-1, i));
+  sections[i].scrollIntoView({behavior:'smooth', block:'start'});
+}
+function playActive(){
+  const sec = sections[_activeIdx];
+  if (!sec) return;
+  // Find the most prominent "play" button — primary class first, then any btn
+  const btn = sec.querySelector('.btn.primary') || sec.querySelector('.btn-row .btn');
+  if (btn) btn.click();
+}
+function toggleTheme(){
+  document.body.classList.toggle('light-theme');
+  // notify all canvases that the theme changed → trigger re-renders
+  window.dispatchEvent(new Event('themechange'));
+  try { localStorage.setItem('lat-theme', document.body.classList.contains('light-theme') ? 'light' : 'dark'); } catch(e){}
+}
+function showTip(){
+  const t = document.getElementById('toolbarTip');
+  t.classList.add('show');
+  clearTimeout(window._tipTimer);
+  window._tipTimer = setTimeout(()=>t.classList.remove('show'), 3500);
+}
+addEventListener('keydown', e=>{
+  if (e.target.matches('input,textarea')) return;
+  if (e.key==='ArrowRight' || e.key==='PageDown'){ e.preventDefault(); gotoChapter(_activeIdx+1); }
+  else if (e.key==='ArrowLeft' || e.key==='PageUp'){ e.preventDefault(); gotoChapter(_activeIdx-1); }
+  else if (e.key===' '){ e.preventDefault(); playActive(); }
+  else if (e.key==='t' || e.key==='T'){ toggleTheme(); }
+  else if (e.key==='?'){ showTip(); }
+  else if (e.key>='0' && e.key<='9'){
+    // 1-9 → first 9 chapters; 0 → 10
+    const n = e.key==='0' ? 10 : parseInt(e.key,10);
+    gotoChapter(n);
+  }
+});
+document.getElementById('prevBtn').addEventListener('click', ()=>gotoChapter(_activeIdx-1));
+document.getElementById('nextBtn').addEventListener('click', ()=>gotoChapter(_activeIdx+1));
+document.getElementById('playBtn').addEventListener('click', playActive);
+document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+document.getElementById('helpBtn').addEventListener('click', showTip);
+// restore theme
+try { if (localStorage.getItem('lat-theme')==='light') document.body.classList.add('light-theme'); } catch(e){}
+
+/* ============================================================
+   SCENE 0 — HERO: a quiet field of vectors that breathes
+   ============================================================ */
+(function hero(){
+  const c = document.getElementById('heroC');
+  function size(){ const r = c.parentElement.getBoundingClientRect();
+    c.width = r.width * (devicePixelRatio||1);
+    c.height = r.height * (devicePixelRatio||1);
+    c.style.width = r.width+'px'; c.style.height = r.height+'px';
+  }
+  size(); addEventListener('resize', size);
+  const ctx = c.getContext('2d');
+
+  // a grid of points pulsing softly
+  const arrows = [];
+  for(let i=0;i<60;i++){
+    arrows.push({
+      x: Math.random(), y: Math.random(),
+      ang: Math.random()*TAU,
+      len: 30+Math.random()*40,
+      drift: 0.0002 + Math.random()*0.0008,
+      hue: ['#5fe3ff','#ff5fa2','#ffd45f'][Math.floor(Math.random()*3)],
+      alpha: 0.15 + Math.random()*0.35
+    });
+  }
+  function frame(t){
+    const W = c.width, H = c.height;
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle = isLight() ? 'rgba(253,252,246,0.20)' : 'rgba(4,6,26,0.18)';
+    ctx.fillRect(0,0,W,H);
+    arrows.forEach(a=>{
+      a.ang += a.drift;
+      const cx = a.x*W, cy = a.y*H;
+      const x1 = cx + Math.cos(a.ang)*a.len*2;
+      const y1 = cy + Math.sin(a.ang)*a.len*2;
+      ctx.save();
+      ctx.globalAlpha = a.alpha;
+      drawArrow(ctx, cx, cy, x1, y1, a.hue, 1.4, 5, true);
+      ctx.restore();
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ============================================================
+   SCENE 1 — VECTOR (interactive)
+   ============================================================ */
+(function vec(){
+  const c = document.getElementById('vecC');
+  let ctx, w, h, cx, cy, scale;
+  let v = {x:3, y:2};
+  let drag = false;
+
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx = w*0.6; cy = h*0.55;
+    scale = Math.min(w,h)/9;
+  }
+  setup();
+  addEventListener('resize', ()=>{setup(); render();});
+
+  const px = x => cx + x*scale;
+  const py = y => cy - y*scale;
+  const ix = p => (p-cx)/scale;
+  const iy = p => -(p-cy)/scale;
+
+  function render(){
+    ctx.clearRect(0,0,w,h);
+    drawGrid(ctx, cx, cy, scale, w, h);
+
+    // x-decomposition (dashed pink)
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,95,162,0.4)';
+    ctx.lineWidth = 1.5; ctx.setLineDash([4,5]);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy); ctx.lineTo(px(v.x), py(0));
+    ctx.stroke();
+    // y-decomp (dashed yellow)
+    ctx.strokeStyle = 'rgba(255,212,95,0.4)';
+    ctx.beginPath();
+    ctx.moveTo(px(v.x), py(0)); ctx.lineTo(px(v.x), py(v.y));
+    ctx.stroke();
+    ctx.restore();
+
+    // basis arrows
+    drawArrow(ctx, cx, cy, px(1), py(0), 'rgba(255,95,162,0.7)', 2, 8);
+    drawArrow(ctx, cx, cy, px(0), py(1), 'rgba(255,212,95,0.7)', 2, 8);
+    drawText(ctx,'î', px(1)+4, py(0)+18, '#ff5fa2','12px JetBrains Mono');
+    drawText(ctx,'ĵ', px(0)-15, py(1)+5, '#ffd45f','12px JetBrains Mono');
+
+    // v
+    drawArrow(ctx, cx, cy, px(v.x), py(v.y), '#5fe3ff', 3.2, 12);
+    drawText(ctx, 'v', px(v.x)+10, py(v.y)-6, '#5fe3ff', '15px JetBrains Mono');
+
+    // three views — top right
+    const rx = w-26, ry = 22;
+    ctx.save();
+    ctx.font = '12px JetBrains Mono, ui-monospace, monospace';
+    ctx.textAlign = 'right';
+
+    ctx.fillStyle = COL.muted;
+    ctx.fillText('AS COORDINATES', rx, ry); ctx.fillStyle = COL.text;
+    ctx.font = '14px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(`v = [${v.x.toFixed(1)}, ${v.y.toFixed(1)}]ᵀ`, rx, ry+22);
+
+    ctx.font = '12px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillStyle = COL.muted;
+    ctx.fillText('AS A WALK', rx, ry+58);
+    ctx.fillStyle = COL.text;
+    ctx.font = '14px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(`go ${v.x.toFixed(1)} right, ${v.y.toFixed(1)} up`, rx, ry+80);
+
+    ctx.font = '12px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillStyle = COL.muted;
+    ctx.fillText('AS A RECIPE', rx, ry+116);
+    ctx.font = '14px JetBrains Mono, ui-monospace, monospace';
+    // mixed colors line
+    const recipe = `${v.x.toFixed(1)} · î  +  ${v.y.toFixed(1)} · ĵ`;
+    ctx.fillStyle = COL.text;
+    ctx.fillText(recipe, rx, ry+138);
+
+    // length
+    ctx.fillStyle = COL.muted;
+    ctx.font = '12px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('LENGTH ‖v‖', rx, ry+174);
+    ctx.fillStyle = '#ffd45f';
+    ctx.font = '14px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText((Math.hypot(v.x,v.y)).toFixed(2), rx, ry+196);
+    ctx.restore();
+  }
+
+  function pointer(e){
+    const r = c.getBoundingClientRect();
+    const x = (e.clientX || e.touches?.[0]?.clientX) - r.left;
+    const y = (e.clientY || e.touches?.[0]?.clientY) - r.top;
+    return {x, y};
+  }
+  c.addEventListener('mousedown', e=>{
+    const p = pointer(e);
+    if (Math.hypot(p.x-px(v.x),p.y-py(v.y))<28) drag=true;
+  });
+  c.addEventListener('mousemove', e=>{
+    if(!drag) return;
+    const p = pointer(e); v.x = ix(p.x); v.y = iy(p.y); render();
+  });
+  ['mouseup','mouseleave'].forEach(ev=>c.addEventListener(ev,()=>drag=false));
+  c.addEventListener('touchstart', e=>{
+    const p=pointer(e); if (Math.hypot(p.x-px(v.x),p.y-py(v.y))<32) drag=true;
+  });
+  c.addEventListener('touchmove', e=>{
+    if(!drag)return; e.preventDefault();
+    const p=pointer(e); v.x=ix(p.x); v.y=iy(p.y); render();
+  },{passive:false});
+  c.addEventListener('touchend',()=>drag=false);
+
+  render();
+})();
+
+/* ============================================================
+   SCENE 2 — SCALING (auto-sweeps λ first, user takes over)
+   ============================================================ */
+(function scl(){
+  const c = document.getElementById('scaleC');
+  let ctx, w, h, cx, cy, scale;
+  const v = {x:2, y:1.2};
+  let lambda = 1.5;
+  let auto = true;
+
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx = w/2; cy = h/2;
+    scale = Math.min(w,h)/9;
+  }
+  setup(); addEventListener('resize', ()=>{setup(); render();});
+
+  const px = x => cx + x*scale;
+  const py = y => cy - y*scale;
+
+  function render(){
+    ctx.clearRect(0,0,w,h);
+    drawGrid(ctx, cx, cy, scale, w, h);
+
+    // span line
+    ctx.save();
+    ctx.strokeStyle = COL.gridFaint;
+    ctx.lineWidth = 1; ctx.setLineDash([6,9]);
+    ctx.beginPath();
+    const t=200;
+    ctx.moveTo(px(-t*v.x), py(-t*v.y)); ctx.lineTo(px(t*v.x), py(t*v.y));
+    ctx.stroke();
+    ctx.restore();
+    drawText(ctx,'span(v)  =  the line v lives on', cx+12, h-22, COL.faint, '11px JetBrains Mono');
+
+    // original v faint
+    drawArrow(ctx, cx, cy, px(v.x), py(v.y), 'rgba(95,227,255,0.5)', 2, 10, false);
+    drawText(ctx,'v', px(v.x)+8, py(v.y)+12, 'rgba(95,227,255,0.5)','12px JetBrains Mono');
+
+    // λv vivid
+    const sx = lambda*v.x, sy = lambda*v.y;
+    drawArrow(ctx, cx, cy, px(sx), py(sy), '#ff5fa2', 3.2, 12);
+    drawText(ctx,'λv', px(sx)+8, py(sy)-8, '#ff5fa2','15px JetBrains Mono');
+
+    // huge λ readout, top-left
+    ctx.save();
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('λ', 26, 36);
+    ctx.fillStyle = lambda<0 ? '#ff5fa2' : '#5fe3ff';
+    ctx.font = '300 56px Inter, sans-serif';
+    ctx.fillText(lambda.toFixed(2), 26, 88);
+
+    // sub
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    let msg = '';
+    if (Math.abs(lambda)<0.05) msg = 'λ ≈ 0 → vector vanishes';
+    else if (lambda<0) msg = 'λ < 0 → flipped past origin';
+    else if (lambda>1) msg = 'λ > 1 → stretched';
+    else if (lambda<1) msg = '0 < λ < 1 → squished';
+    else msg = 'λ = 1 → unchanged';
+    ctx.fillText(msg, 26, 106);
+    // length label
+    ctx.fillText('‖λv‖ = ' + (Math.abs(lambda)*Math.hypot(v.x,v.y)).toFixed(2), 26, 124);
+    ctx.restore();
+
+    document.getElementById('lamV').textContent = lambda.toFixed(2);
+    document.getElementById('lam').value = lambda;
+  }
+
+  // auto sweep for first ~6s, then handover
+  let t = 0;
+  function loop(){
+    if (auto){
+      t += 0.012;
+      lambda = 2.5*Math.sin(t);
+      render();
+      if (t > 4*Math.PI) auto = false;
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  document.getElementById('lam').addEventListener('input', e=>{
+    auto = false;
+    lambda = parseFloat(e.target.value);
+    render();
+  });
+
+  render();
+})();
+
+/* ============================================================
+   SCENE 3 — ADDITION (parallelogram, draggable)
+   ============================================================ */
+(function add(){
+  const c = document.getElementById('addC');
+  let ctx, w, h, cx, cy, scale;
+  let v = {x:2, y:1};
+  let wv = {x:1, y:2};
+  let drag = null;
+  let revealT = 0; let revealing = true;
+
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx = w/2; cy = h/2;
+    scale = Math.min(w,h)/8;
+  }
+  setup(); addEventListener('resize', ()=>{setup(); render();});
+
+  const px = x => cx + x*scale;
+  const py = y => cy - y*scale;
+  const ix = p => (p-cx)/scale;
+  const iy = p => -(p-cy)/scale;
+
+  function render(){
+    ctx.clearRect(0,0,w,h);
+    drawGrid(ctx, cx, cy, scale, w, h);
+    const rT = Math.min(1, revealT);
+
+    // parallelogram fill
+    ctx.save();
+    ctx.fillStyle = `rgba(95,227,255,${0.05*rT})`;
+    ctx.strokeStyle = `rgba(95,227,255,${0.18*rT})`;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3,5]);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(px(v.x), py(v.y));
+    ctx.lineTo(px(v.x+wv.x), py(v.y+wv.y));
+    ctx.lineTo(px(wv.x), py(wv.y));
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    // tip-to-tail dashes (sequential reveal)
+    ctx.save();
+    ctx.lineWidth = 1.5; ctx.setLineDash([4,5]);
+    ctx.strokeStyle = `rgba(255,95,162,${rT*0.6})`;
+    ctx.beginPath();
+    ctx.moveTo(px(v.x), py(v.y));
+    ctx.lineTo(px(v.x+wv.x*rT), py(v.y+wv.y*rT));
+    ctx.stroke();
+    ctx.strokeStyle = `rgba(95,227,255,${rT*0.6})`;
+    ctx.beginPath();
+    ctx.moveTo(px(wv.x), py(wv.y));
+    ctx.lineTo(px(wv.x+v.x*rT), py(wv.y+v.y*rT));
+    ctx.stroke();
+    ctx.restore();
+
+    // arrows
+    drawArrow(ctx, cx, cy, px(v.x), py(v.y), '#5fe3ff', 3, 12);
+    drawArrow(ctx, cx, cy, px(wv.x), py(wv.y), '#ff5fa2', 3, 12);
+    if (rT > 0.99){
+      drawArrow(ctx, cx, cy, px(v.x+wv.x), py(v.y+wv.y), '#ffd45f', 3.5, 13);
+      drawText(ctx, 'v + w', px(v.x+wv.x)+10, py(v.y+wv.y)-6, '#ffd45f','15px JetBrains Mono');
+    }
+    drawText(ctx,'v', px(v.x)+8, py(v.y)+18, '#5fe3ff','14px JetBrains Mono');
+    drawText(ctx,'w', px(wv.x)+8, py(wv.y)+18, '#ff5fa2','14px JetBrains Mono');
+
+    // big eq, top right
+    ctx.save();
+    ctx.font = '12px JetBrains Mono, ui-monospace, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = COL.muted;
+    ctx.fillText('CLOSURE — STILL A VECTOR', w-26, 36);
+    ctx.font = '15px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillStyle = COL.text;
+    ctx.fillText(`[${v.x.toFixed(1)}, ${v.y.toFixed(1)}] + [${wv.x.toFixed(1)}, ${wv.y.toFixed(1)}]`, w-26, 64);
+    ctx.fillStyle = '#ffd45f';
+    ctx.fillText(`= [${(v.x+wv.x).toFixed(1)}, ${(v.y+wv.y).toFixed(1)}]`, w-26, 88);
+    ctx.restore();
+  }
+
+  function pointer(e){
+    const r = c.getBoundingClientRect();
+    const x = (e.clientX || e.touches?.[0]?.clientX) - r.left;
+    const y = (e.clientY || e.touches?.[0]?.clientY) - r.top;
+    return {x,y};
+  }
+  c.addEventListener('mousedown', e=>{
+    const p = pointer(e);
+    if (Math.hypot(p.x-px(v.x),p.y-py(v.y))<28) drag='v';
+    else if (Math.hypot(p.x-px(wv.x),p.y-py(wv.y))<28) drag='w';
+  });
+  c.addEventListener('mousemove', e=>{
+    if(!drag) return;
+    const p = pointer(e);
+    if (drag==='v'){v.x=ix(p.x); v.y=iy(p.y);} else {wv.x=ix(p.x); wv.y=iy(p.y);}
+    render();
+  });
+  ['mouseup','mouseleave'].forEach(ev=>c.addEventListener(ev,()=>drag=null));
+
+  function loop(){
+    if (revealing){
+      revealT += 0.02;
+      if (revealT >= 1.05){ revealing = false; revealT = 1; }
+      render();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+  render();
+})();
+
+/* ============================================================
+   SCENE 4 — SPAN (the magic)
+   ============================================================ */
+let _spanCase = 'indep';
+let _renderSpan = null;
+let _spanV1 = {x:1.4, y:0.4};
+let _spanV2 = {x:0.4, y:1.4};
+let _spanA = 0, _spanB = 0;
+let _spanPaints = []; // accumulated reachable points
+
+function setSpanCase(c){
+  _spanCase = c;
+  document.getElementById('spIndep').classList.toggle('active', c==='indep');
+  document.getElementById('spDep').classList.toggle('active', c==='dep');
+  if (c==='indep'){ _spanV1={x:1.4,y:0.4}; _spanV2={x:0.4,y:1.4}; }
+  else { _spanV1={x:1.4,y:0.4}; _spanV2={x:-1.4,y:-0.4}; }
+  _spanPaints = [];
+  if (_renderSpan) _renderSpan();
+}
+
+let _spanAnimating = false;
+function paintSpan(){
+  if (_spanAnimating) return;
+  _spanAnimating = true;
+  _spanPaints = [];
+  let t = 0;
+  const steps = 360;
+  const interval = setInterval(()=>{
+    t++;
+    const ang = t/steps * TAU * 1.5;
+    _spanA = 2.4*Math.cos(ang);
+    _spanB = 2.4*Math.sin(ang*1.8);
+    _spanPaints.push({a:_spanA, b:_spanB});
+    if (_renderSpan) _renderSpan();
+    if (t >= steps){ clearInterval(interval); _spanAnimating = false; }
+  }, 8);
+}
+
+(function spn(){
+  const c = document.getElementById('spanC');
+  let ctx, w, h, cx, cy, scale;
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx=w/2; cy=h/2; scale=Math.min(w,h)/9;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  const px = x => cx + x*scale;
+  const py = y => cy - y*scale;
+
+  function render(){
+    ctx.clearRect(0,0,w,h);
+
+    // Background "span shading"
+    if (_spanCase === 'indep'){
+      const grad = ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(w,h)*0.7);
+      grad.addColorStop(0,'rgba(178,155,255,0.16)');
+      grad.addColorStop(1,'rgba(178,155,255,0)');
+      ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+    } else {
+      // line
+      ctx.save();
+      ctx.strokeStyle = 'rgba(178,155,255,0.55)';
+      ctx.lineWidth = 4;
+      ctx.shadowColor = '#b29bff'; ctx.shadowBlur = 18;
+      ctx.beginPath();
+      const t = 1000;
+      ctx.moveTo(px(-t*_spanV1.x), py(-t*_spanV1.y));
+      ctx.lineTo(px(t*_spanV1.x), py(t*_spanV1.y));
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    drawGrid(ctx, cx, cy, scale, w, h);
+
+    // painted reachable points
+    ctx.save();
+    _spanPaints.forEach((p, i)=>{
+      const rx = p.a*_spanV1.x + p.b*_spanV2.x;
+      const ry = p.a*_spanV1.y + p.b*_spanV2.y;
+      const X = px(rx), Y = py(ry);
+      const alpha = 0.06 + (i/_spanPaints.length)*0.4;
+      ctx.fillStyle = `rgba(255,212,95,${alpha})`;
+      ctx.beginPath(); ctx.arc(X,Y,2.5,0,TAU); ctx.fill();
+    });
+    ctx.restore();
+
+    // current α v1 + β v2
+    const rx = _spanA*_spanV1.x + _spanB*_spanV2.x;
+    const ry = _spanA*_spanV1.y + _spanB*_spanV2.y;
+    if (Math.abs(_spanA)+Math.abs(_spanB) > 0.001){
+      ctx.save();
+      ctx.strokeStyle = 'rgba(95,227,255,0.5)'; ctx.setLineDash([3,4]);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy); ctx.lineTo(px(_spanA*_spanV1.x), py(_spanA*_spanV1.y));
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,95,162,0.5)';
+      ctx.beginPath();
+      ctx.moveTo(px(_spanA*_spanV1.x), py(_spanA*_spanV1.y));
+      ctx.lineTo(px(rx), py(ry));
+      ctx.stroke();
+      ctx.restore();
+      drawArrow(ctx, cx, cy, px(rx), py(ry), '#ffd45f', 3, 12);
+    }
+
+    // base vectors
+    drawArrow(ctx, cx, cy, px(_spanV1.x), py(_spanV1.y), '#5fe3ff', 3, 12);
+    drawArrow(ctx, cx, cy, px(_spanV2.x), py(_spanV2.y), '#ff5fa2', 3, 12);
+    drawText(ctx,'v', px(_spanV1.x)+8, py(_spanV1.y)-6, '#5fe3ff','14px JetBrains Mono');
+    drawText(ctx,'w', px(_spanV2.x)+8, py(_spanV2.y)-6, '#ff5fa2','14px JetBrains Mono');
+
+    // big readout
+    ctx.save();
+    ctx.font='11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillStyle=COL.muted;
+    ctx.fillText('REACHABLE  =  α·v + β·w', 24, h-30);
+    ctx.font='12px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillStyle = _spanCase==='indep' ? '#5fffb0' : '#ff5fa2';
+    ctx.fillText(_spanCase==='indep' ? 'span = ENTIRE PLANE  (v, w independent)' : 'span = ONE LINE  (v, w dependent — collapsed)', 24, h-12);
+    ctx.restore();
+  }
+  _renderSpan = render;
+  render();
+})();
+
+/* ============================================================
+   SCENE 5 — 3D vector
+   ============================================================ */
+(function v3d(){
+  const c = document.getElementById('threeC');
+  let ctx, w, h, cx, cy;
+  let scale = 80;
+  let yaw = 0.7, pitch = 0.5;
+  let drag = false, lx=0, ly=0;
+  const v = {x:2, y:1.5, z:1.2};
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx=w/2; cy=h/2;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  function project(p){
+    const cyaw=Math.cos(yaw), syaw=Math.sin(yaw);
+    const cpit=Math.cos(pitch), spit=Math.sin(pitch);
+    let x = p.x*cyaw - p.z*syaw;
+    let z = p.x*syaw + p.z*cyaw;
+    let y = p.y*cpit - z*spit;
+    z = p.y*spit + z*cpit;
+    const f = 700/(z + 7);
+    return {x: cx + x*scale*f/100, y: cy - y*scale*f/100, depth:z};
+  }
+  function arr(a,b,col,lw=2.5){
+    const A=project(a),B=project(b);
+    drawArrow(ctx, A.x, A.y, B.x, B.y, col, lw, 9);
+  }
+  function lab(t,p,col){
+    const P=project(p);
+    drawText(ctx, t, P.x+6, P.y-6, col, '12px JetBrains Mono');
+  }
+  function render(){
+    ctx.clearRect(0,0,w,h);
+    // floor grid
+    ctx.save();
+    ctx.strokeStyle=COL.gridFaint;
+    for(let i=-4;i<=4;i++){
+      const a=project({x:i,y:0,z:-4}), b=project({x:i,y:0,z:4});
+      const cz=project({x:-4,y:0,z:i}), d=project({x:4,y:0,z:i});
+      ctx.beginPath();
+      ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+      ctx.moveTo(cz.x,cz.y); ctx.lineTo(d.x,d.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // axes
+    arr({x:0,y:0,z:0},{x:3.2,y:0,z:0}, 'rgba(255,95,162,0.85)');
+    arr({x:0,y:0,z:0},{x:0,y:3.2,z:0}, 'rgba(255,212,95,0.85)');
+    arr({x:0,y:0,z:0},{x:0,y:0,z:3.2}, 'rgba(95,255,176,0.85)');
+    lab('î (x)',{x:3.4,y:0,z:0},'#ff5fa2');
+    lab('ĵ (y)',{x:0,y:3.4,z:0},'#ffd45f');
+    lab('k̂ (z)',{x:0,y:0,z:3.4},'#5fffb0');
+
+    // dashed projections
+    ctx.save();
+    ctx.strokeStyle='rgba(95,227,255,0.3)'; ctx.setLineDash([3,4]);
+    let A=project({x:v.x,y:0,z:v.z}), B=project({x:v.x,y:v.y,z:v.z});
+    ctx.beginPath(); ctx.moveTo(A.x,A.y); ctx.lineTo(B.x,B.y); ctx.stroke();
+    let C=project({x:0,y:0,z:0}), D=project({x:v.x,y:0,z:v.z});
+    ctx.beginPath(); ctx.moveTo(C.x,C.y); ctx.lineTo(D.x,D.y); ctx.stroke();
+    ctx.restore();
+
+    arr({x:0,y:0,z:0}, v, '#5fe3ff', 3);
+    lab(`v=[${v.x.toFixed(1)}, ${v.y.toFixed(1)}, ${v.z.toFixed(1)}]`, {x:v.x,y:v.y+0.3,z:v.z},'#5fe3ff');
+
+    // hint
+    drawText(ctx, 'And in ℝ⁷⁸⁴? Same rules. We just can’t draw it.', 24, h-22, COL.muted,'12px JetBrains Mono');
+  }
+
+  c.addEventListener('mousedown', e=>{drag=true; lx=e.clientX; ly=e.clientY;});
+  addEventListener('mouseup',()=>drag=false);
+  c.addEventListener('mousemove', e=>{
+    if(!drag) return;
+    yaw -= (e.clientX-lx)*0.01;
+    pitch += (e.clientY-ly)*0.01;
+    pitch = Math.max(-1.4, Math.min(1.4, pitch));
+    lx=e.clientX; ly=e.clientY;
+    render();
+  });
+  c.addEventListener('wheel', e=>{e.preventDefault(); scale=Math.max(30,Math.min(150,scale-e.deltaY*0.05)); render();});
+  let auto=true; c.addEventListener('mousedown',()=>auto=false);
+  function loop(){ if(auto) yaw+=0.003; render(); requestAnimationFrame(loop); }
+  loop();
+})();
+
+/* ============================================================
+   SCENE 6 — MATRIX = where basis vectors land
+   ============================================================ */
+(function mat(){
+  const c = document.getElementById('matC');
+  let ctx, w, h, cx, cy, scale;
+  let M = {a:2, b:0.5, c:0.5, d:1.5}; // a,b cols → î, ĵ destinations
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx=w/2; cy=h/2; scale=Math.min(w,h)/9;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  const px = x => cx + x*scale;
+  const py = y => cy - y*scale;
+
+  function render(){
+    ctx.clearRect(0,0,w,h);
+    drawGrid(ctx, cx, cy, scale, w, h, {color:COL.gridFaint});
+
+    // transformed grid (subtle)
+    drawTransformedGrid(ctx, cx, cy, scale, w, h, M, 0.18);
+
+    // unit square mapped
+    ctx.save();
+    ctx.fillStyle = 'rgba(95,227,255,0.10)';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(px(M.a), py(M.c));
+    ctx.lineTo(px(M.a+M.b), py(M.c+M.d));
+    ctx.lineTo(px(M.b), py(M.d));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // ghost î, ĵ
+    drawArrow(ctx, cx, cy, px(1), py(0), 'rgba(255,95,162,0.3)', 1.5, 8, false);
+    drawArrow(ctx, cx, cy, px(0), py(1), 'rgba(255,212,95,0.3)', 1.5, 8, false);
+
+    // moved î, ĵ
+    drawArrow(ctx, cx, cy, px(M.a), py(M.c), '#ff5fa2', 3, 13);
+    drawArrow(ctx, cx, cy, px(M.b), py(M.d), '#ffd45f', 3, 13);
+    drawText(ctx,'î →', px(M.a)+8, py(M.c)-8, '#ff5fa2','13px JetBrains Mono');
+    drawText(ctx,'ĵ →', px(M.b)+8, py(M.d)-8, '#ffd45f','13px JetBrains Mono');
+
+    // matrix display top right
+    ctx.save();
+    ctx.font='12px JetBrains Mono, ui-monospace, monospace';
+    ctx.textAlign='right';
+    ctx.fillStyle=COL.muted;
+    ctx.fillText('A  =  [ col₁ | col₂ ]', w-24, 36);
+    ctx.fillStyle=COL.text;
+    ctx.font='30px Inter, sans-serif';
+    ctx.fillText('A', w-180, 76);
+    ctx.font='400 18px JetBrains Mono, ui-monospace, monospace';
+    ctx.textAlign='left';
+    ctx.fillStyle='#ff5fa2';
+    ctx.fillText(M.a.toFixed(2), w-150, 64);
+    ctx.fillStyle='#ffd45f';
+    ctx.fillText(M.b.toFixed(2), w-90, 64);
+    ctx.fillStyle='#ff5fa2';
+    ctx.fillText(M.c.toFixed(2), w-150, 88);
+    ctx.fillStyle='#ffd45f';
+    ctx.fillText(M.d.toFixed(2), w-90, 88);
+    // brackets
+    ctx.strokeStyle='#5fe3ff'; ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(w-160, 50); ctx.lineTo(w-165, 50); ctx.lineTo(w-165, 100); ctx.lineTo(w-160, 100);
+    ctx.moveTo(w-50, 50); ctx.lineTo(w-45, 50); ctx.lineTo(w-45, 100); ctx.lineTo(w-50, 100);
+    ctx.stroke();
+    ctx.restore();
+
+    // hint at bottom
+    drawText(ctx, 'A·[x,y]ᵀ  =  x·col₁  +  y·col₂', 24, h-22, COL.muted,'12px JetBrains Mono');
+
+    document.getElementById('m11V').textContent = M.a.toFixed(2);
+    document.getElementById('m21V').textContent = M.c.toFixed(2);
+    document.getElementById('m12V').textContent = M.b.toFixed(2);
+    document.getElementById('m22V').textContent = M.d.toFixed(2);
+  }
+  ['m11','m21','m12','m22'].forEach((id, k)=>{
+    const map = {m11:'a', m21:'c', m12:'b', m22:'d'};
+    document.getElementById(id).addEventListener('input', e=>{
+      M[map[id]] = parseFloat(e.target.value); render();
+    });
+  });
+  render();
+})();
+
+/* ============================================================
+   SCENE 7 — DATA: photo as matrix, dataset as matrix, NN layer
+   ============================================================ */
+(function dat(){
+  const c = document.getElementById('dataC');
+  let ctx, w, h;
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  // a 12x12 "digit" pattern
+  const W = 12;
+  const img = [];
+  for(let y=0;y<W;y++){
+    const row=[];
+    for(let x=0;x<W;x++){
+      const dx=x-5.5, dy=y-5.5;
+      const r=Math.hypot(dx,dy);
+      let v = 0;
+      // a "3"-like shape
+      if (r<5){
+        const ang = Math.atan2(dy,dx);
+        if (ang>-1.6 && ang<1.6 && r>3) v = Math.max(0, 1 - Math.abs(r-4)/1.5);
+        if (Math.abs(dx)<3 && Math.abs(dy)<0.7) v = Math.max(v, 0.7);
+      }
+      row.push(Math.min(1, v + Math.random()*0.05));
+    }
+    img.push(row);
+  }
+  // a small dataset (2D)
+  const dataset = [
+    [25,32,16,0],[42,78,14,1],[31,55,18,1],[19,24,12,0],[58,110,16,1],[37,64,17,1],
+    [22,28,12,0],[48,90,15,1],[33,52,14,1],[27,44,13,0],[51,98,18,1],[40,73,17,1]
+  ];
+
+  function render(){
+    ctx.clearRect(0,0,w,h);
+
+    // Three panels horizontally
+    const padX = w*0.04;
+    const panelW = (w - padX*4)/3;
+    const panelH = h - 80;
+    const top = 50;
+
+    function panel(idx, label, sub, drawFn){
+      const x0 = padX + idx*(panelW+padX);
+      // panel bg
+      ctx.save();
+      ctx.fillStyle = COL.gridFaint;
+      ctx.strokeStyle = COL.gridFaint;
+      ctx.lineWidth = 1;
+      const radius = 14;
+      ctx.beginPath();
+      ctx.moveTo(x0+radius, top);
+      ctx.arcTo(x0+panelW, top, x0+panelW, top+panelH, radius);
+      ctx.arcTo(x0+panelW, top+panelH, x0, top+panelH, radius);
+      ctx.arcTo(x0, top+panelH, x0, top, radius);
+      ctx.arcTo(x0, top, x0+panelW, top, radius);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+
+      // label
+      ctx.fillStyle = COL.muted;
+      ctx.font = '10px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText(label, x0+18, top+22);
+      ctx.fillStyle = COL.text;
+      ctx.font = '300 18px Inter, sans-serif';
+      ctx.fillText(sub, x0+18, top+44);
+
+      drawFn(x0, top, panelW, panelH);
+    }
+
+    // PANEL 1 — image as matrix
+    panel(0, 'PANEL 1', 'A photo is a matrix.', (x0,y0,pw,ph)=>{
+      const cellSize = Math.min(pw,ph) * 0.052;
+      const totalGrid = cellSize * W;
+      const gx = x0 + (pw - totalGrid)/2;
+      const gy = y0 + 80;
+      for(let y=0;y<W;y++)for(let x=0;x<W;x++){
+        const v = img[y][x];
+        ctx.fillStyle = `rgba(${Math.floor(v*95)}, ${Math.floor(v*227)}, ${Math.floor(v*255)}, 1)`;
+        ctx.fillRect(gx + x*cellSize, gy + y*cellSize, cellSize-0.5, cellSize-0.5);
+      }
+      // label
+      ctx.fillStyle = COL.muted;
+      ctx.font = '10px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText(`pixel matrix · ${W}×${W}`, gx, gy + totalGrid + 22);
+      ctx.fillStyle = '#5fe3ff';
+      ctx.fillText(`every cell ∈ [0, 255]`, gx, gy + totalGrid + 38);
+
+      // little bracket-flair
+      ctx.strokeStyle = '#5fe3ff'; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(gx-8, gy); ctx.lineTo(gx-12, gy);
+      ctx.lineTo(gx-12, gy+totalGrid); ctx.lineTo(gx-8, gy+totalGrid);
+      ctx.moveTo(gx+totalGrid+8, gy); ctx.lineTo(gx+totalGrid+12, gy);
+      ctx.lineTo(gx+totalGrid+12, gy+totalGrid); ctx.lineTo(gx+totalGrid+8, gy+totalGrid);
+      ctx.stroke();
+    });
+
+    // PANEL 2 — dataset as matrix
+    panel(1, 'PANEL 2', 'A dataset is a matrix.', (x0,y0,pw,ph)=>{
+      const tx = x0 + 20;
+      let ty = y0 + 80;
+      ctx.fillStyle = COL.muted;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText('     age   inc   edu   y', tx, ty);
+      ty += 18;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      dataset.forEach((row,i)=>{
+        ctx.fillStyle = COL.muted;
+        ctx.fillText(`x${i+1}`.padEnd(4,' '), tx, ty);
+        ctx.fillStyle = '#5fe3ff';
+        ctx.fillText(`${row[0]}`.padStart(4,' '), tx+30, ty);
+        ctx.fillText(`${row[1]}`.padStart(5,' '), tx+70, ty);
+        ctx.fillText(`${row[2]}`.padStart(4,' '), tx+115, ty);
+        ctx.fillStyle = row[3]?'#5fffb0':'#ff5fa2';
+        ctx.fillText(`${row[3]}`.padStart(4,' '), tx+150, ty);
+        ty += 16;
+      });
+      ctx.fillStyle = COL.muted;
+      ctx.font = '10px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText('rows = examples · cols = features', tx, ty+14);
+      ctx.fillStyle = '#ff5fa2';
+      ctx.fillText('every customer is a vector', tx, ty+30);
+    });
+
+    // PANEL 3 — neural net layer
+    panel(2, 'PANEL 3', 'A neural layer is matrices.', (x0,y0,pw,ph)=>{
+      // Visualize y = Wx + b — show input dot, weight matrix bar, output dot
+      const cyc = y0 + ph*0.55;
+      const inX = x0 + 36;
+      const wL = pw*0.4;
+      const wR = inX + 80;
+      const outX = x0 + pw - 50;
+      // input column
+      ctx.fillStyle=COL.muted;
+      ctx.font='10px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText('input  x', inX-12, y0+80);
+      ctx.fillText('ℝ⁷⁸⁴', inX-12, y0+95);
+      // input dots
+      const nIn = 12;
+      const nOut = 6;
+      for(let i=0;i<nIn;i++){
+        ctx.fillStyle='rgba(95,227,255,0.7)';
+        ctx.beginPath(); ctx.arc(inX, y0+115 + i*16, 5, 0, TAU); ctx.fill();
+      }
+      // output dots
+      for(let i=0;i<nOut;i++){
+        ctx.fillStyle='rgba(255,95,162,0.7)';
+        ctx.beginPath(); ctx.arc(outX, y0+135 + i*22, 5, 0, TAU); ctx.fill();
+      }
+      // connections (sample)
+      ctx.strokeStyle=COL.gridFaint;
+      ctx.lineWidth=1;
+      for(let i=0;i<nIn;i++)for(let j=0;j<nOut;j++){
+        ctx.beginPath();
+        ctx.moveTo(inX+5, y0+115+i*16);
+        ctx.lineTo(outX-5, y0+135+j*22);
+        ctx.stroke();
+      }
+      // matrix glyph in middle
+      const mx = (inX+outX)/2 - 30, my = y0+ph*0.5 - 30;
+      ctx.fillStyle = 'rgba(255,212,95,0.15)';
+      ctx.fillRect(mx, my, 60, 60);
+      ctx.strokeStyle = '#ffd45f';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(mx, my, 60, 60);
+      ctx.fillStyle = '#ffd45f';
+      ctx.font = '300 28px Inter, sans-serif';
+      ctx.textAlign='center';
+      ctx.fillText('W', mx+30, my+38);
+      ctx.textAlign='left';
+      ctx.fillStyle=COL.muted;
+      ctx.font='10px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText('256×784', mx+12, my+74);
+
+      ctx.fillStyle=COL.muted;
+      ctx.fillText('output  y', outX-20, y0+115);
+      ctx.fillText('ℝ²⁵⁶', outX-12, y0+130);
+
+      // bottom equation
+      ctx.fillStyle=COL.text;
+      ctx.font='15px JetBrains Mono, ui-monospace, monospace';
+      ctx.textAlign='center';
+      ctx.fillText('y  =  W · x  +  b', x0+pw/2, y0+ph-30);
+      ctx.fillStyle=COL.muted;
+      ctx.font='11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText('every layer in every model — a matrix multiply', x0+pw/2, y0+ph-12);
+      ctx.textAlign='left';
+    });
+  }
+  render();
+})();
+
+/* ============================================================
+   SCENE 8 — TRANSFORM (THE big moment)
+   Side-by-side. Left: input. Right: output morphing.
+   Plus a "follow the point" feature.
+   ============================================================ */
+let _T = {a:1,b:0,c:0,d:1};
+let _Tfrom = {..._T};
+let _Tto = {..._T};
+let _Tprog = 1; // 1 = settled
+let _Tspeed = 0.012;
+let _renderTr = null;
+const _samplePoints = [];
+for(let i=0;i<5;i++)for(let j=0;j<5;j++){
+  if (i===2 && j===2) continue;
+  _samplePoints.push({x:i-2, y:j-2});
+}
+// Click-to-trace points
+const _trClicks = []; // each: {x, y, hue}
+const _trHues = ['#5fe3ff','#ff5fa2','#ffd45f','#5fffb0','#b29bff'];
+function clearTrClicks(){ _trClicks.length = 0; }
+
+function setTransformPreset(name){
+  const presets = {
+    rotate: {a:0, b:-1, c:1, d:0},
+    shear: {a:1, b:1, c:0, d:1},
+    stretch: {a:2, b:0, c:0, d:0.5},
+    reflect: {a:1, b:1.5, c:1.5, d:1},
+    collapse: {a:1, b:1, c:2, d:2},
+    reset: {a:1, b:0, c:0, d:1}
+  };
+  const target = presets[name];
+  if (!target) return;
+  _Tfrom = {..._T};
+  _Tto = target;
+  _Tprog = 0;
+}
+
+(function tr(){
+  const c = document.getElementById('trC');
+  let ctx, w, h, halfW, cx1, cy, cx2, scale;
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    halfW = w/2;
+    cx1 = halfW/2; cx2 = halfW + halfW/2; cy = h/2;
+    scale = Math.min(halfW, h)/8;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  // click → trace a point through A
+  c.addEventListener('click', e=>{
+    const rect = c.getBoundingClientRect();
+    const px = (e.clientX - rect.left) * (w/rect.width);
+    const py = (e.clientY - rect.top) * (h/rect.height);
+    if (px >= halfW) return; // only left side accepts clicks
+    const x = (px - cx1) / scale;
+    const y = -(py - cy) / scale;
+    const hue = _trHues[_trClicks.length % _trHues.length];
+    _trClicks.push({x, y, hue});
+    if (_trClicks.length > 6) _trClicks.shift(); // cap at 6 for clarity
+  });
+  function render(){
+    ctx.clearRect(0,0,w,h);
+
+    // labels
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('INPUT SPACE   x', 24, 28);
+    ctx.fillText('OUTPUT SPACE   Ax', halfW+24, 28);
+
+    // divider
+    ctx.strokeStyle = COL.gridFaint;
+    ctx.beginPath();
+    ctx.moveTo(halfW, 20); ctx.lineTo(halfW, h-20);
+    ctx.stroke();
+
+    // LEFT: static grid + identity arrows
+    drawGrid(ctx, cx1, cy, scale, halfW, h);
+    drawArrow(ctx, cx1, cy, cx1+scale, cy, '#ff5fa2', 2.5, 10);
+    drawArrow(ctx, cx1, cy, cx1, cy-scale, '#ffd45f', 2.5, 10);
+    // unit square
+    ctx.save();
+    ctx.fillStyle = 'rgba(95,227,255,0.10)';
+    ctx.fillRect(cx1, cy-scale, scale, scale);
+    ctx.restore();
+
+    // sample points (left, faded)
+    _samplePoints.forEach(p=>{
+      ctx.fillStyle = 'rgba(95,255,176,0.5)';
+      ctx.beginPath();
+      ctx.arc(cx1+p.x*scale, cy-p.y*scale, 3, 0, TAU);
+      ctx.fill();
+    });
+
+    // RIGHT: morphed
+    // axes (clipped to right half by virtue of cx2)
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(halfW+1, 0, halfW-1, h);
+    ctx.clip();
+
+    // base grid (faint)
+    drawGrid(ctx, cx2, cy, scale, w, h, {color:COL.gridFaint});
+    // transformed grid (vivid)
+    drawTransformedGrid(ctx, cx2, cy, scale, w, h, _T, 0.22);
+
+    // unit square transformed
+    ctx.fillStyle = 'rgba(95,227,255,0.14)';
+    ctx.beginPath();
+    ctx.moveTo(cx2, cy);
+    ctx.lineTo(cx2 + _T.a*scale, cy - _T.c*scale);
+    ctx.lineTo(cx2 + (_T.a+_T.b)*scale, cy - (_T.c+_T.d)*scale);
+    ctx.lineTo(cx2 + _T.b*scale, cy - _T.d*scale);
+    ctx.closePath();
+    ctx.fill();
+
+    // moved basis arrows
+    drawArrow(ctx, cx2, cy, cx2+_T.a*scale, cy-_T.c*scale, '#ff5fa2', 3, 12);
+    drawArrow(ctx, cx2, cy, cx2+_T.b*scale, cy-_T.d*scale, '#ffd45f', 3, 12);
+
+    // sample points moved
+    _samplePoints.forEach(p=>{
+      const tx = _T.a*p.x + _T.b*p.y;
+      const ty = _T.c*p.x + _T.d*p.y;
+      ctx.fillStyle = 'rgba(95,255,176,0.9)';
+      ctx.shadowColor = '#5fffb0'; ctx.shadowBlur = 6;
+      ctx.beginPath();
+      ctx.arc(cx2+tx*scale, cy-ty*scale, 3, 0, TAU);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+
+    // click-traced points (image side)
+    _trClicks.forEach(p=>{
+      const tx = _T.a*p.x + _T.b*p.y;
+      const ty = _T.c*p.x + _T.d*p.y;
+      ctx.save();
+      ctx.fillStyle = p.hue;
+      ctx.shadowColor = p.hue; ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.arc(cx2+tx*scale, cy-ty*scale, 6, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+      ctx.fillStyle = p.hue;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText(`Ax=[${tx.toFixed(2)}, ${ty.toFixed(2)}]`, cx2+tx*scale+10, cy-ty*scale-8);
+    });
+    ctx.restore();
+
+    // click-traced points (input side, with leader line into the divider)
+    _trClicks.forEach(p=>{
+      const X = cx1 + p.x*scale, Y = cy - p.y*scale;
+      ctx.save();
+      ctx.fillStyle = p.hue;
+      ctx.shadowColor = p.hue; ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.arc(X, Y, 6, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+      ctx.fillStyle = p.hue;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText(`x=[${p.x.toFixed(2)}, ${p.y.toFixed(2)}]`, X+10, Y-8);
+      // dashed connector across divider
+      const tx = _T.a*p.x + _T.b*p.y;
+      const ty = _T.c*p.x + _T.d*p.y;
+      const X2 = cx2 + tx*scale, Y2 = cy - ty*scale;
+      ctx.save();
+      ctx.strokeStyle = p.hue;
+      ctx.globalAlpha = 0.35;
+      ctx.setLineDash([4,5]);
+      ctx.beginPath();
+      ctx.moveTo(X, Y); ctx.lineTo(X2, Y2);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // matrix display under
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('A  =', halfW+24, h-30);
+    ctx.fillStyle = '#ff5fa2';
+    ctx.font = '15px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(_T.a.toFixed(2), halfW+72, h-44);
+    ctx.fillText(_T.c.toFixed(2), halfW+72, h-26);
+    ctx.fillStyle = '#ffd45f';
+    ctx.fillText(_T.b.toFixed(2), halfW+128, h-44);
+    ctx.fillText(_T.d.toFixed(2), halfW+128, h-26);
+    // det
+    const det = _T.a*_T.d - _T.b*_T.c;
+    ctx.fillStyle = Math.abs(det)<0.01 ? '#ff5fa2' : (det<0 ? '#ff5fa2' : COL.muted);
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(`det = ${det.toFixed(2)}${Math.abs(det)<0.01?' · DIMENSION COLLAPSED':(det<0?' · ORIENTATION FLIPPED':'')}`, halfW+24, h-8);
+  }
+  _renderTr = render;
+
+  function loop(){
+    if (_Tprog < 1){
+      _Tprog = Math.min(1, _Tprog + _Tspeed);
+      const e = easeInOutCubic(_Tprog);
+      _T = {
+        a: lerp(_Tfrom.a, _Tto.a, e),
+        b: lerp(_Tfrom.b, _Tto.b, e),
+        c: lerp(_Tfrom.c, _Tto.c, e),
+        d: lerp(_Tfrom.d, _Tto.d, e)
+      };
+    }
+    render();  // always render so clicks/theme update
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ============================================================
+   SCENE 9 — Ax = b  ROW PICTURE | COLUMN PICTURE  side-by-side
+   ============================================================ */
+let _axbProg = 0; let _axbAnim = false;
+function playAxb(){ _axbAnim = true; _axbProg = 0; }
+function resetAxb(){ _axbAnim = false; _axbProg = 0; }
+
+(function axb(){
+  const c = document.getElementById('axbC');
+  let ctx, w, h, halfW, cx1, cx2, cy, scale;
+  // System: 2x+y=5, x+3y=10  → solution x=1, y=3
+  // A = [[2,1],[1,3]], b = [5,10]
+  const A = {a:2,b:1,c:1,d:3};
+  const col1 = {x:2, y:1};   // first column of A
+  const col2 = {x:1, y:3};   // second column of A
+  const ans = {x:1, y:3};    // solution: 1·col1 + 3·col2 = b
+  const target = {x:5, y:10};
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    halfW = w/2; cx1 = halfW/2; cx2 = halfW+halfW/2; cy = h/2;
+    scale = Math.min(halfW,h)/12;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  function render(){
+    ctx.clearRect(0,0,w,h);
+
+    // headers
+    ctx.fillStyle=COL.muted;
+    ctx.font='11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('ROW PICTURE  ·  two equations = two lines', 24, 28);
+    ctx.fillText('COLUMN PICTURE  ·  combine columns to reach b', halfW+24, 28);
+
+    // divider
+    ctx.strokeStyle=COL.gridFaint;
+    ctx.beginPath(); ctx.moveTo(halfW, 20); ctx.lineTo(halfW, h-20); ctx.stroke();
+
+    drawGrid(ctx, cx1, cy, scale, halfW, h);
+    drawGrid(ctx, cx2, cy, scale, w, h, {color:COL.gridFaint});
+
+    // animation progress
+    let p = 1;
+    if (_axbAnim){
+      _axbProg = Math.min(1, _axbProg + 0.006);
+      p = easeInOutCubic(_axbProg);
+      if (_axbProg >= 1) _axbAnim = false;
+    }
+
+    // ====================================================
+    // LEFT — ROW PICTURE
+    // Two equations:  2x + y = 5,   x + 3y = 10
+    // Lines: y = 5 - 2x,   y = (10 - x)/3
+    // ====================================================
+    function drawLineL(fn, color, label){
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = color; ctx.shadowBlur = 8;
+      ctx.beginPath();
+      let started=false;
+      for(let xv=-12; xv<=12; xv+=0.05){
+        const yv = fn(xv);
+        const X = cx1+xv*scale, Y = cy-yv*scale;
+        if (X<8 || X>halfW-8) { started=false; continue; }
+        if (!started){ ctx.moveTo(X,Y); started=true; } else ctx.lineTo(X,Y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+    drawLineL(x=>5-2*x, '#5fe3ff');
+    drawLineL(x=>(10-x)/3, '#ff5fa2');
+    drawText(ctx, '2x + y = 5', 24, 50, '#5fe3ff', '12px JetBrains Mono');
+    drawText(ctx, 'x + 3y = 10', 24, 68, '#ff5fa2', '12px JetBrains Mono');
+
+    // intersection point (the solution) — appear with progress
+    const ix = ans.x, iy = ans.y;
+    const aR = 9 * (0.4 + 0.6*p);
+    ctx.save();
+    ctx.fillStyle = '#ffd45f';
+    ctx.globalAlpha = 0.4 + 0.6*p;
+    ctx.shadowColor = '#ffd45f'; ctx.shadowBlur = 6 + 18*p;
+    ctx.beginPath(); ctx.arc(cx1+ix*scale, cy-iy*scale, aR, 0, TAU); ctx.fill();
+    ctx.restore();
+    drawText(ctx, `(${ix}, ${iy})`, cx1+ix*scale+12, cy-iy*scale-12, '#ffd45f', '12px JetBrains Mono');
+
+    // row-pic equation panel bottom
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('two lines  ·  one intersection  ·  one solution', 24, h-12);
+
+    // ====================================================
+    // RIGHT — COLUMN PICTURE
+    // Build  x·col1 + y·col2 = b  using scaling factors
+    // (xScale, yScale) animate from 0 to (1, 3)
+    // ====================================================
+    const xScale = lerp(0, ans.x, p);
+    const yScale = lerp(0, ans.y, p);
+
+    // target b (faint guide)
+    const bx = cx2 + target.x*scale, by_ = cy - target.y*scale;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,212,95,0.4)';
+    ctx.lineWidth = 1; ctx.setLineDash([4,5]);
+    ctx.beginPath(); ctx.arc(bx, by_, 16, 0, TAU); ctx.stroke();
+    ctx.restore();
+    drawText(ctx, 'b = [5, 10]  (target)', bx+18, by_-16, '#ffd45f', '11px JetBrains Mono');
+
+    // x·col1 from origin
+    const e1x = xScale*col1.x, e1y = xScale*col1.y;
+    drawArrow(ctx, cx2, cy, cx2 + e1x*scale, cy - e1y*scale, '#5fe3ff', 3, 12);
+    drawText(ctx, `${xScale.toFixed(2)} · col₁`, cx2 + e1x*scale + 8, cy - e1y*scale - 6, '#5fe3ff', '11px JetBrains Mono');
+
+    // + y·col2 stacked tip-to-tail
+    const e2x = e1x + yScale*col2.x, e2y = e1y + yScale*col2.y;
+    drawArrow(ctx, cx2 + e1x*scale, cy - e1y*scale, cx2 + e2x*scale, cy - e2y*scale, '#ff5fa2', 3, 12);
+    drawText(ctx, `${yScale.toFixed(2)} · col₂`, cx2 + (e1x+e2x)/2*scale + 8, cy - (e1y+e2y)/2*scale + 14, '#ff5fa2', '11px JetBrains Mono');
+
+    // resultant from origin (gold), arriving at b
+    if (p > 0.05){
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, p*1.5);
+      drawArrow(ctx, cx2, cy, cx2 + e2x*scale, cy - e2y*scale, '#ffd45f', 3.5, 14);
+      ctx.restore();
+    }
+
+    // ghost columns (faint, so students see what cols are)
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    drawArrow(ctx, cx2, cy, cx2 + col1.x*scale, cy - col1.y*scale, '#5fe3ff', 1.5, 8, false);
+    drawArrow(ctx, cx2, cy, cx2 + col2.x*scale, cy - col2.y*scale, '#ff5fa2', 1.5, 8, false);
+    ctx.restore();
+    drawText(ctx, 'col₁ = [2,1]', cx2 + col1.x*scale + 6, cy - col1.y*scale + 14, 'rgba(95,227,255,0.6)', '10px JetBrains Mono');
+    drawText(ctx, 'col₂ = [1,3]', cx2 + col2.x*scale + 6, cy - col2.y*scale - 6, 'rgba(255,95,162,0.6)', '10px JetBrains Mono');
+
+    // success ring on b when arrived
+    if (p >= 0.99){
+      ctx.save();
+      ctx.strokeStyle = '#ffd45f';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#ffd45f'; ctx.shadowBlur = 26;
+      ctx.beginPath(); ctx.arc(bx, by_, 14, 0, TAU); ctx.stroke();
+      ctx.restore();
+      drawText(ctx, '✓  1·col₁ + 3·col₂ = b', halfW+24, h-30, '#ffd45f', '13px JetBrains Mono');
+    }
+
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('"how many of col₁, how many of col₂, makes b?"', halfW+24, h-12);
+
+    // central system display
+    ctx.save();
+    ctx.fillStyle = COL.faint;
+    ctx.font = '10px JetBrains Mono, ui-monospace, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('A·x = b  ·  same equation, two views', w/2, h-30);
+    ctx.textAlign = 'left';
+    ctx.restore();
+  }
+
+  function loop(){ render(); requestAnimationFrame(loop); }
+  loop();
+})();
+
+/* ============================================================
+   SCENE 10 — three solution cases
+   ============================================================ */
+let _solCase = 1;
+let _renderSol = null;
+function setSolutionCase(n){
+  _solCase = n;
+  ['solT1','solT2','solT3'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('active', i+1===n);
+  });
+  if (_renderSol) _renderSol();
+}
+
+(function sol(){
+  const c = document.getElementById('solC');
+  let ctx, w, h, cx, cy, scale;
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx = w/2; cy = h/2; scale = Math.min(w,h)/12;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  const cases = {
+    1: {l1:x=>5-2*x, l2:x=>(10-x)/3, sol:[{x:1,y:3}], title:'ONE SOLUTION', subtitle:'Two lines crossing once'},
+    2: {l1:x=>5-2*x, l2:x=>2.5-2*x, sol:[], title:'NO SOLUTION', subtitle:'Parallel lines · contradiction'},
+    3: {l1:x=>5-2*x, l2:x=>(10-4*x)/2, sol:'line', title:'INFINITE SOLUTIONS', subtitle:'Same line · infinite valid x'}
+  };
+
+  function render(){
+    const C = cases[_solCase];
+    ctx.clearRect(0,0,w,h);
+    drawGrid(ctx, cx, cy, scale, w, h);
+
+    function drawLine(fn, color, dashed=false){
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = color; ctx.shadowBlur = 10;
+      if (dashed) ctx.setLineDash([8,7]);
+      ctx.beginPath();
+      let started=false;
+      for(let xv=-15; xv<=15; xv+=0.05){
+        const yv = fn(xv);
+        const X = cx+xv*scale, Y = cy-yv*scale;
+        if (!started){ ctx.moveTo(X,Y); started=true; } else ctx.lineTo(X,Y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+    drawLine(C.l1, '#5fe3ff');
+    drawLine(C.l2, '#ff5fa2', _solCase===3);
+
+    if (Array.isArray(C.sol)){
+      C.sol.forEach(p=>{
+        ctx.save();
+        ctx.fillStyle = '#ffd45f';
+        ctx.shadowColor = '#ffd45f'; ctx.shadowBlur = 24;
+        ctx.beginPath(); ctx.arc(cx+p.x*scale, cy-p.y*scale, 9, 0, TAU); ctx.fill();
+        ctx.restore();
+        drawText(ctx, `(${p.x}, ${p.y})`, cx+p.x*scale+14, cy-p.y*scale-12, '#ffd45f','13px JetBrains Mono');
+      });
+    }
+
+    // big label
+    ctx.save();
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('GEOMETRIC FATE', 24, h-58);
+    ctx.fillStyle = _solCase===2?'#ff5fa2':(_solCase===3?'#b29bff':'#5fffb0');
+    ctx.font = '300 32px Inter, sans-serif';
+    ctx.fillText(C.title, 24, h-26);
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(C.subtitle, 24, h-8);
+    ctx.restore();
+
+    // det note
+    const det = _solCase===1 ? '≠ 0  · A invertible' : '= 0  · A singular (collapsed)';
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(`det(A) ${det}`, w-24, h-22);
+    ctx.textAlign = 'left';
+  }
+  _renderSol = render;
+  render();
+})();
+
+/* ============================================================
+   SCENE 11 — DETERMINANT (2D)
+   ============================================================ */
+let _detM = {a:1.5, b:0.4, c:0.3, d:1.2};
+let _renderDet = null;
+let _detAnim = false;
+function animateDet(){
+  if (_detAnim) return;
+  _detAnim = true;
+  let t = 0;
+  const dur = 200;
+  const start = {..._detM};
+  // sweep toward singular: target where col2 is multiple of col1
+  // pick target where det → 0
+  const target = {a: start.a, b: start.a*0.6, c: start.c, d: start.c*0.6};
+  function step(){
+    t++;
+    const p = easeInOutCubic(Math.min(1, t/dur));
+    _detM = {
+      a: lerp(start.a, target.a, p),
+      b: lerp(start.b, target.b, p),
+      c: lerp(start.c, target.c, p),
+      d: lerp(start.d, target.d, p)
+    };
+    document.getElementById('da').value = _detM.a;
+    document.getElementById('db').value = _detM.b;
+    document.getElementById('dc').value = _detM.c;
+    document.getElementById('dd').value = _detM.d;
+    if (_renderDet) _renderDet();
+    if (t < dur) requestAnimationFrame(step); else _detAnim = false;
+  }
+  step();
+}
+
+(function det(){
+  const c = document.getElementById('detC');
+  let ctx, w, h, cx, cy, scale;
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx = w*0.55; cy = h/2; scale = Math.min(w,h)/8;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  function render(){
+    ctx.clearRect(0,0,w,h);
+    drawGrid(ctx, cx, cy, scale, w, h);
+
+    // unit square (faint)
+    ctx.save();
+    ctx.fillStyle = COL.gridFaint;
+    ctx.strokeStyle = COL.veryFaint;
+    ctx.lineWidth = 1; ctx.setLineDash([4,5]);
+    ctx.fillRect(cx, cy-scale, scale, scale);
+    ctx.strokeRect(cx, cy-scale, scale, scale);
+    ctx.restore();
+    drawText(ctx,'unit square (area = 1)', cx+8, cy-8, COL.faint,'11px JetBrains Mono');
+
+    // transformed
+    const det = _detM.a*_detM.d - _detM.b*_detM.c;
+    const fillCol = Math.abs(det)<0.02 ? 'rgba(255,212,95,0.20)' : (det<0 ? 'rgba(255,95,162,0.18)' : 'rgba(95,227,255,0.18)');
+    const strokeCol = Math.abs(det)<0.02 ? '#ffd45f' : (det<0 ? '#ff5fa2' : '#5fe3ff');
+    ctx.save();
+    ctx.fillStyle = fillCol;
+    ctx.strokeStyle = strokeCol;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = strokeCol; ctx.shadowBlur = 14;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx+_detM.a*scale, cy-_detM.c*scale);
+    ctx.lineTo(cx+(_detM.a+_detM.b)*scale, cy-(_detM.c+_detM.d)*scale);
+    ctx.lineTo(cx+_detM.b*scale, cy-_detM.d*scale);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    drawArrow(ctx, cx, cy, cx+_detM.a*scale, cy-_detM.c*scale, '#ff5fa2', 2.5, 11);
+    drawArrow(ctx, cx, cy, cx+_detM.b*scale, cy-_detM.d*scale, '#ffd45f', 2.5, 11);
+
+    // BIG number top-left
+    ctx.save();
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('AREA AFTER  =  det(A)', 26, 36);
+    ctx.fillStyle = strokeCol;
+    ctx.font = '300 92px Inter, sans-serif';
+    ctx.fillText(det.toFixed(2), 26, 122);
+    // formula
+    ctx.fillStyle = COL.muted;
+    ctx.font = '12px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(`= ${_detM.a.toFixed(2)}·${_detM.d.toFixed(2)}  −  ${_detM.b.toFixed(2)}·${_detM.c.toFixed(2)}`, 26, 144);
+
+    // status
+    let msg = '';
+    if (Math.abs(det)<0.02) msg = 'collapsed → no inverse exists';
+    else if (det<0) msg = 'orientation flipped';
+    else msg = 'orientation preserved';
+    ctx.fillStyle = strokeCol;
+    ctx.fillText(msg, 26, 166);
+    ctx.restore();
+
+    // sliders update
+    document.getElementById('daV').textContent = _detM.a.toFixed(2);
+    document.getElementById('dbV').textContent = _detM.b.toFixed(2);
+    document.getElementById('dcV').textContent = _detM.c.toFixed(2);
+    document.getElementById('ddV').textContent = _detM.d.toFixed(2);
+  }
+  _renderDet = render;
+
+  ['da','db','dc','dd'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', e=>{
+      _detM[id[1]] = parseFloat(e.target.value); render();
+    });
+  });
+  render();
+})();
+
+/* ============================================================
+   SCENE 12 — Determinant 3D (parallelepiped + cube ghost)
+   ============================================================ */
+(function det3(){
+  const c = document.getElementById('det3dC');
+  let ctx, w, h, cx, cy;
+  let scale = 65;
+  let yaw = 0.7, pitch = 0.45;
+  let drag = false, lx=0, ly=0;
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx=w/2; cy=h/2;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  // animated columns: morph slowly
+  let cols = [{x:1,y:0,z:0},{x:0,y:1,z:0},{x:0,y:0,z:1}];
+
+  function project(p){
+    const cyaw=Math.cos(yaw), syaw=Math.sin(yaw);
+    const cpit=Math.cos(pitch), spit=Math.sin(pitch);
+    let x = p.x*cyaw - p.z*syaw;
+    let z = p.x*syaw + p.z*cyaw;
+    let y = p.y*cpit - z*spit;
+    z = p.y*spit + z*cpit;
+    const f = 700/(z + 7);
+    return {x: cx + x*scale*f/100, y: cy - y*scale*f/100, depth:z};
+  }
+  function add(a,b){return {x:a.x+b.x,y:a.y+b.y,z:a.z+b.z}}
+  function arr(a,b,col){const A=project(a),B=project(b);drawArrow(ctx,A.x,A.y,B.x,B.y,col,2.5,10);}
+  function det3(c1,c2,c3){
+    return c1.x*(c2.y*c3.z-c2.z*c3.y)
+         - c1.y*(c2.x*c3.z-c2.z*c3.x)
+         + c1.z*(c2.x*c3.y-c2.y*c3.x);
+  }
+  function render(){
+    ctx.clearRect(0,0,w,h);
+    // floor grid
+    ctx.save();
+    ctx.strokeStyle=COL.gridFaint;
+    for(let i=-3;i<=3;i++){
+      const a=project({x:i,y:0,z:-3}),b=project({x:i,y:0,z:3});
+      const cz=project({x:-3,y:0,z:i}),d=project({x:3,y:0,z:i});
+      ctx.beginPath();
+      ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+      ctx.moveTo(cz.x,cz.y);ctx.lineTo(d.x,d.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // unit cube wireframe (ghost)
+    const o={x:0,y:0,z:0},e1={x:1,y:0,z:0},e2={x:0,y:1,z:0},e3={x:0,y:0,z:1};
+    const v0=[o,e1,add(e1,e2),e2,e3,add(e3,e1),add(add(e1,e2),e3),add(e2,e3)];
+    const edges=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+    ctx.save();
+    ctx.strokeStyle=COL.veryFaint; ctx.setLineDash([3,4]);
+    edges.forEach(([a,b])=>{
+      const A=project(v0[a]),B=project(v0[b]);
+      ctx.beginPath(); ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.stroke();
+    });
+    ctx.restore();
+
+    // parallelepiped
+    const c1=cols[0],c2=cols[1],c3=cols[2];
+    const v=[o,c1,add(c1,c2),c2,c3,add(c3,c1),add(add(c1,c2),c3),add(c2,c3)];
+    const faces=[[0,1,2,3],[4,5,6,7],[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7]];
+    const sorted = faces.map(f=>({f, d:f.reduce((s,i)=>s+project(v[i]).depth,0)/4})).sort((a,b)=>b.d-a.d);
+    const faceCol = ['rgba(95,227,255,0.18)','rgba(255,95,162,0.18)','rgba(255,212,95,0.18)','rgba(178,155,255,0.18)','rgba(95,255,176,0.18)',COL.gridFaint];
+    sorted.forEach(({f},i)=>{
+      const pts = f.map(idx=>project(v[idx]));
+      ctx.save();
+      ctx.fillStyle = faceCol[i%faceCol.length];
+      ctx.strokeStyle = 'rgba(95,227,255,0.5)'; ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      pts.forEach((p,k)=>k===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+    });
+
+    arr(o,c1,'#ff5fa2');
+    arr(o,c2,'#ffd45f');
+    arr(o,c3,'#5fffb0');
+
+    // big number
+    const D = det3(c1,c2,c3);
+    ctx.save();
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('VOLUME  =  |det(A)|', 26, 36);
+    ctx.fillStyle = Math.abs(D)<0.05?'#ffd45f':(D<0?'#ff5fa2':'#5fe3ff');
+    ctx.font = '300 64px Inter, sans-serif';
+    ctx.fillText(Math.abs(D).toFixed(3), 26, 96);
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(`det(A) = ${D.toFixed(3)}${D<0?'  (handedness flipped)':(Math.abs(D)<0.05?'  (collapsed to plane)':'')}`, 26, 116);
+    ctx.restore();
+  }
+
+  // animate columns to oscillate gently
+  let t = 0;
+  function loop(){
+    if (!drag){
+      yaw += 0.003;
+    }
+    t += 0.012;
+    cols = [
+      {x:1+0.4*Math.sin(t), y:0.2*Math.cos(t*0.7), z:0.1*Math.sin(t*1.1)},
+      {x:0.2*Math.sin(t*1.3), y:1+0.3*Math.cos(t*0.9), z:0.2*Math.sin(t*0.6)},
+      {x:0.1*Math.cos(t*0.8), y:0.15*Math.sin(t*1.4), z:1+0.4*Math.cos(t*1.1)}
+    ];
+    render();
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  c.addEventListener('mousedown', e=>{drag=true; lx=e.clientX; ly=e.clientY;});
+  addEventListener('mouseup',()=>drag=false);
+  c.addEventListener('mousemove', e=>{
+    if(!drag) return;
+    yaw -= (e.clientX-lx)*0.01;
+    pitch += (e.clientY-ly)*0.01;
+    pitch = Math.max(-1.4, Math.min(1.4, pitch));
+    lx=e.clientX; ly=e.clientY;
+  });
+  c.addEventListener('wheel', e=>{e.preventDefault(); scale=Math.max(30,Math.min(120,scale-e.deltaY*0.05));});
+})();
+
+/* ============================================================
+   SCENE 13 — TRANSPOSE: animated flip across diagonal
+   ============================================================ */
+let _transProg = 0; let _transAnim = false;
+function playTranspose(){ _transAnim = true; _transProg = 0; }
+function resetTranspose(){ _transAnim = false; _transProg = 0; }
+
+(function trans(){
+  const c = document.getElementById('transC');
+  let ctx, w, h, cx, cy;
+  // 3x4 matrix
+  const M = [[1,2,3,4],[5,6,7,8],[9,10,11,12]];
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx = w/2; cy = h/2;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  function render(){
+    const cellSize = Math.min(w,h)/9;
+    ctx.clearRect(0,0,w,h);
+
+    // diagonal axis line
+    ctx.save();
+    ctx.strokeStyle = COL.veryFaint;
+    ctx.lineWidth = 1; ctx.setLineDash([6,8]);
+    ctx.beginPath();
+    ctx.moveTo(cx-cellSize*4, cy-cellSize*4);
+    ctx.lineTo(cx+cellSize*4, cy+cellSize*4);
+    ctx.stroke();
+    ctx.restore();
+    drawText(ctx,'reflection axis (i = j)', cx+cellSize*3, cy+cellSize*3+14, COL.faint, '11px JetBrains Mono');
+
+    // For each (i,j): start position (i,j) and end position (j,i)
+    // start col: (j-1.5)*cellSize, start row: (i-1)*cellSize
+    // end col: (i-1)*cellSize, end row: (j-1.5)*cellSize
+    const t = _transProg;
+    const colors = ['#5fe3ff','#ff5fa2','#ffd45f'];
+    for (let i=0;i<3;i++)for (let j=0;j<4;j++){
+      const sx = (j-1.5)*cellSize, sy = (i-1)*cellSize;
+      const ex = (i-1)*cellSize, ey = (j-1.5)*cellSize;
+      const x = lerp(sx, ex, t);
+      const y = lerp(sy, ey, t);
+      ctx.save();
+      const col = colors[i];
+      ctx.fillStyle = col + '30';
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = col; ctx.shadowBlur = 6;
+      const cw = cellSize*0.85;
+      ctx.beginPath();
+      ctx.rect(cx+x-cw/2, cy+y-cw/2, cw, cw);
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = COL.text;
+      ctx.font = `${Math.floor(cellSize*0.32)}px JetBrains Mono, ui-monospace, monospace`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(M[i][j], cx+x, cy+y);
+      ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+    }
+
+    // labels
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(t < 0.5 ? 'A   (3 rows × 4 cols)' : 'Aᵀ  (4 rows × 3 cols)', 26, 36);
+    ctx.fillStyle = COL.text;
+    ctx.font = '300 32px Inter, sans-serif';
+    ctx.fillText(t < 0.5 ? 'A' : 'Aᵀ', 26, 76);
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('row i ↔ column i  ·  (Aᵀ)ᵢⱼ = Aⱼᵢ', 26, 96);
+    ctx.fillText('(AB)ᵀ = BᵀAᵀ   (order reverses)', 26, 114);
+  }
+
+  function loop(){
+    if (_transAnim){
+      _transProg = Math.min(1, _transProg + 0.012);
+      if (_transProg >= 1) _transAnim = false;
+    }
+    render();
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ============================================================
+   SCENE 14 — INVERSE: apply A then A⁻¹ → identity
+   ============================================================ */
+const _invA = {a:1.4, b:-0.6, c:0.6, d:1.2};
+let _invPhase = 0; // 0=identity, 1=after A, 2=after A then A⁻¹
+let _invProg = 1;
+let _invAnimating = false;
+
+function playInverse(){
+  if (_invAnimating) return;
+  if (_invPhase >= 2){ _invPhase = 0; }
+  _invAnimating = true;
+  _invProg = 0;
+  function step(){
+    _invProg = Math.min(1, _invProg + 0.01);
+    if (_invProg >= 1){
+      _invProg = 1; _invAnimating = false;
+      _invPhase++;
+      if (_invPhase === 1){ setTimeout(playInverse, 800); }
+      return;
+    }
+    requestAnimationFrame(step);
+  }
+  step();
+}
+function resetInverse(){ _invAnimating = false; _invPhase = 0; _invProg = 1; }
+
+(function inv(){
+  const c = document.getElementById('invC');
+  let ctx, w, h, cx, cy, scale;
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    cx = w/2; cy = h/2; scale = Math.min(w,h)/9;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  const I = {a:1,b:0,c:0,d:1};
+  const Ainv = (function(){
+    const det = _invA.a*_invA.d - _invA.b*_invA.c;
+    return {a:_invA.d/det, b:-_invA.b/det, c:-_invA.c/det, d:_invA.a/det};
+  })();
+
+  // sample particle field
+  const particles = [];
+  for(let i=-3;i<=3;i++) for(let j=-3;j<=3;j++){
+    if (i===0 && j===0) continue;
+    particles.push({x:i*0.6, y:j*0.6});
+  }
+
+  function currentMatrix(){
+    if (!_invAnimating){
+      if (_invPhase===0) return I;
+      if (_invPhase===1) return _invA;
+      return I;
+    }
+    const e = easeInOutCubic(_invProg);
+    if (_invPhase===0){ // animate I → A
+      return {
+        a: lerp(I.a, _invA.a, e),
+        b: lerp(I.b, _invA.b, e),
+        c: lerp(I.c, _invA.c, e),
+        d: lerp(I.d, _invA.d, e)
+      };
+    } else { // animate A → I (which is doing A⁻¹ on top of A)
+      return {
+        a: lerp(_invA.a, I.a, e),
+        b: lerp(_invA.b, I.b, e),
+        c: lerp(_invA.c, I.c, e),
+        d: lerp(_invA.d, I.d, e)
+      };
+    }
+  }
+
+  function render(){
+    ctx.clearRect(0,0,w,h);
+    drawGrid(ctx, cx, cy, scale, w, h, {color:COL.gridFaint});
+    const M = currentMatrix();
+    drawTransformedGrid(ctx, cx, cy, scale, w, h, M, 0.22);
+
+    // unit square morph
+    ctx.save();
+    ctx.fillStyle = 'rgba(95,227,255,0.14)';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx+M.a*scale, cy-M.c*scale);
+    ctx.lineTo(cx+(M.a+M.b)*scale, cy-(M.c+M.d)*scale);
+    ctx.lineTo(cx+M.b*scale, cy-M.d*scale);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    drawArrow(ctx, cx, cy, cx+M.a*scale, cy-M.c*scale, '#ff5fa2', 3, 12);
+    drawArrow(ctx, cx, cy, cx+M.b*scale, cy-M.d*scale, '#ffd45f', 3, 12);
+
+    // particles
+    particles.forEach(p=>{
+      const tx = M.a*p.x + M.b*p.y;
+      const ty = M.c*p.x + M.d*p.y;
+      ctx.save();
+      ctx.fillStyle = 'rgba(95,255,176,0.7)';
+      ctx.shadowColor = '#5fffb0'; ctx.shadowBlur = 5;
+      ctx.beginPath(); ctx.arc(cx+tx*scale, cy-ty*scale, 2.5, 0, TAU); ctx.fill();
+      ctx.restore();
+    });
+
+    // status big text
+    ctx.save();
+    let label = 'IDENTITY  ·  start';
+    let color = '#5fffb0';
+    if (_invAnimating){
+      if (_invPhase===0){ label = 'APPLYING  A  ·  space transforms'; color = '#ff5fa2'; }
+      else { label = 'APPLYING  A⁻¹  ·  undoing the transformation'; color = '#b29bff'; }
+    } else if (_invPhase===1){ label = 'AFTER  A  ·  space transformed'; color = '#ff5fa2'; }
+    else if (_invPhase===2){ label = 'BACK TO IDENTITY  ·  A⁻¹ undid A perfectly'; color = '#5fffb0'; }
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('STATUS', 26, 36);
+    ctx.fillStyle = color;
+    ctx.font = '300 28px Inter, sans-serif';
+    ctx.fillText(label, 26, 72);
+
+    // identity check
+    const det = M.a*M.d - M.b*M.c;
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(`area scale = det = ${det.toFixed(3)}`, 26, 96);
+    ctx.fillText('A · A⁻¹  =  I', 26, 114);
+    ctx.restore();
+  }
+
+  function loop(){
+    render();
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ============================================================
+   SCENE 7.5 — FURNITURE FACTORY (real-world Ax = b)
+   Constraints from the slide deck:
+     wood:    1 x1 + 2 x2 + 1 x3 = 9
+     labor:   2 x1 + 1 x2 + 1 x3 = 8
+     machine: 1 x1 + 1 x2 + 2 x3 = 7
+     ship:    3 x1 + 1 x2 + 2 x3 = 11
+   Solution: x1=2, x2=3, x3=1
+   ============================================================ */
+let _factX = [0, 0, 0];
+let _factAnim = null;
+function solveFactory(){
+  if (_factAnim) cancelAnimationFrame(_factAnim);
+  const start = [..._factX];
+  const target = [2, 3, 1];
+  let t = 0;
+  function step(){
+    t += 0.012;
+    const e = easeInOutCubic(Math.min(1, t));
+    for (let i=0;i<3;i++){
+      _factX[i] = lerp(start[i], target[i], e);
+      const slider = document.getElementById('fx'+(i+1));
+      if (slider) slider.value = _factX[i].toFixed(2);
+    }
+    if (t < 1) _factAnim = requestAnimationFrame(step); else _factAnim = null;
+  }
+  step();
+}
+function resetFactory(){
+  if (_factAnim) cancelAnimationFrame(_factAnim);
+  _factAnim = null;
+  _factX = [0, 0, 0];
+  for (let i=0;i<3;i++){
+    const slider = document.getElementById('fx'+(i+1));
+    if (slider) slider.value = 0;
+  }
+}
+(function fact(){
+  const c = document.getElementById('factoryC');
+  let ctx, w, h;
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+  // A and b
+  const A = [
+    [1, 2, 1],   // wood
+    [2, 1, 1],   // labor
+    [1, 1, 2],   // machine
+    [3, 1, 2]    // shipping
+  ];
+  const b = [9, 8, 7, 11];
+  const labels = ['Wood', 'Labor hours', 'Machine time', 'Shipping'];
+  const accents = ['#5fe3ff', '#ff5fa2', '#ffd45f', '#5fffb0'];
+  const kitColors = {
+    chair: '#5fe3ff', table: '#ff5fa2', cabinet: '#ffd45f'
+  };
+
+  function render(){
+    ctx.clearRect(0,0,w,h);
+    // header
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('PRODUCTION PLAN  →  RESOURCE BILL', 28, 30);
+
+    // top: kit production summary cards
+    const cardY = 50, cardH = 70, cardGap = 16;
+    const cardW = (w - 28*2 - cardGap*2) / 3;
+    const kits = [
+      {name:'Chair Kit', col:'#5fe3ff', val:_factX[0], var:'x₁'},
+      {name:'Table Kit', col:'#ff5fa2', val:_factX[1], var:'x₂'},
+      {name:'Cabinet Kit', col:'#ffd45f', val:_factX[2], var:'x₃'}
+    ];
+    kits.forEach((k, i)=>{
+      const x = 28 + i*(cardW+cardGap);
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,0.02)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      // rounded rect
+      const radius = 10;
+      ctx.beginPath();
+      ctx.moveTo(x+radius, cardY);
+      ctx.arcTo(x+cardW, cardY, x+cardW, cardY+cardH, radius);
+      ctx.arcTo(x+cardW, cardY+cardH, x, cardY+cardH, radius);
+      ctx.arcTo(x, cardY+cardH, x, cardY, radius);
+      ctx.arcTo(x, cardY, x+cardW, cardY, radius);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.restore();
+      // text
+      ctx.fillStyle = k.col;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText(`${k.var}  ·  ${k.name}`, x+14, cardY+22);
+      ctx.fillStyle = COL.text;
+      ctx.font = '300 38px Inter, sans-serif';
+      ctx.fillText(k.val.toFixed(1), x+14, cardY+58);
+    });
+
+    // bottom: 4 resource bars
+    const barTop = cardY + cardH + 30;
+    const barH = 28;
+    const barGap = 14;
+    const barLeft = 200;
+    const barRight = w - 28;
+    const barWidth = barRight - barLeft;
+    let allMet = true;
+    A.forEach((row, i)=>{
+      const used = row[0]*_factX[0] + row[1]*_factX[1] + row[2]*_factX[2];
+      const limit = b[i];
+      const yT = barTop + i*(barH + barGap);
+      // label
+      ctx.fillStyle = COL.muted;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText(labels[i], 28, yT+18);
+      // bar background (target = full width)
+      ctx.fillStyle = 'rgba(255,255,255,0.05)';
+      ctx.fillRect(barLeft, yT, barWidth, barH);
+      // segments stacked: x1 contribution, x2, x3
+      let xCursor = barLeft;
+      const segs = [
+        {amt: row[0]*_factX[0], col:'#5fe3ff'},
+        {amt: row[1]*_factX[1], col:'#ff5fa2'},
+        {amt: row[2]*_factX[2], col:'#ffd45f'}
+      ];
+      segs.forEach(s=>{
+        const segPx = (s.amt / limit) * barWidth;
+        ctx.fillStyle = s.col + 'cc';
+        ctx.fillRect(xCursor, yT, segPx, barH);
+        xCursor += segPx;
+      });
+      // target line
+      ctx.strokeStyle = '#ffffffaa';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(barLeft + barWidth, yT-2); ctx.lineTo(barLeft + barWidth, yT+barH+2);
+      ctx.stroke();
+      // overflow indicator
+      if (used > limit){
+        const over = ((used - limit)/limit) * barWidth;
+        ctx.fillStyle = '#ff5fa2';
+        ctx.fillRect(barLeft + barWidth, yT, Math.min(over, w - (barLeft+barWidth) - 14), barH);
+      }
+      // numbers
+      ctx.fillStyle = Math.abs(used - limit) < 0.05 ? '#5fffb0' : (used > limit ? '#ff5fa2' : COL.muted);
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText(`${used.toFixed(2)} / ${limit}`, barLeft + barWidth + 8, yT+18);
+      // equation breakdown (left of bar)
+      const eqStr = `${row[0]}·x₁ + ${row[1]}·x₂ + ${row[2]}·x₃`;
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = '10px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText(eqStr, 28, yT+32);
+      if (Math.abs(used - limit) > 0.05) allMet = false;
+    });
+
+    // bottom status
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    if (allMet){
+      ctx.fillStyle = '#5fffb0';
+      ctx.fillText('✓  ALL CONSTRAINTS MET EXACTLY  ·  Ax = b solved  ·  x = [2, 3, 1]', 28, h-20);
+    } else {
+      ctx.fillStyle = COL.muted;
+      ctx.fillText('drag sliders or click "Reveal solution" to find x where every bar lands on the white line', 28, h-20);
+    }
+    // sliders update
+    ['fx1','fx2','fx3'].forEach((id,i)=>{
+      const v = document.getElementById(id+'V');
+      if (v) v.textContent = _factX[i].toFixed(1);
+    });
+  }
+  // listen to sliders
+  ['fx1','fx2','fx3'].forEach((id, i)=>{
+    document.getElementById(id).addEventListener('input', e=>{
+      if (_factAnim){ cancelAnimationFrame(_factAnim); _factAnim = null; }
+      _factX[i] = parseFloat(e.target.value);
+    });
+  });
+  function loop(){ render(); requestAnimationFrame(loop); }
+  loop();
+})();
+
+/* ============================================================
+   SCENE 14.5 — GAUSSIAN ELIMINATION
+   System: 2x + y = 5,  4x + 3y = 11   →  x=2, y=1
+   We show: lines morphing as row ops apply, plus the augmented
+   matrix at each step.
+   ============================================================ */
+const _gaussSteps = [
+  {
+    title: 'INITIAL  ·  augmented matrix [A | b]',
+    note: 'Each row is an equation. Each row also defines a line in the plane.',
+    aug: [[2, 1, 5], [4, 3, 11]],
+    lines: [
+      {a:2, b:1, c:5},   // 2x + y = 5
+      {a:4, b:3, c:11}   // 4x + 3y = 11
+    ]
+  },
+  {
+    title: 'R₂ ← R₂ − 2·R₁',
+    note: 'Subtract 2 copies of row 1 from row 2. The eliminated 4 becomes 0. The line for row 2 morphs — but it still passes through (2, 1).',
+    aug: [[2, 1, 5], [0, 1, 1]],
+    lines: [
+      {a:2, b:1, c:5},
+      {a:0, b:1, c:1}    // y = 1
+    ]
+  },
+  {
+    title: 'R₁ ← R₁ − R₂',
+    note: 'Eliminate the 1 above the new pivot in column 2. Row 1 simplifies — its line morphs into a vertical.',
+    aug: [[2, 0, 4], [0, 1, 1]],
+    lines: [
+      {a:2, b:0, c:4},   // x = 2
+      {a:0, b:1, c:1}    // y = 1
+    ]
+  },
+  {
+    title: 'R₁ ← R₁ / 2  ·  reduced row-echelon form',
+    note: 'Scale row 1 to make its pivot = 1. Now the matrix is the identity — and the right side IS the solution.',
+    aug: [[1, 0, 2], [0, 1, 1]],
+    lines: [
+      {a:1, b:0, c:2},   // x = 2
+      {a:0, b:1, c:1}    // y = 1
+    ]
+  },
+  {
+    title: '✓ READ THE SOLUTION  ·  x = 2,  y = 1',
+    note: 'Every step preserved the solution set. The intersection (2, 1) was always there — we just rewrote the equations until it became impossible to miss.',
+    aug: [[1, 0, 2], [0, 1, 1]],
+    lines: [
+      {a:1, b:0, c:2},
+      {a:0, b:1, c:1}
+    ]
+  }
+];
+let _gaussIdx = 0;
+let _gaussFrom = JSON.parse(JSON.stringify(_gaussSteps[0]));
+let _gaussTo = JSON.parse(JSON.stringify(_gaussSteps[0]));
+let _gaussProg = 1;
+function gaussNextStep(){
+  if (_gaussProg < 1) return;  // wait until current animation is done
+  if (_gaussIdx >= _gaussSteps.length - 1) {
+    // wrap around
+    _gaussIdx = 0;
+    _gaussFrom = JSON.parse(JSON.stringify(_gaussSteps[_gaussIdx]));
+    _gaussTo = JSON.parse(JSON.stringify(_gaussSteps[_gaussIdx]));
+    _gaussProg = 1;
+    return;
+  }
+  _gaussFrom = JSON.parse(JSON.stringify(_gaussSteps[_gaussIdx]));
+  _gaussIdx++;
+  _gaussTo = JSON.parse(JSON.stringify(_gaussSteps[_gaussIdx]));
+  _gaussProg = 0;
+}
+function gaussReset(){
+  _gaussIdx = 0;
+  _gaussFrom = JSON.parse(JSON.stringify(_gaussSteps[0]));
+  _gaussTo = JSON.parse(JSON.stringify(_gaussSteps[0]));
+  _gaussProg = 1;
+}
+(function gauss(){
+  const c = document.getElementById('gaussC');
+  let ctx, w, h, leftW, cy, cx, scale;
+  function setup(){
+    const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h;
+    leftW = w * 0.55;
+    cx = leftW/2; cy = h/2;
+    scale = Math.min(leftW, h)/8;
+  }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+
+  function lerpStep(from, to, e){
+    return {
+      aug: [
+        [lerp(from.aug[0][0], to.aug[0][0], e), lerp(from.aug[0][1], to.aug[0][1], e), lerp(from.aug[0][2], to.aug[0][2], e)],
+        [lerp(from.aug[1][0], to.aug[1][0], e), lerp(from.aug[1][1], to.aug[1][1], e), lerp(from.aug[1][2], to.aug[1][2], e)]
+      ],
+      lines: [
+        {a:lerp(from.lines[0].a, to.lines[0].a, e), b:lerp(from.lines[0].b, to.lines[0].b, e), c:lerp(from.lines[0].c, to.lines[0].c, e)},
+        {a:lerp(from.lines[1].a, to.lines[1].a, e), b:lerp(from.lines[1].b, to.lines[1].b, e), c:lerp(from.lines[1].c, to.lines[1].c, e)}
+      ]
+    };
+  }
+
+  function drawLineFor(L, color){
+    // ax + by = c → if b≠0: y = (c - ax)/b; else x = c/a (vertical)
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = color; ctx.shadowBlur = 9;
+    ctx.beginPath();
+    if (Math.abs(L.b) > 0.001){
+      let started = false;
+      for (let xv = -10; xv <= 10; xv += 0.05){
+        const yv = (L.c - L.a*xv)/L.b;
+        const X = cx + xv*scale, Y = cy - yv*scale;
+        if (X<8 || X>leftW-8 || Y<8 || Y>h-8){ started = false; continue; }
+        if (!started){ ctx.moveTo(X, Y); started = true; }
+        else ctx.lineTo(X, Y);
+      }
+    } else if (Math.abs(L.a) > 0.001){
+      // vertical line x = c/a
+      const xv = L.c / L.a;
+      ctx.moveTo(cx + xv*scale, 8);
+      ctx.lineTo(cx + xv*scale, h-8);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function render(){
+    if (_gaussProg < 1){
+      _gaussProg = Math.min(1, _gaussProg + 0.014);
+    }
+    const e = easeInOutCubic(_gaussProg);
+    const now = lerpStep(_gaussFrom, _gaussTo, e);
+
+    ctx.clearRect(0,0,w,h);
+
+    // Left panel — lines
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('GEOMETRIC VIEW  ·  two lines per system', 24, 28);
+    drawGrid(ctx, cx, cy, scale, leftW, h);
+    // divider
+    ctx.strokeStyle = COL.gridFaint;
+    ctx.beginPath();
+    ctx.moveTo(leftW, 20); ctx.lineTo(leftW, h-20);
+    ctx.stroke();
+
+    drawLineFor(now.lines[0], '#5fe3ff');
+    drawLineFor(now.lines[1], '#ff5fa2');
+
+    // intersection (always at (2,1))
+    ctx.save();
+    ctx.fillStyle = '#ffd45f';
+    ctx.shadowColor = '#ffd45f'; ctx.shadowBlur = 18;
+    ctx.beginPath(); ctx.arc(cx + 2*scale, cy - 1*scale, 8, 0, TAU); ctx.fill();
+    ctx.restore();
+    drawText(ctx, '(2, 1)', cx + 2*scale + 12, cy - 1*scale - 12, '#ffd45f', '12px JetBrains Mono');
+
+    // Right panel — augmented matrix + step text
+    const rx = leftW + 30;
+    let ry = 50;
+    const step = _gaussSteps[_gaussIdx];
+
+    ctx.fillStyle = COL.muted;
+    ctx.font = '10px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(`STEP ${_gaussIdx+1} / ${_gaussSteps.length}`, rx, ry);
+    ry += 22;
+
+    ctx.fillStyle = '#5fe3ff';
+    ctx.font = '14px JetBrains Mono, ui-monospace, monospace';
+    // wrap title at width
+    const titleParts = step.title.split('  ·  ');
+    titleParts.forEach(t=>{ ctx.fillText(t, rx, ry); ry += 20; });
+    ry += 6;
+
+    // augmented matrix display
+    ctx.font = '15px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillStyle = COL.text;
+    const mxLeft = rx + 6, my = ry;
+    const colWs = [50, 50, 70];
+    // bracket
+    ctx.strokeStyle = '#5fe3ff';
+    ctx.lineWidth = 1.5;
+    const bx = mxLeft - 8, bw = colWs[0]+colWs[1]+colWs[2]+22, bh = 60;
+    ctx.beginPath();
+    ctx.moveTo(bx+6, my-6); ctx.lineTo(bx, my-6); ctx.lineTo(bx, my+bh); ctx.lineTo(bx+6, my+bh);
+    ctx.moveTo(bx+bw-6, my-6); ctx.lineTo(bx+bw, my-6); ctx.lineTo(bx+bw, my+bh); ctx.lineTo(bx+bw-6, my+bh);
+    ctx.stroke();
+
+    // values
+    for (let i=0;i<2;i++){
+      let xCursor = mxLeft;
+      for (let j=0;j<3;j++){
+        const v = now.aug[i][j];
+        const isPivot = (j===i && Math.abs(v - 1) < 0.05);
+        ctx.fillStyle = j===2 ? '#ffd45f' : (isPivot ? '#5fffb0' : COL.text);
+        ctx.fillText(v.toFixed(2), xCursor, my + 18 + i*30);
+        xCursor += colWs[j];
+        // bar between coefficients and rhs
+        if (j===1){
+          ctx.strokeStyle = COL.faint;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(xCursor-6, my-2); ctx.lineTo(xCursor-6, my + 56);
+          ctx.stroke();
+        }
+      }
+    }
+    ry = my + bh + 26;
+
+    // wrap note
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    const words = step.note.split(' ');
+    let line = '';
+    const maxW = w - rx - 24;
+    words.forEach(word=>{
+      const test = line + (line?' ':'') + word;
+      if (ctx.measureText(test).width > maxW){
+        ctx.fillText(line, rx, ry); ry += 16; line = word;
+      } else line = test;
+    });
+    if (line) ctx.fillText(line, rx, ry);
+
+    // legend
+    ctx.fillStyle = COL.muted;
+    ctx.font = '10px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('row 1 (cyan) and row 2 (pink) lines  ·  intersection (2,1) preserved by every legal move', 24, h-12);
+  }
+  function loop(){ render(); requestAnimationFrame(loop); }
+  loop();
+})();
+
+/* ============================================================
+   SHARED MATRIX-RENDERER — used by REF, RREF, Particular chapters
+   Displays an m×n matrix with optional augmentation, pivot
+   highlighting, and a staircase overlay.
+   ============================================================ */
+function drawMatrixWithStaircase(ctx, M, opts){
+  const {
+    x, y, cellW=58, cellH=46,
+    pivots=[],            // array of [row, col] pivot positions
+    freeCols=[],          // array of column indices that are free
+    augCol=-1,            // column index where the | bar goes; -1 for no aug
+    showStaircase=true,
+    title=null,
+    highlightCol=-1,
+    valDigits=0,
+    cellFmt=null
+  } = opts;
+  const rows = M.length, cols = M[0].length;
+
+  // Title
+  if (title){
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(title, x, y - 14);
+  }
+
+  // Pivot highlighting (cells)
+  pivots.forEach(([r, c])=>{
+    ctx.save();
+    ctx.fillStyle = 'rgba(95,255,176,0.18)';
+    ctx.fillRect(x + c*cellW, y + r*cellH, cellW, cellH);
+    ctx.restore();
+  });
+
+  // Highlighted column (e.g. for "current target column")
+  if (highlightCol >= 0){
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,212,95,0.10)';
+    ctx.fillRect(x + highlightCol*cellW, y, cellW, rows*cellH);
+    ctx.restore();
+  }
+
+  // Free-column dim shading
+  freeCols.forEach(c=>{
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,95,162,0.08)';
+    ctx.fillRect(x + c*cellW, y, cellW, rows*cellH);
+    ctx.restore();
+  });
+
+  // Brackets
+  ctx.save();
+  ctx.strokeStyle = '#5fe3ff';
+  ctx.lineWidth = 1.5;
+  const totalW = cols*cellW, totalH = rows*cellH;
+  ctx.beginPath();
+  ctx.moveTo(x+8, y); ctx.lineTo(x, y); ctx.lineTo(x, y+totalH); ctx.lineTo(x+8, y+totalH);
+  ctx.moveTo(x+totalW-8, y); ctx.lineTo(x+totalW, y); ctx.lineTo(x+totalW, y+totalH); ctx.lineTo(x+totalW-8, y+totalH);
+  ctx.stroke();
+  ctx.restore();
+
+  // Augmentation bar
+  if (augCol > 0 && augCol < cols){
+    ctx.save();
+    ctx.strokeStyle = COL.faint;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x + augCol*cellW, y); ctx.lineTo(x + augCol*cellW, y+totalH);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Cell values
+  ctx.save();
+  ctx.font = '15px JetBrains Mono, ui-monospace, monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let r=0; r<rows; r++){
+    for (let c=0; c<cols; c++){
+      const isPivot = pivots.some(([pr,pc])=>pr===r && pc===c);
+      const isFree = freeCols.includes(c);
+      const val = M[r][c];
+      let display;
+      if (cellFmt) display = cellFmt(val, r, c);
+      else display = (Math.abs(val) < 1e-9) ? '0' : (valDigits ? val.toFixed(valDigits) : (Number.isInteger(val) ? val.toString() : val.toFixed(2)));
+      ctx.fillStyle = isPivot ? '#5fffb0' : (isFree ? '#ff5fa2' : (Math.abs(val) < 1e-9 ? COL.muted : COL.text));
+      if (augCol > 0 && c >= augCol) ctx.fillStyle = '#ffd45f';
+      ctx.fillText(display, x + c*cellW + cellW/2, y + r*cellH + cellH/2);
+    }
+  }
+  ctx.restore();
+
+  // Staircase overlay — line connecting pivots in descending pattern
+  if (showStaircase && pivots.length > 0){
+    ctx.save();
+    ctx.strokeStyle = '#5fffb0';
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = '#5fffb0'; ctx.shadowBlur = 10;
+    ctx.beginPath();
+    // staircase: go down each row to its pivot column, then right
+    let prevRow = -1, prevCol = -1;
+    pivots.forEach(([r, c], idx)=>{
+      if (idx === 0){
+        // start at top-left of pivot cell
+        ctx.moveTo(x, y + r*cellH);
+        ctx.lineTo(x + c*cellW, y + r*cellH);
+        ctx.lineTo(x + c*cellW, y + (r+1)*cellH);
+        ctx.lineTo(x + (c+1)*cellW, y + (r+1)*cellH);
+      } else {
+        // from previous (prevCol+1, prevRow+1) corner, go down to current row, then right
+        ctx.lineTo(x + (c)*cellW, y + r*cellH);
+        ctx.lineTo(x + (c)*cellW, y + (r+1)*cellH);
+        ctx.lineTo(x + (c+1)*cellW, y + (r+1)*cellH);
+      }
+      prevRow = r; prevCol = c;
+    });
+    // Continue staircase to right edge after last pivot
+    if (pivots.length > 0){
+      const [lr, lc] = pivots[pivots.length-1];
+      ctx.lineTo(x + cols*cellW, y + (lr+1)*cellH);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // Pivot labels — small "P" badges
+    pivots.forEach(([r, c])=>{
+      ctx.save();
+      ctx.fillStyle = '#5fffb0';
+      ctx.font = '9px JetBrains Mono, ui-monospace, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('pivot', x + c*cellW + cellW/2, y + r*cellH - 4);
+      ctx.textAlign = 'left';
+      ctx.restore();
+    });
+  }
+}
+
+/* ============================================================
+   CH 16 — REF / Echelon Form — staircase visualization
+   ============================================================ */
+const _refExamples = [
+  {
+    label: 'Example A — 3×4 in REF',
+    note: 'Three pivots in columns 1, 2, 3. Free variable in column 4. Staircase descends right at every row.',
+    M: [
+      [2, 1, -3, 4],
+      [0, 5,  2, 1],
+      [0, 0,  7, 3]
+    ],
+    pivots: [[0,0],[1,1],[2,2]],
+    freeCols: [3],
+    isValid: true
+  },
+  {
+    label: 'Example B — 3×5 with skipped column',
+    note: 'Pivots in columns 1, 3, 4. Columns 2 and 5 are free. Each pivot still lies STRICTLY right of the one above.',
+    M: [
+      [3, 2, -1, 4, 0],
+      [0, 0,  5, 2, 1],
+      [0, 0,  0, 6, 3]
+    ],
+    pivots: [[0,0],[1,2],[2,3]],
+    freeCols: [1,4],
+    isValid: true
+  },
+  {
+    label: 'Example C — 4×4 with zero row',
+    note: 'Three non-zero rows above the zero row. Three pivots, one free variable. Zero rows always sit at the bottom.',
+    M: [
+      [1, 4, 2, -1],
+      [0, 0, 3,  2],
+      [0, 0, 0,  5],
+      [0, 0, 0,  0]
+    ],
+    pivots: [[0,0],[1,2],[2,3]],
+    freeCols: [1],
+    isValid: true
+  },
+  {
+    label: 'NOT in REF — staircase broken ✗',
+    note: 'Look at row 2: its pivot is in column 1, NOT strictly right of row 1\'s pivot in column 1. Same column = invalid REF.',
+    M: [
+      [2, 1, 3, 4],
+      [3, 0, 1, 2],
+      [0, 0, 5, 1]
+    ],
+    pivots: [],
+    freeCols: [],
+    isValid: false
+  }
+];
+let _refIdx = 0;
+function setRefExample(i){
+  _refIdx = i;
+  // mark the active button
+  const btns = document.querySelectorAll('#ref .btn-row .btn');
+  btns.forEach((b, k)=>b.classList.toggle('primary', k===i));
+}
+(function ref(){
+  const c = document.getElementById('refC');
+  let ctx, w, h;
+  function setup(){ const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h; }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+  function render(){
+    ctx.clearRect(0,0,w,h);
+    const ex = _refExamples[_refIdx];
+    // Title
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('STAIRCASE OF PIVOTS', 28, 30);
+    ctx.fillStyle = ex.isValid ? '#5fffb0' : '#ff5fa2';
+    ctx.font = '300 28px Inter, sans-serif';
+    ctx.fillText(ex.label, 28, 70);
+
+    // Matrix in center
+    const cellW = 64, cellH = 50;
+    const cols = ex.M[0].length, rows = ex.M.length;
+    const mx = (w - cols*cellW)/2;
+    const my = 110;
+    drawMatrixWithStaircase(ctx, ex.M, {
+      x:mx, y:my, cellW, cellH,
+      pivots: ex.pivots,
+      freeCols: ex.freeCols,
+      showStaircase: ex.isValid
+    });
+
+    // Description
+    ctx.fillStyle = COL.text;
+    ctx.font = '13px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    const noteY = my + rows*cellH + 50;
+    // wrap
+    const words = ex.note.split(' ');
+    let line='', y=noteY;
+    const maxW = w - 60;
+    words.forEach(word=>{
+      const test = line + (line?' ':'') + word;
+      if (ctx.measureText(test).width > maxW){
+        ctx.fillText(line, w/2, y); y += 22; line = word;
+      } else line = test;
+    });
+    if (line) ctx.fillText(line, w/2, y);
+    ctx.textAlign = 'left';
+
+    // Legend bottom
+    const ly = h - 26;
+    ctx.fillStyle = '#5fffb0';
+    ctx.fillRect(28, ly, 14, 14);
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('pivot column (basic var)', 50, ly+11);
+    ctx.fillStyle = '#ff5fa2';
+    ctx.fillRect(240, ly, 14, 14);
+    ctx.fillStyle = COL.muted;
+    ctx.fillText('free column (free var)', 262, ly+11);
+    ctx.fillStyle = '#5fffb0';
+    ctx.fillText('— green line: staircase descending right', 440, ly+11);
+  }
+  function loop(){ render(); requestAnimationFrame(loop); }
+  loop();
+})();
+
+/* ============================================================
+   CH 17 — RREF — animated step-by-step reduction from REF
+   ============================================================ */
+const _rrefSteps = [
+  {
+    title: 'STEP 0  ·  starting from REF',
+    note: 'A 3×4 matrix in row-echelon form. Pivots are 2, 5, 7 — but they need to become 1.',
+    M: [[2,1,-3,4],[0,5,2,1],[0,0,7,3]],
+    pivots: [[0,0],[1,1],[2,2]]
+  },
+  {
+    title: 'STEP 1  ·  scale each pivot row → pivot becomes 1',
+    note: 'R₁ ← R₁/2, R₂ ← R₂/5, R₃ ← R₃/7. Every leading non-zero is now 1.',
+    M: [[1,0.5,-1.5,2],[0,1,0.4,0.2],[0,0,1,3/7]],
+    pivots: [[0,0],[1,1],[2,2]]
+  },
+  {
+    title: 'STEP 2  ·  eliminate above pivot in column 3',
+    note: 'R₁ ← R₁ + 1.5·R₃, R₂ ← R₂ − 0.4·R₃. The −1.5 and 0.4 above the third pivot become 0.',
+    M: [[1,0.5,0,2 + 1.5*(3/7)],[0,1,0,0.2 - 0.4*(3/7)],[0,0,1,3/7]],
+    pivots: [[0,0],[1,1],[2,2]]
+  },
+  {
+    title: 'STEP 3  ·  eliminate above pivot in column 2',
+    note: 'R₁ ← R₁ − 0.5·R₂. The 0.5 above the second pivot becomes 0. RREF reached.',
+    M: [
+      [1,0,0,(2 + 1.5*(3/7)) - 0.5*(0.2 - 0.4*(3/7))],
+      [0,1,0,0.2 - 0.4*(3/7)],
+      [0,0,1,3/7]
+    ],
+    pivots: [[0,0],[1,1],[2,2]]
+  },
+  {
+    title: '✓ RREF  ·  pivots = 1, sole non-zero in their column',
+    note: 'Pivot columns are now standard basis vectors of ℝ³. The right side IS the solution.',
+    M: [
+      [1,0,0,(2 + 1.5*(3/7)) - 0.5*(0.2 - 0.4*(3/7))],
+      [0,1,0,0.2 - 0.4*(3/7)],
+      [0,0,1,3/7]
+    ],
+    pivots: [[0,0],[1,1],[2,2]]
+  }
+];
+let _rrefIdx = 0;
+let _rrefFrom = JSON.parse(JSON.stringify(_rrefSteps[0]));
+let _rrefTo = JSON.parse(JSON.stringify(_rrefSteps[0]));
+let _rrefProg = 1;
+function rrefNextStep(){
+  if (_rrefProg < 1) return;
+  if (_rrefIdx >= _rrefSteps.length-1){ _rrefIdx = 0; _rrefFrom = JSON.parse(JSON.stringify(_rrefSteps[0])); _rrefTo = JSON.parse(JSON.stringify(_rrefSteps[0])); _rrefProg = 1; return; }
+  _rrefFrom = JSON.parse(JSON.stringify(_rrefSteps[_rrefIdx]));
+  _rrefIdx++;
+  _rrefTo = JSON.parse(JSON.stringify(_rrefSteps[_rrefIdx]));
+  _rrefProg = 0;
+}
+function rrefReset(){
+  _rrefIdx = 0;
+  _rrefFrom = JSON.parse(JSON.stringify(_rrefSteps[0]));
+  _rrefTo = JSON.parse(JSON.stringify(_rrefSteps[0]));
+  _rrefProg = 1;
+}
+(function rref(){
+  const c = document.getElementById('rrefC');
+  let ctx, w, h;
+  function setup(){ const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h; }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+  function lerpMatrix(A, B, e){
+    return A.map((row,i)=>row.map((v,j)=>lerp(v, B[i][j], e)));
+  }
+  function render(){
+    if (_rrefProg < 1) _rrefProg = Math.min(1, _rrefProg + 0.012);
+    const e = easeInOutCubic(_rrefProg);
+    const Mnow = lerpMatrix(_rrefFrom.M, _rrefTo.M, e);
+    const step = _rrefSteps[_rrefIdx];
+    ctx.clearRect(0,0,w,h);
+
+    // Title
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('REF  →  RREF', 28, 30);
+    ctx.fillStyle = '#5fe3ff';
+    ctx.font = '300 26px Inter, sans-serif';
+    ctx.fillText(step.title, 28, 64);
+
+    // Matrix
+    const cellW = 90, cellH = 56;
+    const cols = Mnow[0].length, rows = Mnow.length;
+    const mx = (w - cols*cellW)/2;
+    const my = 100;
+    drawMatrixWithStaircase(ctx, Mnow, {
+      x:mx, y:my, cellW, cellH,
+      pivots: step.pivots,
+      showStaircase: false,
+      valDigits: 2
+    });
+
+    // pivot indicators (small green dots above pivot cells)
+    step.pivots.forEach(([r,col])=>{
+      ctx.save();
+      ctx.fillStyle = '#5fffb0';
+      ctx.shadowColor = '#5fffb0'; ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(mx + col*cellW + cellW/2, my - 14, 4, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    });
+
+    // Description
+    ctx.fillStyle = COL.text;
+    ctx.font = '13px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    const noteY = my + rows*cellH + 46;
+    const words = step.note.split(' ');
+    let line='', y=noteY;
+    const maxW = w - 100;
+    words.forEach(word=>{
+      const test = line + (line?' ':'') + word;
+      if (ctx.measureText(test).width > maxW){
+        ctx.fillText(line, w/2, y); y += 22; line = word;
+      } else line = test;
+    });
+    if (line) ctx.fillText(line, w/2, y);
+    ctx.textAlign = 'left';
+
+    // legend
+    ctx.fillStyle = COL.muted;
+    ctx.font = '10px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(`step ${_rrefIdx+1} / ${_rrefSteps.length}  ·  green = pivot cells  ·  yellow = augmented column`, 28, h-12);
+  }
+  function loop(){ render(); requestAnimationFrame(loop); }
+  loop();
+})();
+
+/* ============================================================
+   CH 18 — Particular & General Solution
+   System: [1 0 8 -4 | 42] · [0 1 2 12 | 8]
+   Pivot cols: 0, 1   Free cols: 2, 3
+   Particular: x = (42, 8, 0, 0)
+   Null space basis: (-8, -2, 1, 0), (4, -12, 0, 1)
+   General: particular + λ₁·n₁ + λ₂·n₂
+   ============================================================ */
+const _partSteps = [
+  {
+    title: 'STEP 0  ·  the system in RREF',
+    note: '2 pivots (cols 1,2) and 2 free variables (cols 3,4). Underconstrained: infinitely many solutions.',
+    showFree: false,
+    showParticular: false,
+    lambda: [0, 0]
+  },
+  {
+    title: 'STEP 1  ·  set free variables to zero',
+    note: 'x₃ = 0 and x₄ = 0 makes columns 3 and 4 disappear from the equation.',
+    showFree: true,
+    showParticular: false,
+    lambda: [0, 0]
+  },
+  {
+    title: 'STEP 2  ·  read the particular solution',
+    note: 'With free vars = 0, x₁ and x₂ must equal the right side directly. Particular: x = (42, 8, 0, 0).',
+    showFree: true,
+    showParticular: true,
+    lambda: [0, 0]
+  },
+  {
+    title: 'STEP 3  ·  find solutions to Ax = 0  (the null space)',
+    note: 'For x₃ = 1, x₄ = 0:  the equations force x₁ = -8, x₂ = -2.  Null vector n₁ = (-8, -2, 1, 0).',
+    showFree: true,
+    showParticular: true,
+    lambda: [0, 0],
+    showN1: true
+  },
+  {
+    title: 'STEP 4  ·  another null vector',
+    note: 'For x₃ = 0, x₄ = 1:  x₁ = 4, x₂ = -12.  Null vector n₂ = (4, -12, 0, 1).',
+    showFree: true,
+    showParticular: true,
+    lambda: [0, 0],
+    showN1: true,
+    showN2: true
+  },
+  {
+    title: 'STEP 5  ·  the general solution',
+    note: 'x = particular + λ₁·n₁ + λ₂·n₂  for any λ₁, λ₂ ∈ ℝ.  Adjust λ to wiggle through the infinite solution set — Ax always equals b.',
+    showFree: true,
+    showParticular: true,
+    lambda: [1, 0.5],
+    showN1: true,
+    showN2: true,
+    interactive: true
+  }
+];
+let _partIdx = 0;
+let _partLambda = [0, 0];
+let _partSweepT = 0;
+function partNextStep(){
+  if (_partIdx >= _partSteps.length-1){ _partIdx = 0; _partLambda = [0,0]; return; }
+  _partIdx++;
+  _partLambda = [..._partSteps[_partIdx].lambda];
+}
+function partReset(){
+  _partIdx = 0;
+  _partLambda = [0, 0];
+}
+(function part(){
+  const c = document.getElementById('partC');
+  let ctx, w, h;
+  function setup(){ const r = fitCanvas(c); ctx=r.ctx; w=r.w; h=r.h; }
+  setup(); addEventListener('resize',()=>{setup(); render();});
+  // The matrix [1 0 8 -4 | 42; 0 1 2 12 | 8]
+  const Aaug = [
+    [1, 0,  8, -4, 42],
+    [0, 1,  2, 12,  8]
+  ];
+  // Particular solution
+  const xp = [42, 8, 0, 0];
+  // Null space basis
+  const n1 = [-8, -2, 1, 0];
+  const n2 = [ 4, -12, 0, 1];
+
+  function render(){
+    const step = _partSteps[_partIdx];
+    if (step.interactive){
+      _partSweepT += 0.012;
+      _partLambda = [1.5*Math.sin(_partSweepT), 1.2*Math.cos(_partSweepT*0.8)];
+    }
+    ctx.clearRect(0,0,w,h);
+
+    // Title
+    ctx.fillStyle = COL.muted;
+    ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText('PARTICULAR  +  NULL SPACE  =  GENERAL SOLUTION', 28, 30);
+    ctx.fillStyle = '#5fe3ff';
+    ctx.font = '300 24px Inter, sans-serif';
+    ctx.fillText(step.title, 28, 60);
+
+    // Matrix [A | b] at top
+    const cellW = 70, cellH = 44;
+    const cols = 5, rows = 2;
+    const mx = 28;
+    const my = 90;
+    drawMatrixWithStaircase(ctx, Aaug, {
+      x:mx, y:my, cellW, cellH,
+      pivots: [[0,0],[1,1]],
+      freeCols: step.showFree ? [2, 3] : [],
+      augCol: 4,
+      showStaircase: false
+    });
+
+    // Right side: x vector display
+    const xCurrent = [
+      xp[0] + _partLambda[0]*n1[0] + _partLambda[1]*n2[0],
+      xp[1] + _partLambda[0]*n1[1] + _partLambda[1]*n2[1],
+      xp[2] + _partLambda[0]*n1[2] + _partLambda[1]*n2[2],
+      xp[3] + _partLambda[0]*n1[3] + _partLambda[1]*n2[3]
+    ];
+    // Verify Ax = b
+    const Ax = [
+      Aaug[0][0]*xCurrent[0] + Aaug[0][1]*xCurrent[1] + Aaug[0][2]*xCurrent[2] + Aaug[0][3]*xCurrent[3],
+      Aaug[1][0]*xCurrent[0] + Aaug[1][1]*xCurrent[1] + Aaug[1][2]*xCurrent[2] + Aaug[1][3]*xCurrent[3]
+    ];
+
+    // Show particular & null vectors
+    const colY = my + rows*cellH + 60;
+    if (step.showParticular){
+      ctx.fillStyle = COL.muted;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText('PARTICULAR  xₚ', 28, colY);
+      drawVecCol(ctx, xp, 28, colY+10, '#5fe3ff');
+    }
+    if (step.showN1){
+      ctx.fillStyle = COL.muted;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText('+  λ₁ · n₁', 175, colY);
+      drawVecCol(ctx, n1, 175, colY+10, '#ff5fa2');
+      // lambda1 value
+      ctx.fillStyle = '#ff5fa2';
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText(`λ₁ = ${_partLambda[0].toFixed(2)}`, 175, colY+150);
+    }
+    if (step.showN2){
+      ctx.fillStyle = COL.muted;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText('+  λ₂ · n₂', 320, colY);
+      drawVecCol(ctx, n2, 320, colY+10, '#ffd45f');
+      ctx.fillStyle = '#ffd45f';
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText(`λ₂ = ${_partLambda[1].toFixed(2)}`, 320, colY+150);
+    }
+    if (step.showParticular){
+      ctx.fillStyle = COL.muted;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText('=  general x', 470, colY);
+      drawVecCol(ctx, xCurrent, 470, colY+10, '#5fffb0', true);
+    }
+
+    // Verification: Ax = b?
+    if (step.showParticular){
+      const verifyY = colY + 180;
+      ctx.fillStyle = COL.muted;
+      ctx.font = '11px JetBrains Mono, ui-monospace, monospace';
+      ctx.fillText('VERIFY  ·  Ax must equal b = (42, 8)', 28, verifyY);
+      ctx.font = '14px JetBrains Mono, ui-monospace, monospace';
+      const ok = Math.abs(Ax[0]-42) < 1e-6 && Math.abs(Ax[1]-8) < 1e-6;
+      ctx.fillStyle = ok ? '#5fffb0' : '#ff5fa2';
+      ctx.fillText(`Ax = (${Ax[0].toFixed(2)},  ${Ax[1].toFixed(2)})  ${ok?'✓':'✗'}`, 28, verifyY+22);
+    }
+
+    // Description note
+    ctx.fillStyle = COL.text;
+    ctx.font = '13px Inter, sans-serif';
+    const noteY = h - 50;
+    const words = step.note.split(' ');
+    let line='', y=noteY;
+    const maxW = w - 60;
+    words.forEach(word=>{
+      const test = line + (line?' ':'') + word;
+      if (ctx.measureText(test).width > maxW){
+        ctx.fillText(line, 28, y); y += 22; line = word;
+      } else line = test;
+    });
+    if (line) ctx.fillText(line, 28, y);
+
+    // bottom
+    ctx.fillStyle = COL.muted;
+    ctx.font = '10px JetBrains Mono, ui-monospace, monospace';
+    ctx.fillText(`step ${_partIdx+1} / ${_partSteps.length}`, w - 80, h - 12);
+  }
+
+  function drawVecCol(ctx, v, x, y, color, glow=false){
+    const cellW = 60, cellH = 26;
+    ctx.save();
+    if (glow){ ctx.shadowColor = color; ctx.shadowBlur = 10; }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(x+8, y); ctx.lineTo(x, y); ctx.lineTo(x, y+v.length*cellH); ctx.lineTo(x+8, y+v.length*cellH);
+    ctx.moveTo(x+cellW-8, y); ctx.lineTo(x+cellW, y); ctx.lineTo(x+cellW, y+v.length*cellH); ctx.lineTo(x+cellW-8, y+v.length*cellH);
+    ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle = color;
+    ctx.font = '14px JetBrains Mono, ui-monospace, monospace';
+    ctx.textAlign = 'center';
+    v.forEach((val, i)=>{
+      const display = Math.abs(val) < 1e-9 ? '0' : (Number.isInteger(val) ? val.toString() : val.toFixed(2));
+      ctx.fillText(display, x + cellW/2, y + i*cellH + cellH/2 + 5);
+    });
+    ctx.textAlign = 'left';
+    // labels
+    ctx.fillStyle = COL.muted;
+    ctx.font = '9px JetBrains Mono, ui-monospace, monospace';
+    ['x₁','x₂','x₃','x₄'].forEach((lab,i)=>{
+      ctx.fillText(lab, x - 18, y + i*cellH + cellH/2 + 4);
+    });
+  }
+  function loop(){ render(); requestAnimationFrame(loop); }
+  loop();
+})();
+</script>
+
+</body>
+</html>

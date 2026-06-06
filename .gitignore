@@ -1,0 +1,12 @@
+# Lecture recordings (large files; exceed GitHub 100MB limit)
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+*.m4v
+*.wmv
+*.flv
+
+# macOS
+.DS_Store
