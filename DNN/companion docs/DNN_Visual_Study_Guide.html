@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DNN Closed-Book Visual Study Guide | AIMLCZG511</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface2: #243044;
+      --border: #2d3f5c;
+      --text: #e8edf4;
+      --muted: #8b9cb3;
+      --accent: #4dabf7;
+      --accent2: #51cf66;
+      --warn: #ffd43b;
+      --danger: #ff6b6b;
+      --code-bg: #0d1117;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+    nav {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    nav h2 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    nav a {
+      display: block;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      margin-bottom: 2px;
+      transition: all 0.15s;
+    }
+    nav a:hover { background: var(--surface2); color: var(--text); }
+    main {
+      padding: 2rem 2.5rem 4rem;
+      max-width: 960px;
+    }
+    header.hero {
+      background: linear-gradient(135deg, #1a2332 0%, #1e3a5f 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    header.hero h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+    header.hero p { color: var(--muted); }
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #000;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      margin-right: 0.4rem;
+      margin-top: 0.75rem;
+    }
+    section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 1rem;
+    }
+    section > h2 {
+      font-size: 1.35rem;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    h3 { font-size: 1.05rem; color: var(--accent); margin: 1.5rem 0 0.75rem; }
+    h4 { font-size: 0.95rem; color: var(--warn); margin: 1rem 0 0.5rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .formula-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.75rem;
+    }
+    .formula-item {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.85rem;
+    }
+    .formula-item strong { color: var(--accent2); display: block; margin-bottom: 0.3rem; font-family: inherit; }
+    figure {
+      margin: 1.25rem 0;
+      text-align: center;
+    }
+    figure img {
+      max-width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    figcaption {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
+      font-style: italic;
+    }
+    .steps { counter-reset: step; }
+    .step {
+      position: relative;
+      padding: 1rem 1rem 1rem 3.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+    .step .why {
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: rgba(77, 171, 247, 0.08);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .answer-box {
+      background: rgba(81, 207, 102, 0.1);
+      border: 1px solid var(--accent2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+    pre, code {
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.85rem;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: relative; height: auto; }
+      main { padding: 1rem; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--surface2); color: var(--accent); }
+    .tip {
+      background: rgba(255, 212, 59, 0.08);
+      border: 1px solid var(--warn);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.9rem;
+    }
+    .tip::before { content: "💡 Exam Tip: "; font-weight: 700; color: var(--warn); }
+    details { margin: 1rem 0; padding: 1rem; background: var(--surface); border-radius: 8px; border: 1px solid var(--border); }
+    details summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+    ol { padding-left: 1.5rem; margin: 0.75rem 0; }
+    li { margin: 0.3rem 0; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+<nav>
+  <h2>Complete Guide</h2>
+  <a href="#formulas">Formula Sheet</a>
+  <a href="#perceptron">EC2 Q1 Perceptron</a>
+  <a href="#linear">EC2 Q2 Linear Reg</a>
+  <a href="#logistic">EC2 Q3 Logistic</a>
+  <a href="#softmax">EC2 Q4 Softmax</a>
+  <a href="#dfnn">EC2 Q5 DFNN</a>
+  <a href="#derivation">BCE Derivation</a>
+  <a href="#cce">CCE Derivation</a>
+  <a href="#midqp">Mid QP 2024 (All 6Q)</a>
+  <a href="#ec3q1">EC3 Q1 X-ray DFNN</a>
+  <a href="#ec3q2">EC3 Q2 Churn</a>
+  <a href="#ec3q3">EC3 Q3 CNN/Transfer</a>
+  <a href="#ec3q4">EC3 Q4 RNN/GRU</a>
+  <a href="#ec3q5">EC3 Q5 Attention</a>
+  <a href="#ec3q6">EC3 Q6 Transformers</a>
+  <a href="#ec3q7">EC3 Q7 Optimizers</a>
+  <a href="#activations">Activation Functions</a>
+  <a href="#strategy">Exam Strategy</a>
+  <a href="#selftest">Self-Test</a>
+</nav>
+
+<main>
+
+<header class="hero"><div class="link-bar" style="margin-bottom:1rem"><a href="DNN_All_PYQ_Complete_Solutions.html">All PYQ Step-by-Step Solutions</a> | <a href="DNN_Practice_Variant_Questions.html">Practice Variant Questions</a></div>
+  <h1>DNN Complete Visual Study Guide</h1>
+  <p>EC2 + EC3 + Mid QP 2024 — All Questions, Theory, Derivations | AIMLCZG511</p>
+  <span class="badge">CLOSED BOOK</span>
+  <span class="badge">21 DIAGRAMS</span>
+  <span class="badge">ALL PYQs COVERED</span>
+</header>
+
+<!-- FORMULA SHEET -->
+<section id="formulas">
+  <h2>Part 0 — Formula Sheet (Memorize)</h2>
+  <div class="formula-grid">
+    <div class="formula-item"><strong>Linear model</strong>z = wᵀx + b</div>
+    <div class="formula-item"><strong>Sigmoid</strong>σ(z) = 1/(1+e⁻ᶻ)</div>
+    <div class="formula-item"><strong>ReLU</strong>max(0, z)</div>
+    <div class="formula-item"><strong>Softmax</strong>pₖ = exp(zₖ)/Σexp(zⱼ)</div>
+    <div class="formula-item"><strong>BCE gradient ★</strong>∂L/∂z = ŷ − y</div>
+    <div class="formula-item"><strong>Weight gradient</strong>∇wL = (ŷ−y)x</div>
+    <div class="formula-item"><strong>Perceptron update</strong>w ← w + η(y−ŷ)x</div>
+    <div class="formula-item"><strong>GD update</strong>w ← w − η∇wL</div>
+    <div class="formula-item"><strong>CNN output</strong>(N−F+2P)/S + 1</div>
+    <div class="formula-item"><strong>Precision</strong>TP/(TP+FP)</div>
+    <div class="formula-item"><strong>Recall</strong>TP/(TP+FN)</div>
+    <div class="formula-item"><strong>Backprop</strong>dZ₂=A₂−Y; dW₂=dZ₂·A₁ᵀ</div>
+    <div class="formula-item"><strong>Conv params</strong>(F²·C_in+1)·C_out</div>
+    <div class="formula-item"><strong>Attention</strong>softmax(QKᵀ/√d_k)V</div>
+    <div class="formula-item"><strong>GRU</strong>h_t=z_t·h_{t−1}+(1−z_t)·h̃_t</div>
+  </div>
+</section>
+
+<!-- PERCEPTRON -->
+<section id="perceptron">
+  <h2>Question 1 — Perceptron (EC2 Q1a)</h2>
+
+  <figure>
+    <img src="html_assets/perceptron_diagram.png" alt="Perceptron diagram showing inputs x0=1, x1=1, x2=2, weights, step activation, output y_hat=1">
+    <figcaption>Perceptron architecture — bias x₀=1 is always included</figcaption>
+  </figure>
+
+  <div class="card">
+    <strong>Given:</strong> w = [0.5, 0.3, −0.4], x₁=1, x₂=2, y=1, η=0.1, step: ŷ=1 if z≥0 else 0
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <strong>Compute weighted sum z</strong>
+      <pre>z = w₀·1 + w₁·x₁ + w₂·x₂
+  = 0.5(1) + 0.3(1) + (−0.4)(2)
+  = 0.5 + 0.3 − 0.8
+  = 0.0</pre>
+      <div class="answer-box">Answer (i): z = 0.0</div>
+    </div>
+    <div class="step">
+      <strong>Apply step activation</strong>
+      <pre>z = 0.0  →  0 ≥ 0 is TRUE  →  ŷ = 1</pre>
+      <div class="answer-box">Answer (ii): ŷ = 1</div>
+    </div>
+    <div class="step">
+      <strong>Check if update needed</strong>
+      <pre>y = 1, ŷ = 1  →  CORRECTLY CLASSIFIED
+Perceptron rule: w ← w + η(y−ŷ)x  (only when ŷ ≠ y)
+→ No update. Weights stay [0.5, 0.3, −0.4]</pre>
+      <div class="why">Many students blindly apply the update. Always compare ŷ vs y first!</div>
+      <div class="answer-box">Answer (iii): No update — weights unchanged</div>
+    </div>
+  </div>
+
+  <h3>Perceptron Code Blanks (Q1d)</h3>
+  <pre>Blank 1: np.dot(X[i], weights)
+Blank 2: y[i] - y_pred
+Blank 3: learning_rate * error * X[i]    ← NOTE: uses + in line 15 (not minus!)
+Blank 4: np.array([1 if np.dot(x, w) >= 0 else 0 for x in X])
+Blank 5: np.mean(preds == y)</pre>
+  <div class="tip">Perceptron uses w + η·error·x (ADD). Logistic uses w − η·gradient (SUBTRACT). Don't mix them!</div>
+
+  <h3>Q1(b) Spam Classifier Theory</h3>
+  <div class="card">
+    <strong>(i) Strongest spam indicator:</strong> Links (weight 0.9) — highest positive weight pushes toward spam class.<br><br>
+    <strong>(ii) 75% accuracy plateau reveals:</strong> (1) Perceptron converged to best linear boundary. (2) Data is NOT fully linearly separable — ~25% cannot be separated by any line. (3) More epochs won't help — model class is too weak. (4) Need MLP with hidden layers for non-linear patterns.
+  </div>
+
+  <h3>Q1(c) Approach A vs B — Generalization</h3>
+  <div class="card">
+    <strong>Approach A generalizes better.</strong> 500 samples / 5 features = 100 samples per feature vs only 10 for Approach B (50 features). Both get 78% on training, but B likely memorizes word combinations. A uses domain-meaningful features (sentiment, star rating) that transfer to new reviews.
+  </div>
+</section>
+
+<!-- LINEAR REGRESSION -->
+<section id="linear">
+  <h2>Question 2 — Linear Regression (EC2 Q2a)</h2>
+
+  <div class="card">
+    <strong>Given:</strong> X=[[1,10],[1,20]], y=[150,250], w₀=50, w₁=8, η=0.01, N=2
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <strong>Predictions</strong>
+      <pre>ŷ₁ = 50 + 8(10) = 130
+ŷ₂ = 50 + 8(20) = 210</pre>
+      <div class="answer-box">ŷ = [130, 210]</div>
+    </div>
+    <div class="step">
+      <strong>MSE Loss</strong>
+      <pre>MSE = (1/2)[(150−130)² + (250−210)²]
+    = (1/2)[400 + 1600] = 1000</pre>
+      <div class="answer-box">MSE = 1000</div>
+    </div>
+    <div class="step">
+      <strong>Gradient</strong>
+      <pre>error = ŷ − y = [−20, −40]
+gradient = Xᵀ · error / N
+         = [−60, −1000] / 2
+         = [−30, −500]</pre>
+      <div class="why">Negative gradient means predictions are too LOW → weights should increase</div>
+    </div>
+    <div class="step">
+      <strong>Weight update</strong>
+      <pre>w₀_new = 50 − 0.01(−30) = 50.30
+w₁_new = 8  − 0.01(−500) = 13.0</pre>
+      <div class="answer-box">New weights = [50.30, 13.0]</div>
+    </div>
+  </div>
+
+  <h3>Q2(b) Linear Regression Code Blanks</h3>
+  <pre>Blank 1: np.dot(X, weights)
+Blank 2: np.mean((y_pred - y)**2)
+Blank 3: np.dot(X.T, error) / N
+Blank 4: weights - lr * gradient
+Blank 5: train_linear(X, y)</pre>
+
+  <h3>Q2(c) Salary Prediction & RMSE</h3>
+  <div class="card">
+    Salary = 30000 + 2500(4) + 3000(2) = <strong>$46,000</strong> — reasonable for entry-level with 4 yrs education + 2 yrs experience.<br><br>
+    RMSE = √5,000,000 = <strong>$2,236</strong> — acceptable (~4–7% of typical salary range).
+  </div>
+
+  <h3>Q2(d) Normalized vs Original Features</h3>
+  <div class="card">
+    <strong>Model B (normalized) trains faster.</strong> Area values 400–2000 create an elongated error surface → GD zigzags. After z-score normalization, surface is more circular → faster convergence. Both reach identical final weights and test MSE.
+  </div>
+</section>
+
+<!-- LOGISTIC REGRESSION -->
+<section id="logistic">
+  <h2>Question 3 — Logistic Regression (EC2 Q3a)</h2>
+
+  <figure>
+    <img src="html_assets/logistic_regression_flow.png" alt="Logistic regression flowchart from input to updated weights">
+    <figcaption>Complete flow for one gradient descent step on a single training example</figcaption>
+  </figure>
+
+  <div class="card">
+    <strong>Given:</strong> w=[0, 0.6, 0.8], x=[1, 0.7, 0.5], y=1, η=0.1
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <strong>Weighted sum z</strong>
+      <pre>z = 0 + 0.6(0.7) + 0.8(0.5) = 0.42 + 0.40 = 0.82</pre>
+    </div>
+    <div class="step">
+      <strong>Sigmoid probability</strong>
+      <pre>ŷ = 1/(1 + e^(−0.82)) = 1/(1 + 0.440) ≈ 0.694</pre>
+      <div class="why">69.4% approval probability — model under-predicts since true label is 1</div>
+    </div>
+    <div class="step">
+      <strong>Gradient (golden formula)</strong>
+      <pre>∇w = (ŷ − y) · x = (0.694 − 1) · [1, 0.7, 0.5]
+     = [−0.306, −0.214, −0.153]</pre>
+    </div>
+    <div class="step">
+      <strong>Updated weights</strong>
+      <pre>w₀ = 0 − 0.1(−0.306) = 0.031
+w₁ = 0.6 − 0.1(−0.214) = 0.621
+w₂ = 0.8 − 0.1(−0.153) = 0.815</pre>
+      <div class="answer-box">w_new ≈ [0.031, 0.621, 0.815]</div>
+    </div>
+  </div>
+
+  <h3>Imbalanced Accuracy (Q3c)</h3>
+  <div class="card">
+    <pre>Accuracy = (40 + 855) / 1000 = 89.5%
+
+Naive "always healthy" classifier = 950/1000 = 95% accuracy!
+Our "smart" model is WORSE than doing nothing.</pre>
+    <div class="tip">On imbalanced data, always report Precision, Recall, F1 — not just accuracy.</div>
+  </div>
+
+  <h3>Q3(b) Logistic Code Blanks</h3>
+  <pre>Blank 1: 1 / (1 + np.exp(-z))
+Blank 2: sigmoid(z)
+Blank 3: np.dot(X_batch.T, (y_pred - y_batch)) / len(y_batch)
+Blank 4: weights - lr * gradient
+Blank 5: (sigmoid(np.dot(X, weights)) >= 0.5).astype(int)</pre>
+
+  <h3>Q3(c)(ii) Threshold & Recall vs Precision</h3>
+  <div class="card">
+    For life-threatening disease: <strong>Recall &gt; Precision</strong> — missing disease (FN) is fatal; false alarm (FP) is extra test only.<br>
+    Lower threshold 0.5→0.3: FP increases, FN decreases, Recall increases.
+  </div>
+
+  <h3>Q3(d) Fraud Detection — Deploy Model B</h3>
+  <div class="card">
+    Model B catches 75 more frauds × $100 = <strong>$7,500 saved</strong>. 1% accuracy gain is marginal; 15% fraud detection improvement dominates. Deploy Model B despite 20 vs 3 features.
+  </div>
+</section>
+
+<!-- SOFTMAX -->
+<section id="softmax">
+  <h2>Question 4 — Softmax & Confusion Matrix (EC2 Q4)</h2>
+
+  <div class="two-col">
+    <figure>
+      <img src="html_assets/softmax_probabilities.png" alt="Softmax probability bar chart for 3 sentiment classes">
+      <figcaption>Softmax: z=[2.0, 1.0, 0.5], true class = Neutral (1)</figcaption>
+    </figure>
+    <figure>
+      <img src="html_assets/confusion_matrix_bird.png" alt="Confusion matrix heatmap for Cat Dog Bird classifier">
+      <figcaption>Bird class: TP=250, FP=35, FN=50</figcaption>
+    </figure>
+  </div>
+
+  <h3>Softmax Calculation</h3>
+  <div class="steps">
+    <div class="step">
+      <strong>Exponentials</strong>
+      <pre>e²·⁰ = 7.389,  e¹·⁰ = 2.718,  e⁰·⁵ = 1.649
+Sum = 11.756</pre>
+    </div>
+    <div class="step">
+      <strong>Probabilities</strong>
+      <pre>p₀ = 7.389/11.756 = 0.629  (negative)
+p₁ = 2.718/11.756 = 0.231  (neutral) ← TRUE CLASS
+p₂ = 1.649/11.756 = 0.140  (positive)</pre>
+    </div>
+    <div class="step">
+      <strong>CCE Loss & Prediction</strong>
+      <pre>L = −log(0.231) = 1.47
+Predicted = argmax = Class 0 (negative) → WRONG</pre>
+      <div class="answer-box">Loss = 1.47 | Prediction incorrect</div>
+    </div>
+  </div>
+
+  <h3>Bird Class Metrics (Q4c)</h3>
+  <table>
+    <tr><th>Metric</th><th>Formula</th><th>Value</th></tr>
+    <tr><td>TP</td><td>True Bird → Pred Bird</td><td>250</td></tr>
+    <tr><td>FP</td><td>Not Bird → Pred Bird (5 cats + 30 dogs)</td><td>35</td></tr>
+    <tr><td>FN</td><td>True Bird → Not Bird (10 cats + 40 dogs)</td><td>50</td></tr>
+    <tr><td>Precision</td><td>250/(250+35)</td><td><strong>87.7%</strong></td></tr>
+    <tr><td>Recall</td><td>250/(250+50)</td><td><strong>83.3%</strong></td></tr>
+  </table>
+
+  <h3>Q4(b) Softmax Code Blanks</h3>
+  <pre>Blank 1: exp_Z / np.sum(exp_Z, axis=1, keepdims=True)
+Blank 2: np.dot(X_batch, W)
+Blank 3: np.dot(X_batch.T, (Y_pred - Y_batch)) / len(Y_batch)
+Blank 4: W - lr * gradient
+Blank 5: np.argmax(np.dot(X, W), axis=1)</pre>
+
+  <h3>Q4(c)(ii) Bird-Dog Confusion Pattern</h3>
+  <div class="card">
+    Birds misclassified as dogs (40/50 errors) → model learned shared visual features. 88% overall accuracy does NOT guarantee good per-class performance — always check precision/recall per class.
+  </div>
+
+  <h3>Q4(d) Hospital TB Model — Deploy Model B</h3>
+  <div class="card">
+    Model B: 85% accuracy but 78% TB recall vs Model A: 92% accuracy but only 45% TB recall. Missing TB is catastrophic (contagious, fatal). 7% accuracy drop is acceptable to catch most TB cases.
+  </div>
+</section>
+
+<!-- DFNN -->
+<section id="dfnn">
+  <h2>Question 5 — DFNN Forward & Backprop (EC2 Q5)</h2>
+
+  <figure>
+    <img src="html_assets/dfnn_forward_pass.png" alt="2-layer DFNN forward propagation with ReLU and sigmoid">
+    <figcaption>Forward pass: Input → Hidden(ReLU) → Output(Sigmoid)</figcaption>
+  </figure>
+
+  <div class="card">
+    <strong>Given:</strong> x=[0.5, 0.8], W¹=[[1,0.5],[-0.5,1.5]], b¹=[0.2,−0.3], w²=[1.2,0.8], b²=0.1, y=1
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <strong>Hidden pre-activation Z¹</strong>
+      <pre>z₁ = 0.5(1.0) + 0.8(−0.5) + 0.2 = 0.3
+z₂ = 0.5(0.5) + 0.8(1.5) − 0.3 = 1.15
+Z¹ = [0.3, 1.15]</pre>
+    </div>
+    <div class="step">
+      <strong>ReLU activation A¹</strong>
+      <pre>A¹ = [max(0,0.3), max(0,1.15)] = [0.3, 1.15]</pre>
+    </div>
+    <div class="step">
+      <strong>Output & Loss</strong>
+      <pre>z² = 0.3(1.2) + 1.15(0.8) + 0.1 = 1.38
+ŷ = sigmoid(1.38) ≈ 0.799
+BCE = −log(0.799) ≈ 0.225</pre>
+      <div class="answer-box">ŷ ≈ 0.799 | Loss ≈ 0.225</div>
+    </div>
+  </div>
+
+  <figure>
+    <img src="html_assets/backprop_flow.png" alt="Backpropagation chain showing forward and backward pass">
+    <figcaption>Backpropagation chain — memorize this flow for closed book</figcaption>
+  </figure>
+
+  <h3>Backprop Code Blanks (Q5b)</h3>
+  <pre>Blank 1: np.maximum(0, Z)              # ReLU
+Blank 2: relu(Z1)
+Blank 3: np.dot(A1.T, dZ2) / N         # dW2
+Blank 4: np.dot(dZ2, W2.T)             # dA1
+Blank 5: np.dot(X.T, dZ1) / N          # dW1
+
+Key chain:
+  dZ2 = A2 - Y
+  dW2 = A1.T @ dZ2 / N
+  dA1 = dZ2 @ W2.T
+  dZ1 = dA1 * (Z1 > 0)    ← ReLU mask
+  dW1 = X.T @ dZ1 / N</pre>
+
+  <h3>Q5(c) Parameter Count & Overfitting</h3>
+  <div class="card">
+    Input(1000)→Hidden(8)→Output(5): 1000×8 + 8×5 = <strong>8,040 params</strong>. 50,000/8,040 ≈ 6 samples/param — borderline OK.<br><br>
+    High train acc + low test acc causes: (1) Model too large — memorizes noise. (2) Insufficient regularization — add dropout, L2, early stopping.
+  </div>
+
+  <h3>Q5(d) Mobile vs Cloud Architecture</h3>
+  <div class="card">
+    <strong>Mobile → Architecture A:</strong> 5ms×1M = 1.4 hr/day vs 45ms = 12.5 hr/day. 3.4 GB RAM exceeds phone budget. 2% accuracy not worth 9× slowdown.<br><br>
+    <strong>Cloud → Architecture B:</strong> Unlimited compute/RAM; 2% accuracy matters at scale.
+  </div>
+</section>
+
+<!-- CCE DERIVATION -->
+<section id="cce">
+  <h2>CCE + Softmax Gradient Derivation (Jacobian)</h2>
+  <figure>
+    <img src="html_assets/cce_derivation.png" alt="CCE gradient derivation flowchart">
+    <figcaption>From DNN_extra_notes (2) — full Jacobian chain rule</figcaption>
+  </figure>
+  <div class="steps">
+    <div class="step"><strong>Step 1 — Loss</strong><pre>L = −Σ y_i log(p̂_i)  [one-hot: L = −log(p̂_k)]</pre></div>
+    <div class="step"><strong>Step 2 — ∂L/∂p̂_i</strong><pre>∂L/∂p̂_i = −y_i / p̂_i</pre></div>
+    <div class="step"><strong>Step 3 — Softmax Jacobian</strong><pre>∂p̂_i/∂z_j = p̂_i(δ_ij − p̂_j)</pre>
+      <div class="why">Softmax couples ALL outputs — changing one logit affects every probability.</div></div>
+    <div class="step"><strong>Step 4 — Chain rule</strong><pre>∂L/∂z_j = Σ(−y_i/p̂_i)·p̂_i(δ_ij−p̂_j) = p̂_j − y_j</pre></div>
+    <div class="step"><strong>Step 5 — Vector form</strong><pre>∇_z L = p̂ − y    |    ∂L/∂W = (p̂−y)xᵀ</pre>
+      <div class="answer-box">Same elegant form as BCE+Sigmoid: Gradient = Prediction − Target</div></div>
+  </div>
+</section>
+
+<!-- MID QP FULL -->
+<section id="midqp">
+  <h2>Mid QP 2024 — All 6 Questions (Closed Book)</h2>
+
+  <h3>Q1 — MLP Design for Non-Linear Boundary [6 marks]</h3>
+  <figure>
+    <img src="html_assets/mlp_decision_boundary.png" alt="MLP for concentric circle decision boundary">
+    <figcaption>Minimum architecture: 1 hidden layer, 2 hidden nodes for ring/concentric boundary</figcaption>
+  </figure>
+  <div class="card">
+    <strong>Minimum architecture: Input(2) → Hidden(2) → Output(1)</strong><br><br>
+    H1: detects inner region (x²+y² &lt; r₁²) → +1 inside<br>
+    H2: detects outer region (x²+y² &lt; r₂²) → +1 inside outer circle<br>
+    Output: combines H1, H2 → +1 for inner class, −1 for outer ring<br><br>
+    Step activation at each node: output = +1 if weighted sum ≥ threshold (write threshold inside node).<br><br>
+    <strong>Why 1 perceptron fails:</strong> Single line cannot separate concentric circles — not linearly separable (XOR principle extended to 2D).
+  </div>
+
+  <h3>Q2 — CNN Output Shapes [5 marks]</h3>
+  <figure>
+    <img src="html_assets/cnn_output_shapes.png" alt="CNN output shape pipeline">
+    <figcaption>Formula: (N − F + 2P) / S + 1</figcaption>
+  </figure>
+  <div class="card">(a) 8×8, 3×3 conv S=1 P=0 → <strong>6×6</strong><br>
+  (b) 5 filters → <strong>6×6×5</strong><br>
+  (c) MaxPool 4×4 S=2 → <strong>2×2×5</strong></div>
+
+  <h3>Q3 — Transfer Learning [4 marks]</h3>
+  <figure>
+    <img src="html_assets/transfer_learning.png" alt="Transfer learning comparison">
+  </figure>
+  <table>
+    <tr><th></th><th>Rakesh (scratch, 100)</th><th>Ram (pretrain→fine-tune)</th></tr>
+    <tr><td>Problem</td><td><strong>Overfitting</strong></td><td>Domain mismatch</td></tr>
+    <tr><td>Fix</td><td>Regularization, more data</td><td>Freeze early layers, small LR</td></tr>
+  </table>
+
+  <h3>Q4 — Gradient Descent E(w₁,w₂) [5 marks]</h3>
+  <div class="card"><pre>E = 3w₁² + 4w₂² + 2w₁w₂, (0.5,0.5), η=0.1
+Gradients: (4, 5)  |  New weights: (0.1, 0.0)</pre></div>
+
+  <h3>Q5 — CNN vs FC + Accuracy Drop [5 marks]</h3>
+  <div class="card">
+    <strong>(a)</strong> Parameter sharing + local connectivity/translation equivariance<br>
+    <strong>(b)</strong> Training acc decreasing = <strong>divergence</strong> (LR too high), NOT overfitting. Fix: reduce η.
+  </div>
+
+  <h3>Q6 — Hyperparameters & CNN vs ANN [5 marks]</h3>
+  <div class="card">η, batch size, epochs, layers, neurons, activation, optimizer, dropout, L2.<br>
+  CNN preferred: 2500-pixel image → millions of FC params vs 27 per conv filter. CNN preserves spatial structure.</div>
+</section>
+
+<!-- EC3 Q1 -->
+<section id="ec3q1">
+  <h2>EC3 Q1 — Hospital X-ray DFNN (10-class)</h2>
+  <figure><img src="html_assets/activation_functions.png" alt="Activation functions reference"></figure>
+  <div class="card">
+    <strong>(a)(i) ReLU inference:</strong> z = 0.4(0.8)+0.1(−0.5)+(−0.2)(0.2)+0.5 = <strong>0.73</strong><br>
+    <strong>(a)(ii) Softmax:</strong> p_i = exp(z_i)/Σexp(z_j) — valid 10-class probability distribution<br>
+    <strong>(a)(iii)</strong> H1: ReLU max(0,z) | H2: Leaky ReLU max(αz,z) | Output: Softmax<br>
+    <strong>(b)(i)</strong> Perceptron = one linear boundary; 10-class needs non-linear regions; XOR analogy<br>
+    <strong>(b)(ii)</strong> Vanishing gradients from sigmoid saturation → early layers don't learn. Fix: ReLU + skip connections (ResNet)
+  </div>
+</section>
+
+<!-- EC3 Q2 -->
+<section id="ec3q2">
+  <h2>EC3 Q2 — Churn Prediction DFNN</h2>
+  <figure><img src="html_assets/churn_dfnn_architecture.png" alt="Churn DFNN architecture"></figure>
+  <div class="card">
+    <strong>(a)(i)</strong> Sigmoid + BCE paired — probability output + logarithmic penalty; gradient = ŷ−y<br>
+    <strong>(a)(ii)</strong> P=0.73 &gt; 0.5 → Predict <strong>Churn</strong>. Threshold = decision boundary for retention action<br>
+    <strong>(b)(i)</strong> DFNN captures non-linear feature interactions + hierarchical representations<br>
+    <strong>(b)(ii)</strong> ReLU (fast, sparse) in H1; Leaky ReLU (prevents dying ReLU) in H2<br>
+    <strong>(b)(iii) Architecture:</strong> Input(4) → H1(64, ReLU) → H2(32, Leaky ReLU) → Out(1, Sigmoid) + BCE
+  </div>
+</section>
+
+<!-- EC3 Q3 -->
+<section id="ec3q3">
+  <h2>EC3 Q3 — Skin Cancer CNN + Edge Device</h2>
+  <div class="two-col">
+    <figure><img src="html_assets/resnet_transfer_learning.png" alt="ResNet transfer learning"></figure>
+    <figure><img src="html_assets/cnn_gap_edge.png" alt="Global Average Pooling"></figure>
+  </div>
+  <div class="card">
+    <strong>Transfer learning YES:</strong> 8000 images, imbalanced melanoma (600), pretrained features help<br>
+    <strong>ResNet FC:</strong> Removed 2,049,000 | Added 1,052,679 | Net <strong>−996,321</strong><br>
+    <strong>Layer 1:</strong> (5×5×3+1)×32 = <strong>2,432</strong> | <strong>Layer 8 FC:</strong> 100352×256+256 = <strong>25,690,368</strong><br>
+    <strong>4-channel input:</strong> Layer1 = 3,232 (+32.9%); Layer 3 &amp; 8 unchanged<br>
+    <strong>GAP Option A:</strong> 128→10 = <strong>1,290 params</strong> (vs 25.6M). Adv: edge deployment. Disadv: loses spatial info<br>
+    <strong>128×128 crop drop:</strong> context loss + train/inference scale mismatch<br>
+    <strong>Infrared RF claim:</strong> <strong>FALSE</strong> — RF depends on kernel/stride/depth, not input channels
+  </div>
+</section>
+
+<!-- EC3 Q4 -->
+<section id="ec3q4">
+  <h2>EC3 Q4 — RNN / GRU Factory Anomaly</h2>
+  <figure><img src="html_assets/rnn_gru_architecture.png" alt="RNN vs GRU architecture"></figure>
+  <div class="steps">
+    <div class="step"><strong>Q4(a) Params</strong><pre>RNN (d=10,h=20) = 620  |  GRU = 1,860</pre>
+      <div class="why">Choose GRU: gated memory, fewer params than LSTM, fits edge device</div></div>
+    <div class="step"><strong>Q4(b)(i) Vanilla RNN</strong><pre>pre_act = [1.1, 0.1]  →  h_t = tanh ≈ [0.80, 0.10]</pre></div>
+    <div class="step"><strong>Q4(b)(ii) GRU</strong><pre>z_t ≈ [0.88, 0.73]  |  h̃_t ≈ [0.76, 0.46]  |  h_t ≈ [0.53, −0.24]</pre></div>
+    <div class="step"><strong>Q4(b)(iii) Conservative update</strong><pre>GRU retains 88% of h_{t−1} at dim 0 — smaller change than vanilla RNN</pre></div>
+    <div class="step"><strong>Q4(c) BPTT</strong><pre>∂L/∂h₂ = 0.9  |  ∂L/∂h₁ = 0.81  |  RNN preferred over Transformer: O(1) streaming vs O(L²)</pre></div>
+  </div>
+</section>
+
+<!-- EC3 Q5 -->
+<section id="ec3q5">
+  <h2>EC3 Q5 — Attention Mechanisms</h2>
+  <div class="two-col">
+    <figure><img src="html_assets/attention_mechanism.png" alt="Scaled dot-product attention"></figure>
+    <figure><img src="html_assets/additive_vs_dot_attention.png" alt="Additive vs dot-product attention"></figure>
+  </div>
+  <div class="card">
+    <strong>Dot-product (Q5a):</strong> scores = [9.19, 9.19, 24.74], context ≈ <strong>[8, 3]</strong><br>
+    Missing: <strong>causal masking</strong> — model copies past instead of predicting future<br>
+    <strong>Additive (Q5b):</strong> e_j = vᵀtanh(W_q q + W_k k_j), context ≈ [1.47, 0.72]<br>
+    External DB → <strong>Cross-attention</strong> | Diverse clinical signals → <strong>Multi-head self-attention</strong><br>
+    <strong>Multi-head:</strong> d_k = 512/8 = 64 per head; different heads learn different temporal patterns
+  </div>
+</section>
+
+<!-- EC3 Q6 -->
+<section id="ec3q6">
+  <h2>EC3 Q6 — Transformers for Clinical NLP</h2>
+  <figure><img src="html_assets/transformer_architecture.png" alt="Transformer encoder-decoder"></figure>
+  <div class="card">
+    <strong>Positional encoding:</strong> injects token order — without it, "fever then cough" = "cough then fever"<br>
+    <strong>Architecture match:</strong> NER → Encoder (BERT) | Generation → Decoder (GPT) | Summarisation → Encoder-Decoder (T5)<br>
+    <strong>Tensor dims:</strong> (B,128,512) → (B,128,2048) → (B,128,512)<br>
+    <strong>Encoder layer params:</strong> MHA ~1.05M + FFN ~2.10M = <strong>~3.15M total</strong><br>
+    <strong>Pre-LN vs Post-LN:</strong> Pre-LN more stable early training; Post-LN slightly better final perf with tuning<br>
+    <strong>Summarisation:</strong> Fine-tune T5/BART — don't train from scratch with 50K pairs<br>
+    <strong>O(L²) bottleneck:</strong> 2048 tokens → 4M attention scores. Mitigation: sliding window attention
+  </div>
+</section>
+
+<!-- EC3 Q7 -->
+<section id="ec3q7">
+  <h2>EC3 Q7 — Optimizers &amp; Regularization</h2>
+  <div class="two-col">
+    <figure><img src="html_assets/optimizer_curves.png" alt="Optimizer training curves"></figure>
+    <figure><img src="html_assets/regularization_diagnosis.png" alt="Regularization diagnosis"></figure>
+  </div>
+  <figure><img src="html_assets/batch_normalization.png" alt="Batch normalization mechanism"></figure>
+  <table>
+    <tr><th>Curve/Run</th><th>Answer</th><th>Why</th></tr>
+    <tr><td>A</td><td>SGD</td><td>Smooth, very slow</td></tr>
+    <tr><td>B</td><td>SGD+Momentum</td><td>Fast, oscillates</td></tr>
+    <tr><td>C</td><td>RMSprop</td><td>Fast, plateaus higher</td></tr>
+    <tr><td>D</td><td>Adam</td><td>Fastest, lowest loss</td></tr>
+    <tr><td>Schedule X</td><td>Constant high LR</td><td>Sharp rise then oscillates</td></tr>
+    <tr><td>Schedule Y</td><td>Constant low LR</td><td>Early plateau</td></tr>
+    <tr><td>Schedule Z</td><td>Cosine annealing + restarts</td><td>Dip then recovers to best</td></tr>
+    <tr><td>Run 1 (98/71)</td><td>Overfitting</td><td>Fix: Dropout + L2</td></tr>
+    <tr><td>Run 2 (84/83)</td><td>Underfitting</td><td>Model too weak</td></tr>
+    <tr><td>Run 3 (91/90)</td><td>Good fit</td><td>Optimal</td></tr>
+    <tr><td>Run 4 (76/74)</td><td>Unstable</td><td>BatchNorm fixes this</td></tr>
+  </table>
+  <div class="card">
+    Val loss ↑ while train loss ↓ = <strong>Overfitting</strong> → weight decay or LR reduction<br>
+    BatchNorm on Run 4: normalizes activations per mini-batch → stable training, faster convergence, higher LR allowed
+  </div>
+</section>
+
+<!-- ACTIVATIONS -->
+<section id="activations">
+  <h2>Activation Functions Reference</h2>
+
+  <figure>
+    <img src="html_assets/activation_functions.png" alt="Step, Sigmoid, ReLU, and Softmax activation functions">
+    <figcaption>Must-know activations for closed book exam</figcaption>
+  </figure>
+
+  <table>
+    <tr><th>Function</th><th>Formula</th><th>Range</th><th>Derivative</th><th>Use</th></tr>
+    <tr><td>Step</td><td>1 if z≥0 else 0</td><td>{0,1}</td><td>—</td><td>Perceptron</td></tr>
+    <tr><td>Sigmoid</td><td>1/(1+e⁻ᶻ)</td><td>(0,1)</td><td>ŷ(1−ŷ)</td><td>Binary output</td></tr>
+    <tr><td>ReLU</td><td>max(0,z)</td><td>[0,∞)</td><td>1 if z>0 else 0</td><td>Hidden layers</td></tr>
+    <tr><td>Leaky ReLU</td><td>max(αz,z)</td><td>(−∞,∞)</td><td>1 or α</td><td>Fixes dying ReLU</td></tr>
+    <tr><td>Softmax</td><td>exp(zᵢ)/Σexp(zⱼ)</td><td sums to 1</td><td>ŷ−y (shortcut)</td><td>Multi-class output</td></tr>
+  </table>
+</section>
+
+<!-- DERIVATION -->
+<section id="derivation">
+  <h2>BCE + Sigmoid Gradient Derivation (Must-Know)</h2>
+
+  <div class="steps">
+    <div class="step">
+      <strong>Step 1 — Write the loss</strong>
+      <pre>L = −[y·log(ŷ) + (1−y)·log(1−ŷ)]    where ŷ = σ(z)</pre>
+    </div>
+    <div class="step">
+      <strong>Step 2 — ∂L/∂ŷ</strong>
+      <pre>∂L/∂ŷ = −[y/ŷ − (1−y)/(1−ŷ)]</pre>
+    </div>
+    <div class="step">
+      <strong>Step 3 — ∂ŷ/∂z (sigmoid derivative)</strong>
+      <pre>∂ŷ/∂z = ŷ(1−ŷ)</pre>
+    </div>
+    <div class="step">
+      <strong>Step 4 — Chain rule & simplify</strong>
+      <pre>∂L/∂z = −[y/ŷ − (1−y)/(1−ŷ)] · ŷ(1−ŷ)
+      = −y(1−ŷ) + (1−y)ŷ
+      = ŷ − y   ★ BEAUTIFUL CANCELLATION ★</pre>
+    </div>
+    <div class="step">
+      <strong>Step 5 — Weight gradient</strong>
+      <pre>∇w L = (∂L/∂z)(∂z/∂w) = (ŷ − y) · x</pre>
+      <div class="answer-box">This is why logistic regression AND neural network output layers are so simple!</div>
+    </div>
+  </div>
+</section>
+
+<section id="strategy">
+  <h2>Exam Strategy (Closed Book)</h2>
+  <div class="card">
+    <strong>Time allocation (100 marks, 2 hrs):</strong> Q1=20min, Q2=20min, Q3=25min, Q4=20min, Q5=25min<br><br>
+    <strong>Attack order:</strong> (1) Scan all questions (2) Numerical first (3) Code blanks (4) Theory in 5-point bullets<br><br>
+    <strong>Common mistakes:</strong> Perceptron uses + not − | Forget bias x₀=1 | Wrong precision/recall denominator | Update perceptron when already correct
+  </div>
+</section>
+
+<section id="selftest">
+  <h2>Self-Test — Close This Page First</h2>
+  <ol>
+    <li>Perceptron: w=[0.2,−0.5,0.3], x=[1,2,1], y=0, η=0.1</li>
+    <li>Linear reg: one batch GD step with X=[[1,5],[1,15]], y=[100,200], w=[10,5]</li>
+    <li>Logistic: w=[0,1,−0.5], x=[1,0.8,0.6], y=0</li>
+    <li>Softmax: z=[1,3,2], y=[0,0,1] → probabilities, CCE, prediction</li>
+    <li>DFNN forward: x=[1,0], W¹=[[1,1],[0,1]], ReLU+sigmoid</li>
+    <li>CNN: 32×32 input, 5×5 conv S=1, then 2×2 pool S=2</li>
+    <li>GRU: compute z_t, h̃_t, h_t for one step</li>
+    <li>Attention: scaled dot-product with q=[2,7], k=[7,3], d_k=2</li>
+  </ol>
+  <details>
+    <summary>Click to reveal answers</summary>
+    <pre>1: z=−0.5, ŷ=0, correct, no update
+2: ŷ=[35,85], MSE=1125, w≈[10.125, 4.625]
+3: z=0.5, σ≈0.622, gradient=(0.622)·x
+4: p=[0.09, 0.67, 0.25], L=1.41, pred=class 1 (wrong)
+5: Z¹=[1,0], A¹=[1,0], z²=1, ŷ≈0.731
+6: Conv→28×28, Pool→14×14
+7: z_t=σ([2,1])≈[0.88,0.73], h̃=tanh([1,0.5])≈[0.76,0.46]
+8: score=(2×7+7×3)/√2=24.74</pre>
+  </details>
+</section>
+
+<footer style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:0.85rem;">
+  DNN Complete Visual Study Guide — EC2 (5Q) + EC3 (7Q) + Mid QP (6Q) + BCE/CCE derivations<br>
+  Full text solutions: DNN_Closed_Book_Complete_Solutions.md | 21 diagrams in html_assets/
+</footer>
+
+</main>
+</div>
+</body>
+</html>

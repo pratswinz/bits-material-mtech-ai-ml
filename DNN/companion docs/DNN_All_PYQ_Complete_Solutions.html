@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>All PYQ Complete Step-by-Step Solutions</title><style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface2: #243044;
+      --border: #2d3f5c;
+      --text: #e8edf4;
+      --muted: #8b9cb3;
+      --accent: #4dabf7;
+      --accent2: #51cf66;
+      --warn: #ffd43b;
+      --danger: #ff6b6b;
+      --code-bg: #0d1117;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+    nav {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    nav h2 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    nav a {
+      display: block;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      margin-bottom: 2px;
+      transition: all 0.15s;
+    }
+    nav a:hover { background: var(--surface2); color: var(--text); }
+    main {
+      padding: 2rem 2.5rem 4rem;
+      max-width: 960px;
+    }
+    header.hero {
+      background: linear-gradient(135deg, #1a2332 0%, #1e3a5f 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    header.hero h1 { font-size: 1.75rem; margin-bottom: 0.5rem; }
+    header.hero p { color: var(--muted); }
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #000;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      margin-right: 0.4rem;
+      margin-top: 0.75rem;
+    }
+    section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 1rem;
+    }
+    section > h2 {
+      font-size: 1.35rem;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    h3 { font-size: 1.05rem; color: var(--accent); margin: 1.5rem 0 0.75rem; }
+    h4 { font-size: 0.95rem; color: var(--warn); margin: 1rem 0 0.5rem; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .formula-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.75rem;
+    }
+    .formula-item {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.85rem;
+    }
+    .formula-item strong { color: var(--accent2); display: block; margin-bottom: 0.3rem; font-family: inherit; }
+    figure {
+      margin: 1.25rem 0;
+      text-align: center;
+    }
+    figure img {
+      max-width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    figcaption {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
+      font-style: italic;
+    }
+    .steps { counter-reset: step; }
+    .step {
+      position: relative;
+      padding: 1rem 1rem 1rem 3.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+    .step::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      width: 1.75rem;
+      height: 1.75rem;
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+    .step .why {
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: rgba(77, 171, 247, 0.08);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .answer-box {
+      background: rgba(81, 207, 102, 0.1);
+      border: 1px solid var(--accent2);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+    pre, code {
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.85rem;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { position: relative; height: auto; }
+      main { padding: 1rem; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--surface2); color: var(--accent); }
+    .tip {
+      background: rgba(255, 212, 59, 0.08);
+      border: 1px solid var(--warn);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.9rem;
+    }
+    .tip::before { content: "💡 Exam Tip: "; font-weight: 700; color: var(--warn); }
+    details { margin: 1rem 0; padding: 1rem; background: var(--surface); border-radius: 8px; border: 1px solid var(--border); }
+    details summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+    ol { padding-left: 1.5rem; margin: 0.75rem 0; }
+    li { margin: 0.3rem 0; }
+  
+.paper-header{background:var(--surface2);border-left:4px solid var(--accent);padding:1rem 1.25rem;margin:2rem 0 1rem;border-radius:0 8px 8px 0}
+.paper-header h2{border:none;margin:0;padding:0;font-size:1.15rem}
+.qblock{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1.5rem}
+.qblock h3{color:var(--accent);font-size:1rem;margin-bottom:.75rem}
+.qtext{color:var(--muted);font-size:.9rem;margin-bottom:1rem;padding:.75rem;background:var(--code-bg);border-radius:6px;border-left:3px solid var(--warn)}
+.priority{display:inline-block;background:#e03131;color:#fff;font-size:.65rem;padding:.15rem .45rem;border-radius:4px;margin-left:.4rem}
+.link-bar{margin:1rem 0;padding:1rem;background:var(--surface);border:1px solid var(--accent);border-radius:8px}
+.link-bar a{color:var(--accent);font-weight:600}
+nav .paper{font-size:.7rem;color:var(--accent);margin-top:1rem;margin-bottom:.3rem;text-transform:uppercase}
+.variant-tag{background:var(--warn);color:#000;font-size:.65rem;padding:.15rem .45rem;border-radius:4px;margin-left:.4rem}
+</style></head><body><div class="layout">
+<nav><h2>All PYQ Solutions</h2>
+<div class="paper">Mid QP 2024</div>
+<a href="#mid-q1">Mid Q1 MLP</a><a href="#mid-q2">Mid Q2 CNN</a><a href="#mid-q3">Mid Q3 Transfer</a>
+<a href="#mid-q4">Mid Q4 GD</a><a href="#mid-q5">Mid Q5 CNN vs FC</a><a href="#mid-q6">Mid Q6 Hyperparams</a>
+<div class="paper">EC2 Dec 2025</div>
+<a href="#ec2-q1">EC2 Q1 Perceptron</a><a href="#ec2-q2">EC2 Q2 Linear</a><a href="#ec2-q3">EC2 Q3 Logistic</a>
+<a href="#ec2-q4">EC2 Q4 Softmax</a><a href="#ec2-q5">EC2 Q5 DFNN</a>
+<div class="paper">EC3 Mar 2026</div>
+<a href="#ec3-q1">EC3 Q1 X-ray</a><a href="#ec3-q2">EC3 Q2 Churn</a><a href="#ec3-q3">EC3 Q3 CNN</a>
+<a href="#ec3-q4">EC3 Q4 RNN/GRU</a><a href="#ec3-q5">EC3 Q5 Attention</a><a href="#ec3-q6">EC3 Q6 Transformers</a>
+<a href="#ec3-q7">EC3 Q7 Optimizers</a>
+<a href="#formulas">Formulas</a><a href="#bce">BCE Derivation</a><a href="#cce">CCE Derivation</a>
+<a href="DNN_Practice_Variant_Questions.html">Practice Variants</a></nav><main>
+<header class="hero"><h1>All PYQ Complete Step-by-Step Solutions</h1><div class="link-bar">Practice variants: <a href="DNN_Practice_Variant_Questions.html">DNN_Practice_Variant_Questions.html</a> | Visual guide: <a href="DNN_Visual_Study_Guide.html">DNN_Visual_Study_Guide.html</a></div></header>
+<section id="formulas"><h2>Golden Formulas</h2><figure><img src="html_assets/golden_formulas_sheet.png" alt="All formulas — memorize first"><figcaption>All formulas — memorize first</figcaption></figure></section><div class="paper-header"><h2>Mid QP 2024 (Closed Book, 30 marks)</h2></div><section id="mid-q1"><div class="qblock"><h3>Mid Q1 — MLP Design [6 marks]<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">Design minimum hidden layers/nodes for non-linear boundary. Step: +1 if sum>=threshold else -1.</div><figure><img src="html_assets/mlp_decision_boundary.png" alt="MLP architecture"><figcaption>MLP architecture</figcaption></figure><div class="steps"><div class="step"><strong>Understand</strong><pre>Single perceptron = ONE linear boundary.
+Concentric circles NOT linearly separable (XOR principle in 2D).</pre><div class="why">One line cannot separate inner +1 from outer -1 ring.</div></div><div class="step"><strong>Design</strong><pre>Input(2) -> Hidden(2) -> Output(1)
+H1: inner circle detector
+H2: outer circle detector
+Output: combine for +1 inner, -1 outer</pre><div class="answer-box">Minimum: 1 hidden layer, 2 nodes</div></div><div class="step"><strong>Exam draw</strong><pre>Draw diagram with THRESHOLD inside each node.
+Show weights on connections.</pre><div class="why">Examiners want WHY hidden layer is needed.</div></div></div></div></section><section id="mid-q2"><div class="qblock"><h3>Mid Q2 — CNN Output Shapes [5 marks]<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">(a) 8x8, 3x3 kernel, S=1, P=0. (b) 5 filters. (c) MaxPool 4x4, S=2.</div><figure><img src="html_assets/cnn_formula_logic.png" alt="CNN formula logic"><figcaption>CNN formula logic</figcaption></figure><figure><img src="html_assets/cnn_output_shapes.png" alt="Visual pipeline"><figcaption>Visual pipeline</figcaption></figure><div class="steps"><div class="step"><strong>Formula</strong><pre>Output = (N - F + 2P) / S + 1</pre></div><div class="step"><strong>(a)</strong><pre>(8-3+0)/1+1 = 6 -> 6x6</pre><div class="answer-box">(a) 6x6</div></div><div class="step"><strong>(b)</strong><pre>5 filters -> 6x6x5</pre><div class="answer-box">(b) 6x6x5</div></div><div class="step"><strong>(c)</strong><pre>(6-4)/2+1 = 2 -> 2x2x5</pre><div class="answer-box">(c) 2x2x5</div></div></div></div></section><section id="mid-q3"><div class="qblock"><h3>Mid Q3 — Transfer Learning [4 marks]<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">Rakesh: scratch on 100 samples. Ram: pretrain 1M then fine-tune 100.</div><figure><img src="html_assets/transfer_learning.png" alt="Transfer learning"><figcaption>Transfer learning</figcaption></figure><div class="steps"><div class="step"><strong>Compare</strong><pre>Rakesh: random init, 100 samples -> OVERFITTING
+Ram: pretrained features, fine-tune top layers</pre><div class="why">State overfitting as Rakesh problem.</div></div><div class="step"><strong>Ram fixes</strong><pre>Pretrained edges/textures transfer.
+Freeze early layers, small LR.</pre></div></div></div></section><section id="mid-q4"><div class="qblock"><h3>Mid Q4 — Gradient Descent [5 marks]<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">E = 3w1^2 + 4w2^2 + 2w1w2, (0.5,0.5), eta=0.1</div><div class="steps"><div class="step"><strong>Gradients</strong><pre>dE/dw1 = 6w1+2w2 = 4
+dE/dw2 = 8w2+2w1 = 5</pre><div class="answer-box">Grad = (4,5)</div></div><div class="step"><strong>Update</strong><pre>w1=0.5-0.4=0.1, w2=0.5-0.5=0.0</pre><div class="why">GD SUBTRACTS. Perceptron ADDS.</div><div class="answer-box">New w = (0.1, 0.0)</div></div></div></div></section><section id="mid-q5"><div class="qblock"><h3>Mid Q5 — CNN vs FC [5 marks]</h3><div class="qtext">(a) 2 benefits of conv. (b) Training accuracy decreasing.</div><div class="steps"><div class="step"><strong>Benefit 1</strong><pre>Parameter sharing — one filter across entire image</pre></div><div class="step"><strong>Benefit 2</strong><pre>Local connectivity + translation equivariance</pre></div><div class="step"><strong>Acc dropping</strong><pre>DIVERGENCE (LR too high), NOT overfitting.
+Fix: reduce eta.</pre><div class="why">Overfitting = high train, low val.</div></div></div></div></section><section id="mid-q6"><div class="qblock"><h3>Mid Q6 — Hyperparams & CNN vs ANN [5 marks]</h3><div class="qtext">(a) List hyperparameters. (b) Why CNN over ANN.</div><div class="steps"><div class="step"><strong>Hyperparams</strong><pre>eta, batch size, epochs, layers, neurons, activation, optimizer, dropout, L2</pre></div><div class="step"><strong>CNN vs ANN</strong><pre>2500 pixels -> 2.5M FC weights vs 27 conv params.
+CNN preserves spatial structure.</pre></div></div></div></section><div class="paper-header"><h2>EC2 Mid-Sem Dec 2025 (Closed Book, 100 marks)</h2></div><section id="ec2-q1"><div class="qblock"><h3>EC2 Q1(a) — Perceptron [6 marks]<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">w=[0.5,0.3,-0.4], x1=1, x2=2, y=1, eta=0.1</div><figure><img src="html_assets/perceptron_diagram.png" alt="Perceptron"><figcaption>Perceptron</figcaption></figure><figure><img src="html_assets/perceptron_update_logic.png" alt="Update logic"><figcaption>Update logic</figcaption></figure><div class="steps"><div class="step"><strong>z</strong><pre>z = 0.5+0.3-0.8 = 0.0</pre><div class="answer-box">z = 0.0</div></div><div class="step"><strong>y_hat</strong><pre>z>=0 -> y_hat=1</pre><div class="answer-box">y_hat = 1</div></div><div class="step"><strong>Update</strong><pre>y=y_hat=1 -> CORRECT -> no update</pre><div class="why">Always check before updating!</div><div class="answer-box">Weights unchanged</div></div></div></div><div class="qblock"><h3>EC2 Q1(b) Spam [6 marks]</h3><div class="qtext">w=[0.2,0.8,0.9,-0.5]. 75% plateau.</div><div class="steps"><div class="step"><strong>Spam feature</strong>Links (0.9) highest positive weight.<div class="answer-box">Links</div></div><div class="step"><strong>Plateau</strong>Linear separability ceiling. Need MLP.</div></div></div><div class="qblock"><h3>EC2 Q1(c) A vs B [3 marks]</h3><div class="qtext">5 vs 50 features, 500 samples.</div><div class="answer-box">Approach A generalizes — 100 vs 10 samples/feature</div></div><div class="qblock"><h3>EC2 Q1(d) Code [5 marks]</h3><div class="qtext">Perceptron blanks.</div><pre>Blank1: np.dot(X[i],weights)
+Blank2: y[i]-y_pred
+Blank3: lr*error*X[i]  # PLUS!
+Blank4: [1 if np.dot(x,w)>=0 else 0 for x in X]
+Blank5: np.mean(preds==y)</pre></div></section><section id="ec2-q2"><div class="qblock"><h3>EC2 Q2(a) Batch GD [6 marks]<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">X=[[1,10],[1,20]], y=[150,250], w=[50,8], eta=0.01</div><div class="steps"><div class="step"><strong>Predict</strong><pre>y_hat=[130,210]</pre><div class="answer-box">y_hat=[130,210]</div></div><div class="step"><strong>MSE</strong><pre>MSE=1000</pre><div class="answer-box">MSE=1000</div></div><div class="step"><strong>Grad</strong><pre>grad=[-30,-500]</pre><div class="why">Pred too low -> increase w</div></div><div class="step"><strong>Update</strong><pre>w=[50.30, 13.0]</pre><div class="answer-box">New w=[50.30,13.0]</div></div></div></div><div class="qblock"><h3>EC2 Q2(b-d)</h3><div class="qtext">Code, salary, normalization.</div><pre>Salary=$46,000 | RMSE=$2,236 OK | Normalized features train faster</pre></div></section><section id="ec2-q3"><div class="qblock"><h3>EC2 Q3(a) Logistic [6 marks]<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">w=[0,0.6,0.8], x=[1,0.7,0.5], y=1</div><figure><img src="html_assets/logistic_regression_flow.png" alt="Logistic flow"><figcaption>Logistic flow</figcaption></figure><div class="steps"><div class="step"><strong>z</strong><pre>z=0.82</pre><div class="answer-box">z=0.82</div></div><div class="step"><strong>sigmoid</strong><pre>y_hat=0.694</pre><div class="answer-box">0.694</div></div><div class="step"><strong>grad</strong><pre>grad=(0.694-1)*x</pre><div class="why">Golden: (y_hat-y)*x</div></div><div class="step"><strong>update</strong><pre>w=[0.031,0.621,0.815]</pre></div></div></div><div class="qblock"><h3>EC2 Q3(c-d)</h3><div class="qtext">Imbalanced + fraud</div><figure><img src="html_assets/metrics_logic_imbalanced.png" alt="Metrics logic"><figcaption>Metrics logic</figcaption></figure><pre>Accuracy 89% but naive=95%! Deploy Model B: $7500 saved</pre></div></section><section id="ec2-q4"><div class="qblock"><h3>EC2 Q4(a) Softmax [6 marks]<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">z=[2,1,0.5], y=neutral</div><figure><img src="html_assets/softmax_cce_logic.png" alt="Softmax logic"><figcaption>Softmax logic</figcaption></figure><figure><img src="html_assets/softmax_probabilities.png" alt="Chart"><figcaption>Chart</figcaption></figure><div class="steps"><div class="step"><strong>probs</strong><pre>p=[0.629,0.231,0.140]</pre></div><div class="step"><strong>loss</strong><pre>CCE=1.47, pred=class0 WRONG</pre><div class="answer-box">Loss=1.47</div></div></div></div><div class="qblock"><h3>EC2 Q4(c-d)</h3><div class="qtext">Bird metrics + TB</div><figure><img src="html_assets/confusion_matrix_bird.png" alt="Confusion matrix"><figcaption>Confusion matrix</figcaption></figure><pre>Precision=87.7%, Recall=83.3% | Deploy Model B for TB</pre></div></section><section id="ec2-q5"><div class="qblock"><h3>EC2 Q5(a) DFNN Forward [6 marks]<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">x=[0.5,0.8], ReLU+sigmoid, y=1</div><figure><img src="html_assets/dfnn_forward_pass.png" alt="Forward"><figcaption>Forward</figcaption></figure><figure><img src="html_assets/backprop_logic_chain.png" alt="Backprop logic"><figcaption>Backprop logic</figcaption></figure><div class="steps"><div class="step"><strong>Z1</strong><pre>[0.3, 1.15]</pre><div class="answer-box">Z1=[0.3,1.15]</div></div><div class="step"><strong>A1</strong><pre>[0.3, 1.15]</pre></div><div class="step"><strong>Out</strong><pre>y_hat=0.799, BCE=0.225</pre><div class="answer-box">Loss=0.225</div></div></div></div><div class="qblock"><h3>EC2 Q5(b-e)</h3><div class="qtext">Backprop, params, mobile</div><figure><img src="html_assets/backprop_flow.png" alt="Backprop"><figcaption>Backprop</figcaption></figure><pre>8040 params OK | Mobile->Arch A | Cloud->Arch B</pre></div></section><div class="paper-header"><h2>EC3 Mid-Sem Mar 2026 (Open Book, 120 marks)</h2></div><section id="ec3-q1"><div class="qblock"><h3>EC3 Q1 X-ray DFNN<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">See PDF for full question text.</div><figure><img src="html_assets/activation_functions.png" alt="EC3 Q1 X-ray DFNN"><figcaption>EC3 Q1 X-ray DFNN</figcaption></figure><div class="answer-box">ReLU z=0.73. Softmax 10-class. Perceptron fails. Vanishing grad->ReLU+skip.</div></div></section><section id="ec3-q2"><div class="qblock"><h3>EC3 Q2 Churn<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">See PDF for full question text.</div><figure><img src="html_assets/churn_dfnn_architecture.png" alt="EC3 Q2 Churn"><figcaption>EC3 Q2 Churn</figcaption></figure><div class="answer-box">Sigmoid+BCE. P=0.73->Churn. Input(4)->H1(64,ReLU)->H2(32,LeakyReLU)->Out(1).</div></div></section><section id="ec3-q3"><div class="qblock"><h3>EC3 Q3 CNN/ResNet<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">See PDF for full question text.</div><figure><img src="html_assets/resnet_transfer_learning.png" alt="EC3 Q3 CNN/ResNet"><figcaption>EC3 Q3 CNN/ResNet</figcaption></figure><figure><img src="html_assets/cnn_gap_edge.png" alt="GAP"><figcaption>GAP</figcaption></figure><div class="answer-box">Transfer YES. L1=2432. L8=25.6M. GAP=1290 params. RF claim FALSE.</div></div></section><section id="ec3-q4"><div class="qblock"><h3>EC3 Q4 RNN/GRU<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">See PDF for full question text.</div><figure><img src="html_assets/gru_gate_logic.png" alt="EC3 Q4 RNN/GRU"><figcaption>EC3 Q4 RNN/GRU</figcaption></figure><div class="answer-box">RNN=620, GRU=1860. Vanilla h=[0.80,0.10]. GRU h=[0.53,-0.24]. dL/dh1=0.81.</div></div></section><section id="ec3-q5"><div class="qblock"><h3>EC3 Q5 Attention<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">See PDF for full question text.</div><figure><img src="html_assets/attention_mechanism.png" alt="EC3 Q5 Attention"><figcaption>EC3 Q5 Attention</figcaption></figure><figure><img src="html_assets/additive_vs_dot_attention.png" alt="Additive"><figcaption>Additive</figcaption></figure><div class="answer-box">Dot-product context=[8,3]. Need causal mask. Additive context=[1.47,0.72].</div></div></section><section id="ec3-q6"><div class="qblock"><h3>EC3 Q6 Transformers<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">See PDF for full question text.</div><figure><img src="html_assets/transformer_architecture.png" alt="EC3 Q6 Transformers"><figcaption>EC3 Q6 Transformers</figcaption></figure><div class="answer-box">NER->BERT. Gen->GPT. Summarise->T5. Encoder~3.15M params. O(L2) fix: sliding window.</div></div></section><section id="ec3-q7"><div class="qblock"><h3>EC3 Q7 Optimizers<span class="priority">HIGH PRIORITY</span></h3><div class="qtext">See PDF for full question text.</div><figure><img src="html_assets/optimizer_curves.png" alt="EC3 Q7 Optimizers"><figcaption>EC3 Q7 Optimizers</figcaption></figure><figure><img src="html_assets/regularization_diagnosis.png" alt="Reg"><figcaption>Reg</figcaption></figure><figure><img src="html_assets/batch_normalization.png" alt="BN"><figcaption>BN</figcaption></figure><div class="answer-box">A=SGD B=Momentum C=RMSprop D=Adam. Run1 overfit->Dropout+L2. BatchNorm fixes Run4.</div></div></section><section id="bce"><h2>BCE Derivation</h2><div class="steps"><div class="step"><strong>Chain rule</strong>L -> dL/dy_hat -> dL/dz = y_hat - y<div class="answer-box">Memorize!</div></div><div class="step"><strong>Weight</strong>grad = (y_hat-y)*x</div></div></section><section id="cce"><h2>CCE Derivation</h2><figure><img src="html_assets/cce_derivation.png" alt="CCE"><figcaption>CCE</figcaption></figure><div class="steps"><div class="step"><strong>Jacobian</strong>dp_i/dz_j = p_i(delta_ij - p_j)</div><div class="step"><strong>Result</strong>grad = p_hat - y<div class="answer-box">Same as BCE!</div></div></div></section>
+<footer style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem;">
+AIMLCZG511 Deep Neural Networks | Offline study — open in any browser
+</footer></main></div></body></html>
