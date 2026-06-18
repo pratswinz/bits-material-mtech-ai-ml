@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unveiling the Matrix — A Visual Journey through Eigenvalues &amp; Eigenvectors</title>
+
+<!-- MathJax -->
+
+
+
+
+
+<style>
+:root{
+  /* BITS Pilani academic palette */
+  --navy:#0a2353;
+  --navy-2:#143a73;
+  --navy-3:#1d4f99;
+  --gold:#d4a017;
+  --gold-soft:#f0b323;
+  --gold-pale:#f7e9c4;
+  --paper:#fbfaf6;
+  --paper-2:#f3f1e8;
+  --ink:#1c2433;
+  --ink-soft:#48526a;
+  --line:#e2ddca;
+  --red:#c0392b;
+  --teal:#16877a;
+  --blue:#2d6cdf;
+  --purple:#7a3ec0;
+  --green:#1f8a4c;
+  --shadow:0 10px 40px rgba(10,35,83,.10);
+  --shadow-lg:0 24px 70px rgba(10,35,83,.18);
+  --mono:'SF Mono',ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;
+  --serif:'Iowan Old Style','Palatino Linotype','Book Antiqua',Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:var(--sans);
+  color:var(--ink);
+  background:var(--paper);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ---------- scroll progress ---------- */
+#progress{
+  position:fixed;top:0;left:0;height:4px;width:0%;
+  background:linear-gradient(90deg,var(--gold),var(--gold-soft));
+  z-index:9999;box-shadow:0 0 12px rgba(212,160,23,.6);
+  transition:width .1s linear;
+}
+
+/* ---------- top nav ---------- */
+#topnav{
+  position:fixed;top:0;left:0;right:0;z-index:9000;
+  display:flex;align-items:center;gap:14px;
+  padding:10px 22px;
+  background:rgba(10,35,83,.86);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(212,160,23,.35);
+  transform:translateY(-110%);transition:transform .35s ease;
+}
+#topnav.show{transform:translateY(0);}
+#topnav .brand{color:#fff;font-weight:700;letter-spacing:.5px;font-size:.95rem;display:flex;align-items:center;gap:9px;}
+#topnav .brand .dot{width:11px;height:11px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold-soft);}
+#topnav .links{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap;}
+#topnav .links a{
+  color:#cdd8ef;text-decoration:none;font-size:.82rem;padding:5px 11px;border-radius:20px;
+  transition:.2s;white-space:nowrap;
+}
+#topnav .links a:hover{background:rgba(212,160,23,.22);color:#fff;}
+
+/* ---------- hero ---------- */
+#hero{
+  position:relative;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  background:
+    radial-gradient(1200px 700px at 50% -10%,rgba(212,160,23,.16),transparent 60%),
+    linear-gradient(160deg,#081c45 0%,#0a2353 45%,#0e2a5e 100%);
+  color:#fff;overflow:hidden;padding:80px 20px;
+}
+#hero canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55;}
+#hero .hero-inner{position:relative;z-index:2;max-width:900px;}
+#hero .eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:.8rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold-soft);border:1px solid rgba(212,160,23,.4);
+  padding:8px 18px;border-radius:30px;margin-bottom:30px;background:rgba(212,160,23,.07);
+}
+#hero h1{
+  font-family:var(--serif);font-weight:700;
+  font-size:clamp(2.4rem,6vw,4.6rem);line-height:1.05;margin:0 0 8px;
+  letter-spacing:-.5px;
+}
+#hero h1 .accent{
+  background:linear-gradient(90deg,var(--gold-soft),#ffd966);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+#hero .sub{font-size:clamp(1.05rem,2.4vw,1.4rem);color:#c8d4ee;max-width:680px;margin:22px auto 0;font-weight:300;}
+#hero .tag{margin-top:14px;font-size:.9rem;color:#9fb2d8;letter-spacing:.5px;}
+#hero .scroll-cue{
+  position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+  color:#cdd8ef;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:8px;animation:bob 2s ease-in-out infinite;
+}
+@keyframes bob{0%,100%{transform:translate(-50%,0);}50%{transform:translate(-50%,8px);}}
+#hero .chip-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:34px;}
+#hero .chip{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  padding:8px 16px;border-radius:30px;font-size:.85rem;color:#dbe5fb;
+  display:flex;align-items:center;gap:8px;
+}
+#hero .chip i{color:var(--gold-soft);}
+
+/* ---------- layout ---------- */
+.chapter{padding:90px 24px;position:relative;}
+.wrap{max-width:1080px;margin:0 auto;}
+.chapter.alt{background:var(--paper-2);}
+.chapter.dark{
+  background:linear-gradient(165deg,#0a2353,#0e2a5e);color:#eaf0fc;
+}
+.chapter.dark h2,.chapter.dark .lead{color:#fff;}
+.chapter.dark .muted{color:#a9bbe0;}
+
+.chap-tag{
+  display:inline-flex;align-items:center;gap:10px;font-size:.78rem;letter-spacing:3px;
+  text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:16px;
+}
+.chap-tag .num{
+  background:var(--navy);color:var(--gold-soft);width:30px;height:30px;border-radius:50%;
+  display:grid;place-items:center;font-size:.85rem;
+}
+.chapter.dark .chap-tag{color:var(--gold-soft);}
+.chapter.dark .chap-tag .num{background:rgba(212,160,23,.18);}
+
+h2{
+  font-family:var(--serif);font-size:clamp(1.8rem,4vw,2.9rem);line-height:1.12;
+  margin:0 0 18px;color:var(--navy);font-weight:700;letter-spacing:-.5px;
+}
+h3{font-family:var(--serif);font-size:1.4rem;color:var(--navy-2);margin:34px 0 10px;}
+.chapter.dark h3{color:var(--gold-soft);}
+.lead{font-size:1.18rem;color:var(--ink-soft);max-width:780px;margin:0 0 8px;font-weight:400;}
+p{margin:14px 0;}
+.muted{color:var(--ink-soft);}
+.big-num{font-family:var(--serif);}
+a.inline{color:var(--navy-3);text-decoration:none;border-bottom:1.5px solid var(--gold);}
+
+/* ---------- callouts ---------- */
+.callout{
+  border-radius:14px;padding:22px 24px;margin:26px 0;position:relative;
+  background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);
+}
+.callout .co-head{display:flex;align-items:center;gap:11px;font-weight:700;color:var(--navy);margin-bottom:6px;font-size:1.02rem;}
+.callout .co-head i{
+  width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:#fff;font-size:.95rem;flex:none;
+}
+.callout.intuition{border-left:5px solid var(--gold);}
+.callout.intuition .co-head i{background:linear-gradient(135deg,var(--gold),var(--gold-soft));}
+.callout.key{border-left:5px solid var(--teal);background:linear-gradient(180deg,#f1f9f7,#fff);}
+.callout.key .co-head i{background:linear-gradient(135deg,var(--teal),#1faa98);}
+.callout.warn{border-left:5px solid var(--red);background:linear-gradient(180deg,#fdf2f0,#fff);}
+.callout.warn .co-head i{background:linear-gradient(135deg,var(--red),#e05c4d);}
+.callout.def{border-left:5px solid var(--navy-3);background:linear-gradient(180deg,#eef3fc,#fff);}
+.callout.def .co-head i{background:linear-gradient(135deg,var(--navy-2),var(--navy-3));}
+.chapter.dark .callout{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);color:#eaf0fc;box-shadow:none;}
+.chapter.dark .callout .co-head{color:#fff;}
+
+/* ---------- interactive lab ---------- */
+.lab{
+  background:#fff;border:1px solid var(--line);border-radius:18px;
+  box-shadow:var(--shadow-lg);overflow:hidden;margin:34px 0;
+}
+.lab .lab-head{
+  background:linear-gradient(100deg,var(--navy),var(--navy-2));color:#fff;
+  padding:14px 22px;display:flex;align-items:center;gap:12px;
+}
+.lab .lab-head .pill{margin-left:auto;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;
+  background:rgba(212,160,23,.22);color:var(--gold-soft);padding:5px 12px;border-radius:20px;border:1px solid rgba(212,160,23,.4);}
+.lab .lab-head i{color:var(--gold-soft);}
+.lab .lab-head .t{font-weight:700;font-size:1.05rem;}
+.lab .lab-body{padding:22px;}
+.lab-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:24px;align-items:start;}
+@media(max-width:780px){.lab-grid{grid-template-columns:1fr;}}
+.stage{
+  background:
+    radial-gradient(900px 500px at 30% 0%,#fcfbf6,#f4f2ea);
+  border:1px solid var(--line);border-radius:14px;position:relative;overflow:hidden;
+}
+.panel h4{margin:0 0 10px;color:var(--navy);font-size:1rem;letter-spacing:.3px;}
+.readout{
+  background:var(--paper-2);border:1px solid var(--line);border-radius:11px;padding:14px 16px;margin:12px 0;
+}
+.readout .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:4px 0;font-size:.95rem;}
+.readout .row .k{color:var(--ink-soft);}
+.readout .row .v{font-family:var(--mono);font-weight:600;color:var(--navy);}
+.readout .row .v.hot{color:var(--red);}
+.readout .row .v.good{color:var(--green);}
+
+/* matrix input */
+.mat-input{display:inline-grid;grid-template-columns:repeat(var(--cols,2),1fr);gap:8px;
+  padding:10px 16px;border-left:3px solid var(--navy);border-right:3px solid var(--navy);border-radius:4px;margin:6px 0;}
+.mat-input input{
+  width:60px;text-align:center;font-family:var(--mono);font-size:1rem;font-weight:600;
+  border:1px solid var(--line);border-radius:8px;padding:8px 4px;color:var(--navy);background:#fff;
+}
+.mat-input input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,160,23,.18);}
+
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+.btn{
+  border:1px solid var(--line);background:#fff;color:var(--navy);
+  padding:8px 15px;border-radius:22px;font-size:.85rem;cursor:pointer;font-weight:600;
+  transition:.18s;display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);
+}
+.btn:hover{border-color:var(--gold);background:var(--gold-pale);}
+.btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.btn.gold{background:linear-gradient(135deg,var(--gold),var(--gold-soft));color:var(--navy);border:none;}
+.btn.gold:hover{filter:brightness(1.05);}
+
+.slider-wrap{margin:14px 0;}
+.slider-wrap label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--ink-soft);margin-bottom:6px;}
+.slider-wrap label b{font-family:var(--mono);color:var(--navy);}
+input[type=range]{width:100%;accent-color:var(--gold);}
+
+.hintline{font-size:.86rem;color:var(--ink-soft);display:flex;align-items:center;gap:8px;margin-top:10px;}
+.hintline i{color:var(--gold);}
+
+.eq-box{
+  background:linear-gradient(180deg,#fff,#f8f6ee);border:1px solid var(--line);
+  border-radius:12px;padding:14px 18px;margin:18px 0;overflow-x:auto;text-align:center;
+}
+.chapter.dark .eq-box{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);}
+
+/* feature grid */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin:26px 0;}
+.fcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow);transition:.25s;}
+.fcard:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+.fcard .ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;font-size:1.2rem;margin-bottom:12px;}
+.fcard h4{margin:0 0 6px;color:var(--navy);font-size:1.08rem;}
+.fcard p{margin:0;font-size:.92rem;color:var(--ink-soft);}
+.chapter.dark .fcard{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);box-shadow:none;}
+.chapter.dark .fcard h4{color:#fff;}
+.chapter.dark .fcard p{color:#b9c8e8;}
+
+/* connective tissue line between chapters */
+.thread{display:flex;align-items:center;justify-content:center;gap:16px;color:var(--ink-soft);font-size:.95rem;margin:0 auto;max-width:680px;text-align:center;}
+.thread .ln{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+
+/* SVG helpers */
+svg text{font-family:var(--sans);}
+.tooltip{
+  position:fixed;pointer-events:none;background:var(--navy);color:#fff;font-size:.8rem;
+  padding:6px 10px;border-radius:8px;opacity:0;transition:opacity .15s;z-index:9999;font-family:var(--mono);
+}
+
+/* footer */
+footer{background:#06163a;color:#aebdde;padding:50px 24px;text-align:center;}
+footer .fwrap{max-width:760px;margin:0 auto;}
+footer h3{color:#fff;font-family:var(--serif);}
+footer a{color:var(--gold-soft);text-decoration:none;}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.in{opacity:1;transform:none;}
+
+.tablewrap{overflow-x:auto;margin:20px 0;}
+table.props{border-collapse:collapse;width:100%;font-size:.95rem;background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);}
+table.props th,table.props td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--line);}
+table.props th{background:var(--navy);color:#fff;font-weight:600;letter-spacing:.3px;}
+table.props tr:last-child td{border-bottom:none;}
+table.props td:first-child{font-family:var(--mono);color:var(--navy-3);font-weight:600;white-space:nowrap;}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.84rem;color:var(--ink-soft);margin-top:8px;}
+.legend span{display:inline-flex;align-items:center;gap:7px;}
+.legend .sw{width:16px;height:4px;border-radius:3px;display:inline-block;}
+.legend .swv{width:12px;height:12px;border-radius:50%;display:inline-block;}
+
+/* ===== self-contained math + icons + responsive ===== */
+.mq{font-family:var(--serif);font-style:normal;white-space:normal;}
+.eqn{display:block;text-align:center;font-family:var(--serif);font-size:1.12rem;line-height:2;margin:.3em 0;
+     white-space:nowrap;overflow-x:auto;overflow-y:hidden;max-width:100%;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
+.mq i,.eqn i{font-style:italic;}
+.vec{font-weight:700;font-style:normal;}
+.aln{display:inline-block;text-align:center;line-height:2.1;white-space:nowrap;}
+.mat{display:inline-grid;gap:.12em .62em;vertical-align:middle;position:relative;padding:.2em .58em;margin:0 .18em;}
+.mat>span{text-align:center;white-space:nowrap;}
+.mat::before,.mat::after{content:"";position:absolute;top:2px;bottom:2px;width:.32em;border:1.7px solid currentColor;}
+.mat::before{left:0;border-right:0;}
+.mat::after{right:0;border-left:0;}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.84em;line-height:1.08;margin:0 .15em;}
+.frac>span:last-child{border-top:1.2px solid currentColor;}
+.boxeq{border:2px solid var(--navy);border-radius:8px;padding:.16em .6em;display:inline-block;}
+.chapter.dark .boxeq{border-color:var(--gold-soft);}
+sup,sub{font-size:.72em;line-height:0;}
+.faicon{display:inline-flex;align-items:center;justify-content:center;line-height:0;}
+.faicon svg{width:1em;height:1em;}
+.co-head .faicon svg{width:1.12em;height:1.12em;}
+.lab-head .faicon svg{width:1.1em;height:1.1em;}
+.fcard .ic .faicon svg{width:1.25em;height:1.25em;}
+img,svg{max-width:100%;}
+.eq-box{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+/* ---- flex-safety: these containers now hold inline math, so keep text flowing ---- */
+.hintline{display:block !important;}
+.hintline .faicon{color:var(--gold);margin-right:7px;vertical-align:-0.14em;}
+.readout .row{flex-wrap:wrap;gap:2px 12px;}
+.readout .row .k{flex:1 1 60%;min-width:0;}
+.readout .row .v{flex:0 0 auto;margin-left:auto;word-break:break-word;text-align:right;max-width:100%;}
+.lab .lab-head{flex-wrap:wrap;}
+.lab .lab-head .t{min-width:0;}
+.legend{flex-wrap:wrap;}
+.thread{flex-wrap:wrap;}
+.co-head{flex-wrap:wrap;}
+.btn{white-space:normal;}
+.mat-input{max-width:100%;}
+@media(max-width:880px){ .lab-grid{grid-template-columns:1fr !important;} }
+@media(max-width:620px){
+  .chapter{padding:56px 15px;}
+  .lab .lab-body{padding:14px;}
+  #topnav{padding:8px 12px;gap:8px;}
+  #topnav .brand{font-size:.8rem;}
+  #topnav .links{display:none;}
+  h2{font-size:1.62rem;}
+  h3{font-size:1.2rem;}
+  .lead{font-size:1.04rem;}
+  .mat-input input{width:46px;font-size:.92rem;padding:7px 2px;}
+  .eqn{font-size:1rem;line-height:1.9;}
+  .fgrid{gap:14px;}
+  #hero h1{font-size:2.3rem;}
+}
+@media(max-width:380px){
+  .mat-input input{width:40px;}
+  .btn{padding:7px 11px;font-size:.8rem;}
+}
+
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<!-- ================= TOP NAV ================= -->
+<nav id="topnav">
+  <span class="brand"><span class="dot"></span> Unveiling the Matrix</span>
+  <span class="links">
+    <a href="#c-det">Determinant</a>
+    <a href="#c-trace">Trace</a>
+    <a href="#c-eigen">Eigenvectors</a>
+    <a href="#c-char">Char. Equation</a>
+    <a href="#c-spectral">Spectral</a>
+    <a href="#c-decomp">Decomposition</a>
+    <a href="#c-complex">Complex</a>
+    <a href="#c-cholesky">Cholesky</a>
+    <a href="#c-why">Why it matters</a>
+  </span>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header id="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-inner">
+    <span class="eyebrow"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 2v10l9-5"/><path d="M12 12L3 7"/><path d="M12 12v10"/></svg></i> ZC416 · Mathematical Foundations for ML / DS · Lecture 4</span>
+    <h1>Unveiling the <span class="accent">Matrix</span></h1>
+    <div class="sub">A visual, interactive journey into <b>determinants</b>, <b>eigenvalues</b>, <b>eigenvectors</b>, and the <b>Spectral Theorem</b> — the hidden skeleton of every linear transformation.</div>
+    <div class="chip-row">
+      <span class="chip"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V6a1.5 1.5 0 0 1 3 0v5"/><path d="M11 11V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M14 11V6.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6 6 6 0 0 1-5-3l-2-4a1.6 1.6 0 0 1 2.6-1.7L8 13"/></svg></i> Drag, tweak &amp; explore</span>
+      <span class="chip"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0"/></svg></i> Live math, no setup</span>
+      <span class="chip"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.3 3 3 6 3s6-1.7 6-3v-5"/></svg></i> BITS Pilani · WILPD–CSIS</span>
+    </div>
+    <div class="tag">Scroll to begin the story →</div>
+  </div>
+  <div class="scroll-cue"><span>Scroll</span><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></i></div>
+</header>
+
+<!-- ================= PROLOGUE ================= -->
+<section class="chapter" id="prologue">
+  <div class="wrap reveal">
+    <div class="chap-tag"><span class="num">0</span> Prologue</div>
+    <h2>Every matrix is a verb, not a noun</h2>
+    <p class="lead">A matrix doesn't just <em>store</em> numbers — it <em>does</em> something. Feed it a vector <span class="mq"><b class="vec">x</b></span> and it hands back a new vector <span class="mq"><i>A</i><b class="vec">x</b></span>: space gets stretched, squeezed, rotated, sheared, or reflected. This whole journey asks one deep question about that action.</p>
+    <div class="eq-box"><span class="eqn"><b>Are there special directions that the transformation leaves alone — merely scaling them?</b></span></div>
+    <p>Those special directions are <b>eigenvectors</b>; the amount they stretch is the <b>eigenvalue</b>. To find and understand them, we first need two single-number "fingerprints" of a matrix — the <b>determinant</b> (how much it scales space) and the <b>trace</b> (a hidden sum) — and then a tool to hunt the eigenvalues down: the <b>characteristic equation</b>. Everything in this page connects back to that one question. Let's build it up, one interactive idea at a time.</p>
+    <div class="fgrid">
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#143a73,#1d4f99)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/></svg></i></div><h4>Determinant</h4><p>The volume-scaling factor — and the alarm bell for when a transformation collapses space.</p></div>
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#16877a,#1faa98)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></i></div><h4>Trace</h4><p>The quiet sum of the diagonal that secretly equals the sum of the eigenvalues.</p></div>
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#d4a017,#f0b323)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M8 9l-3 3 3 3"/><path d="M16 9l3 3-3 3"/></svg></i></div><h4>Eigenvectors</h4><p>The directions that refuse to turn — the "grain" of the transformation.</p></div>
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#7a3ec0,#9b59d0)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l3 6-9 12L3 9z"/><path d="M3 9h18"/><path d="M9 3l3 6 3-6"/></svg></i></div><h4>Spectral Theorem</h4><p>The crown jewel: symmetric matrices split into pure rotations and stretches.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 1 — DETERMINANT ================= -->
+<section class="chapter alt" id="c-det">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="chap-tag"><span class="num">1</span> The Determinant</div>
+      <h2>How much does a transformation stretch space?</h2>
+      <p class="lead">Picture the humble unit square sitting at the origin. Apply a matrix <span class="mq"><i>A</i></span> and it warps into a parallelogram. The <b>determinant</b> is a single number that answers: by what factor did the area change — and did space get flipped inside-out?</p>
+    </div>
+
+    <div class="callout intuition reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10c1 1 1.2 1.8 1.2 3h5.6c0-1.2.2-2 1.2-3a6 6 0 0 0-4-10z"/></svg></i> The one-number summary</div>
+      <p style="margin:6px 0 0;">For a transformation <span class="mq"><i>A</i></span> acting on 2D (or 3D):</p>
+      <ul>
+        <li><b><span class="mq">|det(<i>A</i>)|</span></b> = the factor by which <b>area</b> (2D) or <b>volume</b> (3D) scales. <span class="mq">det = 2 ⇒</span> area doubles; <span class="mq">det = 0.5 ⇒</span> it halves.</li>
+        <li><b><span class="mq">det(<i>A</i>) = 0</span></b> is the alarm bell: space is <b>squashed</b> into a lower dimension (a line or a point). The matrix is <b>singular</b> — non-invertible — because information is destroyed.</li>
+        <li>The <b>sign</b> of <span class="mq">det(<i>A</i>)</span> tells you orientation: positive keeps it, negative <b>flips</b> space like a mirror.</li>
+      </ul>
+    </div>
+
+    <!-- INTERACTIVE: determinant area visualizer -->
+    <div class="lab reveal">
+      <div class="lab-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/></svg></i><span class="t">Playground · The Determinant as Area</span><span class="pill">Drag the arrows</span></div>
+      <div class="lab-body">
+        <div class="lab-grid">
+          <div class="stage"><svg id="detSvg" viewBox="0 0 460 420" style="width:100%;display:block;"></svg></div>
+          <div class="panel">
+            <h4>The matrix <span class="mq"><i>A</i></span> (its columns are the arrows)</h4>
+            <div class="mat-input" style="--cols:2" id="detMat">
+              <input type="number" step="0.1" id="d00" value="2">
+              <input type="number" step="0.1" id="d01" value="1">
+              <input type="number" step="0.1" id="d10" value="1">
+              <input type="number" step="0.1" id="d11" value="1.5">
+            </div>
+            <div class="readout">
+              <div class="row"><span class="k">Determinant <span class="mq">det(<i>A</i>)</span></span><span class="v" id="detVal">2.00</span></div>
+              <div class="row"><span class="k">Area of parallelogram</span><span class="v" id="detArea">2.00</span></div>
+              <div class="row"><span class="k">Orientation</span><span class="v" id="detOrient">preserved</span></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn" data-det="2,1,1,1.5">Stretch</button>
+              <button class="btn" data-det="0,-1,1,0">Rotate 90°</button>
+              <button class="btn" data-det="1,1,0,1">Shear</button>
+              <button class="btn" data-det="1,2,0.5,1">Collapse → 0</button>
+              <button class="btn" data-det="-1,0,0,1">Mirror flip</button>
+            </div>
+            <div class="hintline"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V6a1.5 1.5 0 0 1 3 0v5"/><path d="M11 11V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M14 11V6.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6 6 6 0 0 1-5-3l-2-4a1.6 1.6 0 0 1 2.6-1.7L8 13"/></svg></i> Drag the blue &amp; gold arrowheads, or type values. Watch the area — and what happens when it hits zero.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="reveal">But how do we actually compute it? Minors &amp; cofactors</h3>
+    <p class="reveal">For anything bigger than <span class="mq">2×2</span> we expand recursively. Strike out a row and a column, take the determinant of what's left (the <b>minor</b> <span class="mq"><i>M</i><sub><i>i</i><i>j</i></sub></span>), and attach a checkerboard sign to get the <b>cofactor</b> <span class="mq"><i>C</i><sub><i>i</i><i>j</i></sub>=(-1)<sup><i>i</i>+<i>j</i></sup><i>M</i><sub><i>i</i><i>j</i></sub></span>.</p>
+    <div class="eq-box reveal"><span class="eqn">det(<i>A</i>)=∑<sub><i>j</i>=1</sub><sup><i>n</i></sup> <i>a</i><sub><i>i</i><i>j</i></sub> <i>C</i><sub><i>i</i><i>j</i></sub>    (expand along any row <span class="mq"><i>i</i></span> — or any column)</span></div>
+
+    <!-- INTERACTIVE: cofactor explorer -->
+    <div class="lab reveal">
+      <div class="lab-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></i><span class="t">Playground · Cofactor Expansion of a <span class="mq">3×3</span></span><span class="pill">Hover a cell</span></div>
+      <div class="lab-body">
+        <div class="lab-grid">
+          <div class="stage" style="display:grid;place-items:center;padding:24px;"><svg id="cofSvg" viewBox="0 0 360 360" style="width:100%;max-width:330px;display:block;"></svg></div>
+          <div class="panel">
+            <h4>Expanding along the first row</h4>
+            <p class="muted" style="font-size:.92rem;margin-top:0;">Hover any entry of the top row to see its minor (the surviving <span class="mq">2×2</span>), its sign, and its contribution. This is exactly Example 1 from the lecture companion.</p>
+            <div class="readout" id="cofReadout">
+              <div class="row"><span class="k">Hovered term</span><span class="v" id="cofTerm">—</span></div>
+              <div class="row"><span class="k">Sign <span class="mq">(-1)<sup><i>i</i>+<i>j</i></sup></span></span><span class="v" id="cofSign">—</span></div>
+              <div class="row"><span class="k">Minor value</span><span class="v" id="cofMinor">—</span></div>
+              <div class="row"><span class="k">Contribution</span><span class="v" id="cofContrib">—</span></div>
+            </div>
+            <div class="readout"><div class="row"><span class="k">Full determinant</span><span class="v good" id="cofTotal">-1</span></div></div>
+            <div class="hintline"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg></i> Pro tip from the lecture: expand along the row or column with the <b>most zeros</b> — every zero saves you an entire cofactor.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout key reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="4"/><path d="M11 11l8 8"/><path d="M16 16l2-2"/></svg></i> The link we'll need later</div>
+      <p style="margin:6px 0 0;">An <span class="mq"><i>n</i>× <i>n</i></span> matrix has <b>full rank</b> (its columns are linearly independent) <b>if and only if</b> <span class="mq">det(<i>A</i>)≠ 0</span>. Gaussian elimination reduces <span class="mq"><i>A</i></span> to an upper-triangular <span class="mq"><i>U</i></span>, and <span class="mq">det(<i>A</i>)=(-1)<sup><i>s</i></sup>det(<i>U</i>)=±∏ <i>U</i><sub><i>i</i><i>i</i></sub></span> — the product of the pivots. No zero pivots <span class="mq">⇔</span> no collapse <span class="mq">⇔</span> invertible. <b>Hold onto this:</b> eigenvalues are born exactly where a cleverly-shifted matrix becomes singular.</p>
+    </div>
+  </div>
+</section>
+
+<div class="chapter"><div class="thread reveal"><span class="ln"></span><span>One number told us about <b>volume</b>. The next tells us about a hidden <b>sum</b>.</span><span class="ln"></span></div></div>
+
+<!-- ================= CHAPTER 2 — TRACE ================= -->
+<section class="chapter" id="c-trace">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="chap-tag"><span class="num">2</span> The Trace</div>
+      <h2>The quiet sum along the diagonal</h2>
+      <p class="lead">The <b>trace</b> looks almost too simple to matter: just add up the diagonal entries, <span class="mq">tr(<i>A</i>)=∑<sub><i>i</i></sub> <i>a</i><sub><i>i</i><i>i</i></sub></span>. Yet it carries a secret we'll cash in soon — it equals the <b>sum of the eigenvalues</b>. It's the determinant's understated sibling.</p>
+    </div>
+
+    <div class="lab-grid reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;">
+      <div class="lab" style="margin:0;">
+        <div class="lab-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></i><span class="t">See the diagonal light up</span></div>
+        <div class="lab-body" style="display:grid;place-items:center;">
+          <svg id="traceSvg" viewBox="0 0 320 250" style="width:100%;max-width:300px;"></svg>
+          <div class="readout" style="width:100%;"><div class="row"><span class="k"><span class="mq">tr(<i>A</i>)=<i>a</i><sub>11</sub>+<i>a</i><sub>22</sub>+<i>a</i><sub>33</sub></span></span><span class="v good" id="traceVal">—</span></div></div>
+          <button class="btn gold" id="traceShuffle"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h4l10 10h4"/><path d="M3 17h4l3-3"/><path d="M18 4l3 3-3 3"/><path d="M18 14l3 3-3 3"/></svg></i> New random matrix</button>
+        </div>
+      </div>
+      <div>
+        <div class="callout def" style="margin-top:0;">
+          <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="8" rx="1"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/></svg></i> Properties (all easy to prove)</div>
+          <div class="tablewrap" style="margin:10px 0 0;">
+            <table class="props">
+              <tr><td><span class="mq">tr(<i>A</i>+<i>B</i>)</span></td><td><span class="mq">=tr(<i>A</i>)+tr(<i>B</i>)</span></td></tr>
+              <tr><td><span class="mq">tr(α <i>A</i>)</span></td><td><span class="mq">=α tr(<i>A</i>)</span></td></tr>
+              <tr><td><span class="mq">tr(<i>I</i><sub><i>n</i></sub>)</span></td><td><span class="mq">=<i>n</i></span></td></tr>
+              <tr><td><span class="mq">tr(<i>A</i><i>B</i>)</span></td><td><span class="mq">=tr(<i>B</i><i>A</i>)</span></td></tr>
+            </table>
+          </div>
+        </div>
+        <p class="muted" style="font-size:.95rem;">That last "cyclic" property — <span class="mq">tr(<i>A</i><i>B</i>)=tr(<i>B</i><i>A</i>)</span> — is the workhorse behind countless machine-learning proofs (think gradients of <span class="mq">tr(<i>X</i><sup>T</sup><i>A</i><i>X</i>)</span>).</p>
+      </div>
+    </div>
+
+    <div class="callout intuition reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M11 6l1-1a4 4 0 0 1 6 6l-1 1"/><path d="M13 18l-1 1a4 4 0 0 1-6-6l1-1"/></svg></i> Why the trace secretly knows the eigenvalues</div>
+      <p style="margin:6px 0 0;"><b>The intuition.</b> Every matrix carries a "hidden polynomial," its characteristic polynomial <span class="mq"><i>p</i><sub><i>A</i></sub>(λ)=det(<i>A</i>-λ <i>I</i>)</span>, whose <em>roots are the eigenvalues</em>. A polynomial is completely pinned down by its coefficients — and it turns out the two easiest coefficients to read are exactly the trace and the determinant.</p>
+      <p><b>The math.</b> Expanding the determinant for any <span class="mq"><i>n</i>× <i>n</i></span> matrix gives</p>
+      <div class="eq-box" style="margin:10px 0;"><span class="eqn"><i>p</i><sub><i>A</i></sub>(λ)=(-1)<sup><i>n</i></sup>λ<sup><i>n</i></sup>+(-1)<sup><i>n</i>-1</sup>tr(<i>A</i>) λ<sup> <i>n</i>-1</sup>+…+det(<i>A</i>).</span></div>
+      <p>The leading wiggle of the polynomial is set by <span class="mq">tr(<i>A</i>)</span>, and its value at <span class="mq">λ=0</span> is just <span class="mq"><i>p</i><sub><i>A</i></sub>(0)=det(<i>A</i>)</span>. Because a degree-<span class="mq"><i>n</i></span> polynomial also equals <span class="mq">∏<sub><i>i</i></sub>(λ<sub><i>i</i></sub>-λ)</span> through its roots, matching the two coefficients gives a pair of beautifully simple identities:</p>
+      <div class="eq-box" style="margin:10px 0;"><span class="eqn">tr(<i>A</i>)=∑<sub><i>i</i></sub>λ<sub><i>i</i></sub>     and     det(<i>A</i>)=∏<sub><i>i</i></sub>λ<sub><i>i</i></sub>.</span></div>
+      <p style="margin-bottom:0;"><b>What it means.</b> The <b>sum</b> of the eigenvalues is the trace; their <b>product</b> is the determinant — two numbers you can read straight off the matrix at a glance. For a <span class="mq">2×2</span> matrix this is especially handy: the whole characteristic polynomial is simply <span class="mq">λ<sup>2</sup>-tr(<i>A</i>) λ+det(<i>A</i>)</span>, so a quick mental "sum and product" already tells you the eigenvalues. We prove this carefully in Chapter&nbsp;4 and use it constantly thereafter.</p>
+    </div>
+  </div>
+</section>
+
+<div class="chapter alt"><div class="thread reveal"><span class="ln"></span><span>Now the star of the show: the directions a matrix <b>can't turn</b>.</span><span class="ln"></span></div></div>
+
+<!-- ================= CHAPTER 3 — EIGENVECTORS ================= -->
+<section class="chapter alt" id="c-eigen">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="chap-tag"><span class="num">3</span> Eigenvectors &amp; Eigenvalues</div>
+      <h2>The directions that refuse to bend</h2>
+      <p class="lead">Most vectors get knocked off course by a transformation. But a precious few — the <b>eigenvectors</b> — come out pointing along the very same line they went in. They only get scaled, by a factor <span class="mq">λ</span> called the <b>eigenvalue</b>. They are the "grain" of the wood, the natural axes of the matrix.</p>
+    </div>
+
+    <div class="eq-box reveal"><span class="eqn"><i>A</i><b class="vec">x</b>=λ<b class="vec">x</b>    (<b class="vec">x</b>≠<b class="vec">0</b>)</span></div>
+    <p class="reveal muted" style="text-align:center;max-width:680px;margin:-4px auto 0;">"Transforming <span class="mq"><b class="vec">x</b></span> with the whole matrix <span class="mq"><i>A</i></span> does nothing more than stretching it by a single number <span class="mq">λ</span>."</p>
+
+    <!-- THE BIG INTERACTIVE -->
+    <div class="lab reveal">
+      <div class="lab-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M8 9l-3 3 3 3"/><path d="M16 9l3 3-3 3"/></svg></i><span class="t">Playground · The Eigenvector Hunt</span><span class="pill">Drag the vector</span></div>
+      <div class="lab-body">
+        <div class="lab-grid">
+          <div class="stage"><svg id="eigSvg" viewBox="0 0 480 480" style="width:100%;display:block;touch-action:none;"></svg></div>
+          <div class="panel">
+            <h4>Pick a transformation</h4>
+            <div class="btn-row" id="eigPresets">
+              <button class="btn active" data-m="2,1,1,2" data-name="Symmetric">Symmetric</button>
+              <button class="btn" data-m="2,0,0,0.5" data-name="Diagonal stretch">Stretch</button>
+              <button class="btn" data-m="1,1,0,1" data-name="Shear">Shear</button>
+              <button class="btn" data-m="0,-1,1,0" data-name="Rotation 90°">Rotation</button>
+              <button class="btn" data-m="1,6,5,2" data-name="General">General</button>
+            </div>
+            <div class="mat-input" style="--cols:2" id="eigMat">
+              <input type="number" step="0.1" id="e00" value="2">
+              <input type="number" step="0.1" id="e01" value="1">
+              <input type="number" step="0.1" id="e10" value="1">
+              <input type="number" step="0.1" id="e11" value="2">
+            </div>
+            <div class="readout">
+              <div class="row"><span class="k">Your vector <span class="mq"><b class="vec">x</b></span></span><span class="v" id="eigX">(1.0, 0.0)</span></div>
+              <div class="row"><span class="k"><span class="mq"><i>A</i><b class="vec">x</b></span></span><span class="v" id="eigAx">(2.0, 1.0)</span></div>
+              <div class="row"><span class="k">Angle between them</span><span class="v" id="eigAngle">26.6°</span></div>
+            </div>
+            <div class="readout" id="eigVerdictBox" style="border-color:var(--gold);background:var(--gold-pale);">
+              <div class="row"><span class="k" id="eigVerdict">Keep dragging — line up <span class="mq"><i>A</i><b class="vec">x</b></span> with <span class="mq"><b class="vec">x</b></span>…</span><span class="v hot" id="eigLambda"></span></div>
+            </div>
+            <div class="legend">
+              <span><span class="sw" style="background:var(--navy-3)"></span> your <span class="mq"><b class="vec">x</b></span></span>
+              <span><span class="sw" style="background:var(--gold)"></span> <span class="mq"><i>A</i><b class="vec">x</b></span></span>
+              <span><span class="sw" style="background:var(--red);height:2px;border-top:2px dashed var(--red);background:none;border-color:var(--red)"></span> eigen-directions</span>
+            </div>
+            <div class="hintline"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V6a1.5 1.5 0 0 1 3 0v5"/><path d="M11 11V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M14 11V6.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6 6 6 0 0 1-5-3l-2-4a1.6 1.6 0 0 1 2.6-1.7L8 13"/></svg></i> Spin <span class="mq"><b class="vec">x</b></span> around. When the gold <span class="mq"><i>A</i><b class="vec">x</b></span> becomes <b>parallel</b> to your blue <span class="mq"><b class="vec">x</b></span>, you've found an eigenvector — and we reveal its <span class="mq">λ</span>.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout intuition reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><ellipse cx="12" cy="12" rx="4" ry="9"/></svg></i> Three everyday pictures</div>
+      <ul style="margin:6px 0 0;">
+        <li><b>Spinning globe.</b> The rotation axis (the line through the poles) doesn't move — it's an eigenvector with <span class="mq">λ=1</span>. Every city off the axis swings around.</li>
+        <li><b>Stretching dough.</b> Pull dough along one direction and squeeze another: the pull-direction is an eigenvector with <span class="mq">λ>1</span>, the squeeze-direction an eigenvector with <span class="mq">0<λ<1</span>.</li>
+        <li><b>Shearing a deck of cards.</b> Push the top of the deck sideways. Horizontal vectors stay horizontal (<span class="mq">λ=1</span>); everything else tilts. (Try the <b>Shear</b> preset — it has only <em>one</em> eigen-direction!)</li>
+      </ul>
+    </div>
+
+    <div class="callout warn reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 3.4 2.3c-.8.4-1 .9-1 1.7"/><path d="M12 17h.01"/></svg></i> A puzzle worth pausing on</div>
+      <p style="margin:6px 0 0;"><span class="mq"><i>A</i><b class="vec">x</b>=λ<b class="vec">x</b></span> says the transformation only rescales <span class="mq"><b class="vec">x</b></span> along its own line. So what about a pure <b>rotation</b>? It turns <em>every</em> real direction — nothing stays put. Select the <b>Rotation</b> preset and try to find an eigenvector: you can't. The resolution is beautiful, and it lives in Chapter&nbsp;7 — the eigenvalues become <b>complex</b>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 4 — CHARACTERISTIC EQUATION ================= -->
+<section class="chapter" id="c-char">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="chap-tag"><span class="num">4</span> The Characteristic Equation</div>
+      <h2>Turning a geometry problem into algebra</h2>
+      <p class="lead">Dragging is fun, but we need a <em>method</em>. Here's the clever move that converts "find the special directions" into "find the roots of a polynomial."</p>
+    </div>
+
+    <div class="lab-grid reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+      <div>
+        <p>Start from the definition and gather everything on one side:</p>
+        <div class="eq-box" style="text-align:left;">
+        <span class="eqn"><span class="aln"><i>A</i><b class="vec">x</b>=λ<b class="vec">x</b><br><i>A</i><b class="vec">x</b>-λ <i>I</i><b class="vec">x</b>=<b class="vec">0</b><br>(<i>A</i>-λ <i>I</i>)<b class="vec">x</b>=<b class="vec">0</b></span></span>
+        </div>
+        <p>We need a <b>non-zero</b> <span class="mq"><b class="vec">x</b></span> to solve this. A square matrix sends a non-zero vector to <span class="mq"><b class="vec">0</b></span> only when it <b>collapses space</b> — i.e. only when it is <b>singular</b>. And we already learned the test for that:</p>
+      </div>
+      <div class="callout key" style="margin-top:0;">
+        <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="4"/><path d="M11 11l8 8"/><path d="M16 16l2-2"/></svg></i> The bridge back to Chapter 1</div>
+        <p style="margin:6px 0 0;">A non-trivial eigenvector exists <span class="mq">⇔</span> <span class="mq">(<i>A</i>-λ <i>I</i>)</span> is singular <span class="mq">⇔</span></p>
+        <div class="eq-box" style="margin:12px 0 0;"><span class="eqn"><span class="boxeq"> det(<i>A</i>-λ <i>I</i>)=0 </span></span></div>
+        <p style="margin:12px 0 0;">Expanding this determinant gives a degree-<span class="mq"><i>n</i></span> polynomial in <span class="mq">λ</span> — the <b>characteristic polynomial</b>. Its roots are exactly the eigenvalues. The determinant from Chapter&nbsp;1 was the key all along.</p>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE: 2x2 characteristic solver -->
+    <div class="lab reveal">
+      <div class="lab-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l3 7 4-17h11"/></svg></i><span class="t">Playground · Solve a <span class="mq">2×2</span> Live</span><span class="pill">Edit the matrix</span></div>
+      <div class="lab-body">
+        <div class="lab-grid">
+          <div class="stage" style="padding:18px;"><svg id="charSvg" viewBox="0 0 460 360" style="width:100%;display:block;"></svg>
+            <div class="legend" style="padding:0 14px 12px;">
+              <span><span class="sw" style="background:var(--navy-3)"></span> <span class="mq"><i>p</i><sub><i>A</i></sub>(λ)=λ<sup>2</sup>-trλ+det</span></span>
+              <span><span class="swv" style="background:var(--red)"></span> eigenvalues (roots)</span>
+            </div>
+          </div>
+          <div class="panel">
+            <h4>Your matrix <span class="mq"><i>A</i></span></h4>
+            <div class="mat-input" style="--cols:2" id="charMat">
+              <input type="number" step="1" id="c00" value="1">
+              <input type="number" step="1" id="c01" value="6">
+              <input type="number" step="1" id="c10" value="5">
+              <input type="number" step="1" id="c11" value="2">
+            </div>
+            <div class="readout">
+              <div class="row"><span class="k">Trace <span class="mq">tr(<i>A</i>)=λ<sub>1</sub>+λ<sub>2</sub></span></span><span class="v" id="charTr">3</span></div>
+              <div class="row"><span class="k">Determinant <span class="mq">det(<i>A</i>)=λ<sub>1</sub>λ<sub>2</sub></span></span><span class="v" id="charDet">-28</span></div>
+              <div class="row"><span class="k">Characteristic polynomial</span><span class="v" id="charPoly">λ²−3λ−28</span></div>
+            </div>
+            <div class="readout" style="border-color:var(--green);background:#f1f9f4;">
+              <div class="row"><span class="k">Eigenvalue <span class="mq">λ<sub>1</sub></span></span><span class="v good" id="charL1">7</span></div>
+              <div class="row"><span class="k">Eigenvalue <span class="mq">λ<sub>2</sub></span></span><span class="v good" id="charL2">−4</span></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn" data-char="1,6,5,2">Companion Ex.</button>
+              <button class="btn" data-char="2,1,1,2">Symmetric</button>
+              <button class="btn" data-char="0,-1,1,0">Rotation (complex!)</button>
+              <button class="btn" data-char="1,1,0,1">Shear (repeated)</button>
+            </div>
+            <div class="hintline"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11"/><path d="M10 20V5"/><path d="M16 20v-7"/><path d="M3 20h18"/></svg></i> Notice: the polynomial is always <span class="mq">λ<sup>2</sup>-tr(<i>A</i>) λ+det(<i>A</i>)</span>. Trace and determinant <em>are</em> the coefficients.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout intuition reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6a4 4 0 0 0 0-8h-4a4 4 0 0 1 0-8h6"/></svg></i> The full recipe</div>
+      <ol style="margin:6px 0 0;">
+        <li><b>Form</b> <span class="mq">det(<i>A</i>-λ <i>I</i>)=0</span> and expand to the characteristic polynomial.</li>
+        <li><b>Solve</b> for its roots <span class="mq">λ<sub>1</sub>,λ<sub>2</sub>,…</span> — these are the eigenvalues.</li>
+        <li><b>For each <span class="mq">λ</span></b>, find the null space of <span class="mq">(<i>A</i>-λ <i>I</i>)</span> by Gaussian elimination — that's the <b>eigenspace</b> <span class="mq"><i>E</i><sub>λ</sub></span>, and any non-zero vector in it is an eigenvector.</li>
+      </ol>
+      <p style="margin:10px 0 0;">The set of all eigenvalues is the matrix's <b>spectrum</b>. Worked example with <span class="mq"><i>A</i>=<span class="mat" style="grid-template-columns:repeat(2,auto)"><span>1</span><span>6</span><span>5</span><span>2</span></span></span>: roots <span class="mq">λ=7,-4</span>; eigenvectors <span class="mq"><span class="mat" style="grid-template-columns:repeat(1,auto)"><span>1</span><span>1</span></span></span> and <span class="mq"><span class="mat" style="grid-template-columns:repeat(1,auto)"><span>6</span><span>-5</span></span></span>.</p>
+    </div>
+
+    <div class="callout key reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L4 14h6l-1 7 9-11h-6z"/></svg></i> A delightful shortcut</div>
+      <p style="margin:6px 0 0;">If <span class="mq"><i>A</i></span> is <b>triangular</b> (upper or lower), then <span class="mq"><i>A</i>-λ <i>I</i></span> is triangular too, so its determinant is just the product of the diagonal: <span class="mq">(<i>a</i><sub>11</sub>-λ)(<i>a</i><sub>22</sub>-λ)⋯(<i>a</i><sub><i>n</i><i>n</i></sub>-λ)=0</span>. <b>The eigenvalues are simply the diagonal entries.</b> No work required.</p>
+    </div>
+  </div>
+</section>
+
+<div class="chapter alt"><div class="thread reveal"><span class="ln"></span><span>For one special, common family of matrices, everything becomes perfect.</span><span class="ln"></span></div></div>
+
+<!-- ================= CHAPTER 5 — SPECTRAL THEOREM ================= -->
+<section class="chapter dark" id="c-spectral">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="chap-tag"><span class="num">5</span> The Spectral Theorem</div>
+      <h2>The crown jewel of symmetric matrices</h2>
+      <p class="lead">A matrix is <b>symmetric</b> when <span class="mq"><i>A</i>=<i>A</i><sup>T</sup></span> — it mirrors across its diagonal. These matrices are everywhere in data science (every covariance matrix, every <span class="mq"><i>A</i><sup>T</sup><i>A</i></span> Gram matrix is symmetric), and they are blessed with a near-magical structure.</p>
+    </div>
+
+    <div class="callout def reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l3 6-9 12L3 9z"/><path d="M3 9h18"/><path d="M9 3l3 6 3-6"/></svg></i> The Spectral Theorem (real symmetric <span class="mq"><i>A</i></span>)</div>
+      <p style="margin:6px 0 0;">If <span class="mq"><i>A</i>∈ℝ<sup><i>n</i>× <i>n</i></sup></span> is symmetric, then:</p>
+      <ol style="margin:8px 0 0;">
+        <li>All eigenvalues <span class="mq">λ</span> are <b>real</b> — never complex.</li>
+        <li>Eigenvectors of <b>distinct</b> eigenvalues are <b>orthogonal</b> (perpendicular).</li>
+        <li>There is an <b>orthonormal basis</b> of <span class="mq">ℝ<sup><i>n</i></sup></span> made entirely of eigenvectors of <span class="mq"><i>A</i></span>. So <span class="mq"><i>A</i></span> is always diagonalizable — beautifully, by an <b>orthogonal</b> matrix.</li>
+      </ol>
+    </div>
+
+    <div class="lab-grid reveal" style="display:grid;grid-template-columns:.95fr 1.05fr;gap:26px;align-items:center;">
+      <div class="stage" style="background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12);"><svg id="symSvg" viewBox="0 0 420 420" style="width:100%;display:block;"></svg></div>
+      <div>
+        <h3>Why symmetry forces "real" and "perpendicular"</h3>
+        <p class="muted"><b>The intuition.</b> A symmetric matrix has no "twist" to it — it never secretly rotates space, it only stretches along some set of clean axes. Two consequences follow, and each has a short, satisfying proof.</p>
+        <p class="muted"><b>1 · Eigenvalues are real.</b> Start from <span class="mq"><i>A</i><b class="vec">x</b>=λ<b class="vec">x</b></span> and pre-multiply by the conjugate-transpose <span class="mq"><b class="vec">x</b><sup><i>H</i></sup></span>:</p>
+        <div class="eq-box" style="margin:8px 0;"><span class="eqn"><b class="vec">x</b><sup><i>H</i></sup><i>A</i><b class="vec">x</b>=λ <b class="vec">x</b><sup><i>H</i></sup><b class="vec">x</b>.</span></div>
+        <p class="muted">The right side has <span class="mq"><b class="vec">x</b><sup><i>H</i></sup><b class="vec">x</b>=‖<b class="vec">x</b>‖<sup>2</sup></span>, which is real and positive. The left side equals its own conjugate (precisely because <span class="mq"><i>A</i>=<i>A</i><sup><i>H</i></sup></span>), so it too is real. A real number divided by a real positive number is real — therefore <span class="mq">λ</span> is real. Symmetric matrices simply cannot have complex eigenvalues.</p>
+        <p class="muted"><b>2 · Eigenvectors of different eigenvalues are perpendicular.</b> Take <span class="mq"><i>A</i><b class="vec">x</b>=λ<b class="vec">x</b></span> and <span class="mq"><i>A</i><b class="vec">y</b>=μ<b class="vec">y</b></span> with <span class="mq">λ≠μ</span>. Computing <span class="mq"><b class="vec">y</b><sup><i>H</i></sup><i>A</i><b class="vec">x</b></span> two ways gives <span class="mq">λ <b class="vec">y</b><sup><i>H</i></sup><b class="vec">x</b>=μ <b class="vec">y</b><sup><i>H</i></sup><b class="vec">x</b></span>, so <span class="mq">(λ-μ) <b class="vec">y</b><sup><i>H</i></sup><b class="vec">x</b>=0</span>. Since <span class="mq">λ≠μ</span>, we must have <span class="mq"><b class="vec">y</b><sup><i>H</i></sup><b class="vec">x</b>=0</span> — the eigenvectors meet at a right angle.</p>
+        <div class="callout key" style="background:rgba(212,160,23,.10);border-color:var(--gold);">
+          <p style="margin:0;color:#fff;"><b>The payoff.</b> A symmetric transformation comes with a perfect set of <b>perpendicular axes</b> along which it does nothing but <b>stretch</b> — never rotate, never shear. Drag the vector in the panel: the gold <span class="mq"><i>A</i><b class="vec">x</b></span> always behaves as a pure stretch relative to those clean perpendicular eigen-axes. This is exactly the structure the eigendecomposition <span class="mq"><i>A</i>=<i>Q</i>Λ <i>Q</i><sup>T</sup></span> captures next.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 6 — EIGENDECOMPOSITION ================= -->
+<section class="chapter" id="c-decomp">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="chap-tag"><span class="num">6</span> Eigendecomposition</div>
+      <h2>Three simple moves hidden inside one matrix</h2>
+      <p class="lead">Because a symmetric matrix has perpendicular eigen-axes, we can <b>factor</b> it. Any real symmetric <span class="mq"><i>A</i></span> splits as</p>
+    </div>
+    <div class="eq-box reveal"><span class="eqn"><i>A</i>=<i>Q</i> Λ <i>Q</i><sup>T</sup></span></div>
+    <p class="reveal muted" style="text-align:center;max-width:760px;margin:-2px auto 0;">where <span class="mq"><i>Q</i></span>'s columns are the orthonormal eigenvectors and <span class="mq">Λ</span> is the diagonal matrix of eigenvalues. Read right-to-left, applying <span class="mq"><i>A</i></span> to a vector is really <b>three clean steps</b>.</p>
+
+    <!-- INTERACTIVE: step-through decomposition -->
+    <div class="lab reveal">
+      <div class="lab-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg></i><span class="t">Playground · Watch <span class="mq"><i>A</i><b class="vec">x</b>=<i>Q</i>Λ <i>Q</i><sup>T</sup><b class="vec">x</b></span> unfold</span><span class="pill">Step through it</span></div>
+      <div class="lab-body">
+        <div class="lab-grid" style="grid-template-columns:1.2fr .8fr;">
+          <div class="stage"><svg id="decompSvg" viewBox="0 0 480 480" style="width:100%;display:block;"></svg></div>
+          <div class="panel">
+            <h4 id="decompStepTitle">Step 0 · The setup</h4>
+            <p class="muted" id="decompStepText" style="min-height:88px;font-size:.95rem;">We use the symmetric matrix <span class="mq"><i>A</i>=<span class="mat" style="grid-template-columns:repeat(2,auto)"><span>2</span><span>1</span><span>1</span><span>2</span></span></span> with eigenvalues <span class="mq">λ<sub>1</sub>=3, λ<sub>2</sub>=1</span> and orthonormal eigenvectors <span class="mq"><b class="vec">q</b><sub>1</sub>=<span class="frac"><span>1</span><span>√2</span></span>(1,1)</span>, <span class="mq"><b class="vec">q</b><sub>2</sub>=<span class="frac"><span>1</span><span>√2</span></span>(-1,1)</span>. Press <b>Next</b> to apply the transformation one piece at a time.</p>
+            <div class="readout"><div class="row"><span class="k">Current vector</span><span class="v" id="decompVec">(1.0, 0.5)</span></div></div>
+            <div class="btn-row">
+              <button class="btn gold" id="decompNext"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5l8 7-8 7z"/><path d="M19 5v14"/></svg></i> Next step</button>
+              <button class="btn" id="decompReset"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 4v5h5"/></svg></i> Reset</button>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:10px;">
+              <span class="dotstep" data-s="0"></span><span class="dotstep" data-s="1"></span><span class="dotstep" data-s="2"></span><span class="dotstep" data-s="3"></span>
+            </div>
+            <div class="hintline"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6a4 4 0 0 0 0-8h-4a4 4 0 0 1 0-8h6"/></svg></i> <span class="mq"><i>Q</i><sup>T</sup></span> rotates into the eigenbasis → <span class="mq">Λ</span> stretches along the axes → <span class="mq"><i>Q</i></span> rotates back.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <style>.dotstep{width:30px;height:6px;border-radius:4px;background:var(--line);transition:.3s;}.dotstep.on{background:var(--gold);}</style>
+
+    <div class="fgrid reveal">
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#2d6cdf,#5b8def)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 4v5h5"/></svg></i></div><h4>1 · Rotate (<span class="mq"><i>Q</i><sup>T</sup></span>)</h4><p>Re-express the vector in the eigenbasis — like turning your head so the natural axes line up with the screen.</p></div>
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#d4a017,#f0b323)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/></svg></i></div><h4>2 · Scale (<span class="mq">Λ</span>)</h4><p>Stretch independently along each axis by its eigenvalue. No rotation, no shear — pure scaling.</p></div>
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#7a3ec0,#9b59d0)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 4v5h-5"/></svg></i></div><h4>3 · Rotate back (<span class="mq"><i>Q</i></span>)</h4><p>Turn your head back to the original view. The result is exactly <span class="mq"><i>A</i><b class="vec">x</b></span> — a "complicated" map demystified.</p></div>
+    </div>
+
+    <div class="callout key reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></i> It really multiplies out</div>
+      <p style="margin:6px 0 0;">For <span class="mq"><i>A</i>=<span class="mat" style="grid-template-columns:repeat(2,auto)"><span>2</span><span>1</span><span>1</span><span>2</span></span></span>: <span class="mq"><i>Q</i>=<span class="frac"><span>1</span><span>√2</span></span><span class="mat" style="grid-template-columns:repeat(2,auto)"><span>1</span><span>-1</span><span>1</span><span>1</span></span></span>, <span class="mq">Λ=<span class="mat" style="grid-template-columns:repeat(2,auto)"><span>3</span><span>0</span><span>0</span><span>1</span></span></span>. Then <span class="mq"><i>Q</i>Λ <i>Q</i><sup>T</sup>=<span class="mat" style="grid-template-columns:repeat(2,auto)"><span>2</span><span>1</span><span>1</span><span>2</span></span>=<i>A</i>.</span> ✓ (Verified numerically — see the companion PDF for the full hand-computation.)</p>
+    </div>
+  </div>
+</section>
+
+<div class="chapter alt"><div class="thread reveal"><span class="ln"></span><span>But what about that rotation with <b>no</b> real eigenvectors? Time to leave the real line.</span><span class="ln"></span></div></div>
+
+<!-- ================= CHAPTER 7 — COMPLEX & HERMITIAN ================= -->
+<section class="chapter" id="c-complex">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="chap-tag"><span class="num">7</span> Complex Vectors &amp; Hermitian Matrices</div>
+      <h2>When the eigenvalues leave the real line</h2>
+      <p class="lead">Remember the rotation puzzle: a <span class="mq">90°</span> rotation turns every real vector, so it has no real eigenvectors. The fix isn't to give up — it's to allow <span class="mq">λ</span> to be <b>complex</b>.</p>
+    </div>
+
+    <div class="lab-grid reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:center;">
+      <div class="stage" style="padding:14px;"><svg id="rotSvg" viewBox="0 0 380 380" style="width:100%;display:block;"></svg>
+        <div class="slider-wrap" style="padding:0 16px 14px;">
+          <label>Rotation angle <span class="mq">θ</span> <b id="rotThetaLbl">45°</b></label>
+          <input type="range" id="rotTheta" min="0" max="180" value="45">
+        </div>
+      </div>
+      <div>
+        <p>The rotation matrix <span class="mq"><i>R</i><sub>θ</sub>=<span class="mat" style="grid-template-columns:repeat(2,auto)"><span>cosθ</span><span>-sinθ</span><span>sinθ</span><span>cosθ</span></span></span> has characteristic polynomial <span class="mq">λ<sup>2</sup>-2cosθ λ+1</span>, whose roots are</p>
+        <div class="eq-box" style="margin:10px 0;"><span class="eqn">λ=cosθ± <i>i</i>sinθ=<i>e</i><sup>± <i>i</i>θ</sup>.</span></div>
+        <p>Unless <span class="mq">θ=0</span> or <span class="mq">π</span> (the trivial <span class="mq"><i>I</i></span> or <span class="mq">-<i>I</i></span>), these are genuinely complex — and they always arrive in <b>conjugate pairs</b>. Geometrically, a complex eigenvalue <span class="mq"><i>r</i><i>e</i><sup>± <i>i</i>θ</sup></span> encodes a <b>rotation by <span class="mq">θ</span> combined with scaling by <span class="mq"><i>r</i></span></b>. Slide <span class="mq">θ</span> and watch the eigenvalues ride around the unit circle.</p>
+        <div class="readout"><div class="row"><span class="k">Eigenvalues</span><span class="v hot" id="rotEig">e^{±i45°}</span></div></div>
+      </div>
+    </div>
+
+    <div class="callout def reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l3 7 4-17h11"/></svg></i> Rescuing "length" for complex vectors</div>
+      <p style="margin:6px 0 0;">With complex entries, the old <span class="mq"><b class="vec">x</b><sup>T</sup><b class="vec">x</b></span> stops being a sensible length (for <span class="mq"><b class="vec">x</b>=(1+<i>i</i>, 2+<i>i</i>)</span> it gives <span class="mq">6+3<i>i</i></span> — not even real!). The repair is to conjugate one copy: the <b>conjugate-transpose</b> <span class="mq"><b class="vec">x</b><sup><i>H</i></sup>=<span style="text-decoration:overline"><b class="vec">x</b></span><sup>T</sup></span>. Then
+      <span class="eqn"><b class="vec">x</b><sup><i>H</i></sup><b class="vec">x</b>=<span style="text-decoration:overline"><i>x</i><sub>1</sub></span><i>x</i><sub>1</sub>+…+<span style="text-decoration:overline"><i>x</i><sub><i>n</i></sub></span><i>x</i><sub><i>n</i></sub>=|<i>x</i><sub>1</sub>|<sup>2</sup>+…+|<i>x</i><sub><i>n</i></sub>|<sup>2</sup>=‖<b class="vec">x</b>‖<sup>2</sup>≥ 0,</span>
+      a real, non-negative number — exactly what a squared length should be.</p>
+    </div>
+
+    <div class="callout key reveal">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M8 9l-3 3 3 3"/><path d="M16 9l3 3-3 3"/></svg></i> Hermitian = symmetric, upgraded</div>
+      <p style="margin:6px 0 0;">A matrix is <b>Hermitian</b> if it equals its own conjugate-transpose, <span class="mq"><i>A</i><sup><i>H</i></sup>=<i>A</i></span> (the complex generalisation of <span class="mq"><i>A</i><sup>T</sup>=<i>A</i></span>). For example
+      <span class="mq"><i>A</i>=<span class="mat" style="grid-template-columns:repeat(2,auto)"><span>1</span><span>3-<i>i</i></span><span>3+<i>i</i></span><span>4</span></span></span> satisfies <span class="mq"><i>A</i><sup><i>H</i></sup>=<i>A</i></span>. The Spectral Theorem extends perfectly: <b>Hermitian matrices have real eigenvalues and orthogonal eigenvectors</b> — which is precisely why quantum mechanics models every physical observable (energy, momentum, spin) as a Hermitian operator: measured values must be real.</p>
+    </div>
+  </div>
+</section>
+
+<div class="chapter alt"><div class="thread reveal"><span class="ln"></span><span>One more decomposition — the one that lets us <b>manufacture</b> random data.</span><span class="ln"></span></div></div>
+
+<!-- ================= CHAPTER 8 — CHOLESKY ================= -->
+<section class="chapter" id="c-cholesky">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="chap-tag"><span class="num">8</span> The Cholesky Decomposition</div>
+      <h2>The "square root" of a symmetric matrix</h2>
+      <p class="lead">If a symmetric matrix is also <b>positive-definite</b> (all eigenvalues positive), it has an especially tidy factorisation — into a lower-triangular matrix times its own transpose:</p>
+    </div>
+    <div class="eq-box reveal"><span class="eqn"><i>A</i>=<i>L</i> <i>L</i><sup>T</sup>    (<i>L</i> lower-triangular, positive diagonal)</span></div>
+
+    <div class="lab-grid reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+      <div>
+        <p>You solve for <span class="mq"><i>L</i></span> entry-by-entry, top-left to bottom-right:</p>
+        <div class="eq-box" style="text-align:left;"><span class="eqn">ℓ<sub>11</sub>=√(<i>a</i><sub>11</sub>),   ℓ<sub>21</sub>=<span class="frac"><span><i>a</i><sub>21</sub></span><span>ℓ<sub>11</sub></span></span>,   ℓ<sub>22</sub>=√(<i>a</i><sub>22</sub>-ℓ<sub>21</sub><sup>2</sup>), …</span></div>
+        <p class="muted">Each diagonal entry is a genuine square root — which only stays real when the matrix is positive-definite. So Cholesky doubles as a <b>positive-definiteness test</b>: if it runs without hitting a negative square root, the matrix is positive-definite.</p>
+      </div>
+      <div class="callout intuition" style="margin-top:0;">
+        <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="15" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/></svg></i> The killer application: sampling a Gaussian</div>
+        <p style="margin:6px 0 0;">A multivariate Gaussian is governed by a symmetric, positive-definite <b>covariance matrix</b> <span class="mq">Σ</span>. To draw a correlated sample:</p>
+        <ol style="margin:8px 0 0;">
+          <li>Factor <span class="mq">Σ=<i>L</i><i>L</i><sup>T</sup></span>.</li>
+          <li>Draw an easy <b>uncorrelated</b> standard-normal vector <span class="mq"><b class="vec">z</b></span> (a round blob).</li>
+          <li>Compute <span class="mq"><b class="vec">x</b>=<i>L</i><b class="vec">z</b></span> — now <span class="mq"><b class="vec">x</b></span> has exactly covariance <span class="mq">Σ</span>.</li>
+        </ol>
+        <p style="margin:8px 0 0;"><span class="mq"><i>L</i></span> is the lens that bends a featureless round cloud into the correlated ellipse your data actually has.</p>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE: Cholesky gaussian sampler -->
+    <div class="lab reveal">
+      <div class="lab-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11"/><path d="M10 20V5"/><path d="M16 20v-7"/><path d="M3 20h18"/></svg></i><span class="t">Playground · Shaping a Gaussian Cloud with <span class="mq"><i>L</i></span></span><span class="pill">Move the sliders</span></div>
+      <div class="lab-body">
+        <div class="lab-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="stage"><svg id="cholSvg" viewBox="0 0 460 380" style="width:100%;display:block;"></svg>
+            <div class="legend" style="padding:0 14px 12px;">
+              <span><span class="swv" style="background:#9fb2d8"></span> standard normal <span class="mq"><b class="vec">z</b></span></span>
+              <span><span class="swv" style="background:var(--gold)"></span> shaped sample <span class="mq"><b class="vec">x</b>=<i>L</i><b class="vec">z</b></span></span>
+            </div>
+          </div>
+          <div class="panel">
+            <h4>Covariance <span class="mq">Σ</span> you want to sample from</h4>
+            <div class="slider-wrap"><label>Variance in <span class="mq"><i>x</i></span> &nbsp; <span class="mq">σ<sub><i>x</i></sub><sup>2</sup></span> <b id="cVxLbl">2.0</b></label><input type="range" id="cVx" min="0.4" max="4" step="0.1" value="2"></div>
+            <div class="slider-wrap"><label>Variance in <span class="mq"><i>y</i></span> &nbsp; <span class="mq">σ<sub><i>y</i></sub><sup>2</sup></span> <b id="cVyLbl">1.0</b></label><input type="range" id="cVy" min="0.4" max="4" step="0.1" value="1"></div>
+            <div class="slider-wrap"><label>Correlation <span class="mq">ρ</span> <b id="cRhoLbl">0.6</b></label><input type="range" id="cRho" min="-0.95" max="0.95" step="0.05" value="0.6"></div>
+            <div class="readout">
+              <div class="row"><span class="k">Cholesky factor <span class="mq"><i>L</i></span></span><span class="v" id="cholL">[[1.41,0],[0.60,0.80]]</span></div>
+              <div class="row"><span class="k">Positive-definite?</span><span class="v good" id="cholPD">yes ✓</span></div>
+            </div>
+            <button class="btn gold" id="cholResample"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h4l10 10h4"/><path d="M3 17h4l3-3"/><path d="M18 4l3 3-3 3"/><path d="M18 14l3 3-3 3"/></svg></i> Draw fresh sample</button>
+            <div class="hintline"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg></i> Push correlation toward <span class="mq">±1</span> and the ellipse flattens toward a line — the matrix approaches singular (the alarm bell from Chapter 1).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CHAPTER 9 — WHY IT MATTERS ================= -->
+<section class="chapter dark" id="c-why">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="chap-tag"><span class="num">9</span> Why It All Matters</div>
+      <h2>From a clock-tower lecture to the engines of data science</h2>
+      <p class="lead">Every thread we pulled — determinant, trace, eigenvectors, the Spectral Theorem, Cholesky — converges on the techniques that quietly run modern machine learning.</p>
+    </div>
+
+    <div class="fgrid reveal">
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#d4a017,#f0b323)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/></svg></i></div><h4>PCA</h4><p>The eigenvectors of the covariance matrix are the <b>principal components</b> — directions of maximum variance. Keep the few with the largest eigenvalues and you compress data while losing almost nothing.</p></div>
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#16877a,#1faa98)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></i></div><h4>SVD</h4><p>Built from the eigenvectors of <span class="mq"><i>A</i><sup>T</sup><i>A</i></span> and <span class="mq"><i>A</i><i>A</i><sup>T</sup></span> (always symmetric, always nicely behaved). It generalises eigendecomposition to <b>any</b> matrix — the backbone of recommender systems and compression.</p></div>
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#2d6cdf,#5b8def)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2-6 4-6 6 0s4 6 6 0 4-6 6 0"/></svg></i></div><h4>Dynamical systems</h4><p>Solutions of <span class="mq"><span class="frac"><span><i>d</i><b class="vec">y</b></span><span><i>d</i><i>t</i></span></span>=<i>A</i><b class="vec">y</b></span> look like <span class="mq"><i>e</i><sup>λ <i>t</i></sup><b class="vec">v</b></span>. The <b>signs of the eigenvalues</b> decide whether a system settles, oscillates, or blows up.</p></div>
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#7a3ec0,#9b59d0)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(120 12 12)"/></svg></i></div><h4>Quantum mechanics</h4><p>Observables are Hermitian operators; their <b>real eigenvalues</b> are the possible measurements and the eigenvectors are the states. The Spectral Theorem makes physics consistent.</p></div>
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#c0392b,#e05c4d)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></i></div><h4>Quadratic forms &amp; ellipsoids</h4><p><span class="mq"><b class="vec">x</b><sup>T</sup><i>A</i><b class="vec">x</b>=<i>c</i></span> traces an ellipsoid whose axes are <span class="mq"><i>A</i></span>'s eigenvectors and whose radii shrink with <span class="mq">√(λ)</span>. This shapes optimisation landscapes and confidence regions.</p></div>
+      <div class="fcard"><div class="ic" style="background:linear-gradient(135deg,#143a73,#1d4f99)"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="15" r="1"/><circle cx="15" cy="9" r="1"/><circle cx="9" cy="15" r="1"/></svg></i></div><h4>Sampling &amp; simulation</h4><p>Cholesky's <span class="mq">Σ=<i>L</i><i>L</i><sup>T</sup></span> turns independent noise into correlated samples — the standard trick behind Monte-Carlo finance, Gaussian processes, and synthetic data.</p></div>
+    </div>
+
+    <div class="callout def reveal" style="background:rgba(212,160,23,.10);border-color:var(--gold);">
+      <div class="co-head"><i class="faicon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M11 6l1-1a4 4 0 0 1 6 6l-1 1"/><path d="M13 18l-1 1a4 4 0 0 1-6-6l1-1"/></svg></i> The single sentence to remember</div>
+      <p style="margin:6px 0 0;font-size:1.08rem;">A matrix transforms space; the <b>determinant</b> measures how much it scales volume and whether it's reversible; the <b>trace</b> and determinant are the sum and product of the <b>eigenvalues</b>; the <b>characteristic equation</b> <span class="mq">det(<i>A</i>-λ <i>I</i>)=0</span> hunts those eigenvalues down; the <b>eigenvectors</b> are the directions left untouched; and for <b>symmetric</b> matrices the <b>Spectral Theorem</b> hands us a perfect set of perpendicular eigen-axes — the decomposition <span class="mq"><i>A</i>=<i>Q</i>Λ <i>Q</i><sup>T</sup></span> that powers it all.</p>
+    </div>
+
+    <p class="reveal" style="text-align:center;color:#b9c8e8;max-width:760px;margin:26px auto 0;">You've now <em>felt</em> these ideas, not just read them. Scroll back up and drag the eigenvector explorer once more — it should look different now that you know what it's showing.</p>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="fwrap">
+    <h3>The whole story, in one breath</h3>
+    <p>A matrix transforms space. The <b>determinant</b> tells us how much it scales volume (and whether it's reversible); the <b>trace</b> sums the diagonal. The <b>characteristic equation</b> <span class="mq">det(<i>A</i>-λ <i>I</i>)=0</span> hunts down the <b>eigenvalues</b> — and the <b>eigenvectors</b> are the directions left untouched. For <b>symmetric</b> matrices the <b>Spectral Theorem</b> guarantees a perfect set of perpendicular eigen-axes, giving the decomposition <span class="mq"><i>A</i>=<i>Q</i>Λ <i>Q</i><sup>T</sup></span> that powers PCA, SVD, and beyond.</p>
+    <p style="margin-top:24px;font-size:.85rem;color:#8597bd;">Interactive companion to <b>ZC416 — Lecture 4: Eigenvalues &amp; Eigenvectors</b> · BITS Pilani, WILPD–CSIS.<br>Built as a living, explorable version of the lecture. Drag everything.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+const NS='http://www.w3.org/2000/svg';
+
+/* ---------- tiny SVG helpers ---------- */
+function E(tag,attrs,parent){
+  const n=document.createElementNS(NS,tag);
+  if(attrs)for(const k in attrs)n.setAttribute(k,attrs[k]);
+  if(parent)parent.appendChild(n);
+  return n;
+}
+function clr(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function fmt(x,d){d=(d==null)?2:d; const v=(Math.abs(x)<1e-9)?0:x; return v.toFixed(d);}
+
+/* a math-plane mapped onto an svg viewBox */
+function plane(svg, vbW, vbH, ox, oy, s){
+  return {
+    svg, s, ox, oy,
+    X:function(x){return ox + x*s;},
+    Y:function(y){return oy - y*s;},
+    ux:function(px){return (px-ox)/s;},
+    uy:function(py){return (oy-py)/s;}
+  };
+}
+/* draw a faint grid + axes */
+function grid(p, vbW, vbH, opt){
+  opt=opt||{};
+  const col=opt.color||'#dfe6f2', ax=opt.axis||'#9aa7c2';
+  const xmin=Math.ceil(-(p.ox)/p.s), xmax=Math.floor((vbW-p.ox)/p.s);
+  const ymin=Math.ceil(-(vbH-p.oy)/p.s), ymax=Math.floor((p.oy)/p.s);
+  for(let i=xmin;i<=xmax;i++){E('line',{x1:p.X(i),y1:0,x2:p.X(i),y2:vbH,stroke:col,'stroke-width':i===0?0:1},p.svg);}
+  for(let j=ymin;j<=ymax;j++){E('line',{x1:0,y1:p.Y(j),x2:vbW,y2:p.Y(j),stroke:col,'stroke-width':j===0?0:1},p.svg);}
+  E('line',{x1:0,y1:p.Y(0),x2:vbW,y2:p.Y(0),stroke:ax,'stroke-width':1.6},p.svg);
+  E('line',{x1:p.X(0),y1:0,x2:p.X(0),y2:vbH,stroke:ax,'stroke-width':1.6},p.svg);
+}
+/* arrow from (x1,y1)->(x2,y2) in pixel space */
+function arrowPx(svg,x1,y1,x2,y2,color,w,dash,op){
+  const a=Math.atan2(y2-y1,x2-x1), len=Math.hypot(x2-x1,y2-y1);
+  const hs=Math.min(13, len*0.34);
+  const attrs={x1,y1,x2,y2,stroke:color,'stroke-width':w||3,'stroke-linecap':'round'};
+  if(dash)attrs['stroke-dasharray']=dash;
+  if(op!=null)attrs['opacity']=op;
+  E('line',attrs,svg);
+  if(len>4 && !dash){
+    const ax1=x2-hs*Math.cos(a-0.4), ay1=y2-hs*Math.sin(a-0.4);
+    const ax2=x2-hs*Math.cos(a+0.4), ay2=y2-hs*Math.sin(a+0.4);
+    E('polygon',{points:`${x2},${y2} ${ax1},${ay1} ${ax2},${ay2}`,fill:color,opacity:op!=null?op:1},svg);
+  }
+}
+function vecArrow(p,svg,vx,vy,color,w,dash,op){arrowPx(svg,p.X(0),p.Y(0),p.X(vx),p.Y(vy),color,w,dash,op);}
+function label(svg,x,y,txt,color,size,anchor,weight){
+  const t=E('text',{x,y,fill:color||'#1c2433','font-size':size||13,'text-anchor':anchor||'start','font-weight':weight||600},svg);
+  t.textContent=txt;return t;
+}
+
+/* 2x2 eigen-analysis */
+function eig2(a,b,c,d){
+  const tr=a+d, det=a*d-b*c, disc=tr*tr-4*det;
+  const out={tr,det,disc,real:disc>=-1e-9,vals:[],vecs:[]};
+  if(out.real){
+    const r=Math.sqrt(Math.max(0,disc));
+    const l1=(tr+r)/2, l2=(tr-r)/2;
+    out.vals=[l1,l2];
+    [l1,l2].forEach(function(l){
+      let vx,vy;
+      if(Math.abs(b)>1e-9){vx=b; vy=l-a;}
+      else if(Math.abs(c)>1e-9){vx=l-d; vy=c;}
+      else { // diagonal: eigenvectors are axes
+        vx=(Math.abs(l-a)<1e-9)?1:0; vy=(Math.abs(l-a)<1e-9)?0:1;
+      }
+      const n=Math.hypot(vx,vy)||1; out.vecs.push([vx/n,vy/n]);
+    });
+  }else{
+    const re=tr/2, im=Math.sqrt(-disc)/2;
+    out.vals=[{re,im},{re,im:-im}];
+  }
+  return out;
+}
+function matVec(a,b,c,d,x,y){return [a*x+b*y, c*x+d*y];}
+
+/* tooltip */
+const TT=document.getElementById('tooltip');
+function showTip(x,y,txt){TT.textContent=txt;TT.style.left=(x+12)+'px';TT.style.top=(y+12)+'px';TT.style.opacity=1;}
+function hideTip(){TT.style.opacity=0;}
+
+/* ---------- progress + nav + reveal ---------- */
+const prog=document.getElementById('progress'), nav=document.getElementById('topnav'), hero=document.getElementById('hero');
+function onScroll(){
+  const h=document.documentElement, st=h.scrollTop||document.body.scrollTop;
+  const sh=(h.scrollHeight-h.clientHeight);
+  prog.style.width=(sh>0?(st/sh*100):0)+'%';
+  if(st>hero.offsetHeight*0.6)nav.classList.add('show');else nav.classList.remove('show');
+}
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+if('IntersectionObserver' in window){
+  const io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(function(r){io.observe(r);});
+}else{
+  document.querySelectorAll('.reveal').forEach(function(r){r.classList.add('in');});
+}
+
+/* ---------- HERO canvas: morphing grid ---------- */
+(function heroAnim(){
+  const cv=document.getElementById('heroCanvas'); if(!cv)return;
+  const ctx=cv.getContext('2d'); let W,H,DPR;
+  function size(){DPR=Math.min(2,window.devicePixelRatio||1);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+  size();window.addEventListener('resize',size);
+  let t=0;
+  function frame(){
+    t+=0.006; ctx.clearRect(0,0,W,H);
+    const cx=W/2, cy=H/2, s=Math.min(W,H)/14;
+    // gentle oscillating symmetric transform
+    const a=1+0.35*Math.sin(t), b=0.55*Math.sin(t*0.7), d=1+0.35*Math.cos(t*0.9);
+    const N=9;
+    ctx.lineWidth=1;
+    for(let gx=-N;gx<=N;gx++){
+      ctx.beginPath();
+      for(let gy=-N;gy<=N;gy++){
+        const X=a*gx+b*gy, Y=b*gx+d*gy;
+        const px=cx+X*s, py=cy-Y*s;
+        if(gy===-N)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+      }
+      ctx.strokeStyle='rgba(150,180,235,0.16)';ctx.stroke();
+    }
+    for(let gy=-N;gy<=N;gy++){
+      ctx.beginPath();
+      for(let gx=-N;gx<=N;gx++){
+        const X=a*gx+b*gy, Y=b*gx+d*gy;
+        const px=cx+X*s, py=cy-Y*s;
+        if(gx===-N)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+      }
+      ctx.strokeStyle='rgba(150,180,235,0.16)';ctx.stroke();
+    }
+    // eigen-directions of [[a,b],[b,d]] are at 45/135 since symmetric w/ equal-ish -> compute
+    const tr=a+d, det=a*d-b*b, disc=Math.sqrt(Math.max(0,tr*tr-4*det));
+    const l1=(tr+disc)/2;
+    let vx=b, vy=l1-a; const nn=Math.hypot(vx,vy)||1; vx/=nn;vy/=nn;
+    ctx.strokeStyle='rgba(240,179,35,0.55)';ctx.lineWidth=2;
+    [[vx,vy],[-vy,vx]].forEach(function(v,i){
+      ctx.beginPath();ctx.moveTo(cx-v[0]*s*N,cy+v[1]*s*N);ctx.lineTo(cx+v[0]*s*N,cy-v[1]*s*N);
+      ctx.strokeStyle=i===0?'rgba(240,179,35,0.5)':'rgba(240,179,35,0.22)';ctx.stroke();
+    });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* pointer -> svg user coords */
+function svgPoint(svg,evt){
+  const pt=svg.createSVGPoint();
+  const e=(evt.touches&&evt.touches[0])?evt.touches[0]:evt;
+  pt.x=e.clientX; pt.y=e.clientY;
+  const m=svg.getScreenCTM(); if(!m)return{x:0,y:0};
+  const r=pt.matrixTransform(m.inverse());
+  return {x:r.x,y:r.y};
+}
+
+/* ============ MODULE: Determinant area ============ */
+(function(){
+  const svg=document.getElementById('detSvg'); if(!svg)return;
+  const W=460,H=420, p=plane(svg,W,H,150,300,68);
+  const g=function(id){return document.getElementById(id);};
+  const fields=['d00','d01','d10','d11'].map(g);
+  let drag=null;
+  function getM(){return fields.map(function(f){return parseFloat(f.value)||0;});}
+  function render(){
+    clr(svg);
+    const m=getM(); const a=m[0],b=m[1],c=m[2],d=m[3];
+    grid(p,W,H);
+    // columns: c1=(a,c), c2=(b,d)
+    const c1=[a,c], c2=[b,d];
+    const det=a*d-b*c;
+    // unit square faint
+    E('polygon',{points:`${p.X(0)},${p.Y(0)} ${p.X(1)},${p.Y(0)} ${p.X(1)},${p.Y(1)} ${p.X(0)},${p.Y(1)}`,fill:'none',stroke:'#9aa7c2','stroke-dasharray':'4 4','stroke-width':1.4},svg);
+    // parallelogram
+    const pts=`${p.X(0)},${p.Y(0)} ${p.X(c1[0])},${p.Y(c1[1])} ${p.X(c1[0]+c2[0])},${p.Y(c1[1]+c2[1])} ${p.X(c2[0])},${p.Y(c2[1])}`;
+    E('polygon',{points:pts,fill:det>=0?'rgba(29,79,153,0.16)':'rgba(192,57,43,0.16)',stroke:det>=0?'#1d4f99':'#c0392b','stroke-width':1.6},svg);
+    // arrows
+    vecArrow(p,svg,c1[0],c1[1],'#1d4f99',3.4);
+    vecArrow(p,svg,c2[0],c2[1],'#d4a017',3.4);
+    label(svg,p.X(c1[0])+6,p.Y(c1[1])-6,'A e₁','#1d4f99',14);
+    label(svg,p.X(c2[0])+6,p.Y(c2[1])-6,'A e₂','#b8860b',14);
+    // handles
+    E('circle',{cx:p.X(c1[0]),cy:p.Y(c1[1]),r:8,fill:'#1d4f99',stroke:'#fff','stroke-width':2,cursor:'grab','data-h':'1'},svg);
+    E('circle',{cx:p.X(c2[0]),cy:p.Y(c2[1]),r:8,fill:'#d4a017',stroke:'#fff','stroke-width':2,cursor:'grab','data-h':'2'},svg);
+    // readouts
+    g('detVal').textContent=fmt(det);
+    g('detVal').className='v '+(Math.abs(det)<0.05?'hot':'');
+    g('detArea').textContent=fmt(Math.abs(det))+' u²';
+    const o=g('detOrient');
+    if(Math.abs(det)<0.05){o.textContent='COLLAPSED (singular)';o.className='v hot';}
+    else if(det>0){o.textContent='preserved';o.className='v good';}
+    else {o.textContent='flipped (mirror)';o.className='v hot';}
+  }
+  function down(e){const t=e.target; if(t.getAttribute&&t.getAttribute('data-h')){drag=t.getAttribute('data-h');e.preventDefault();}}
+  function move(e){
+    if(!drag)return; e.preventDefault();
+    const q=svgPoint(svg,e);
+    let x=Math.round(p.ux(q.x)*10)/10, y=Math.round(p.uy(q.y)*10)/10;
+    x=Math.max(-3.5,Math.min(3.5,x)); y=Math.max(-3.5,Math.min(3.5,y));
+    if(drag==='1'){fields[0].value=x;fields[2].value=y;}else{fields[1].value=x;fields[3].value=y;}
+    render();
+  }
+  function up(){drag=null;}
+  svg.addEventListener('mousedown',down);svg.addEventListener('touchstart',down,{passive:false});
+  window.addEventListener('mousemove',move);window.addEventListener('touchmove',move,{passive:false});
+  window.addEventListener('mouseup',up);window.addEventListener('touchend',up);
+  fields.forEach(function(f){f.addEventListener('input',render);});
+  document.querySelectorAll('[data-det]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      const v=btn.getAttribute('data-det').split(',').map(Number);
+      fields[0].value=v[0];fields[1].value=v[1];fields[2].value=v[2];fields[3].value=v[3];render();
+    });
+  });
+  render();
+})();
+
+/* ============ MODULE: Cofactor 3x3 ============ */
+(function(){
+  const svg=document.getElementById('cofSvg'); if(!svg)return;
+  const M=[[3,1,0],[-2,-4,3],[5,4,-2]];
+  const cs=98, ox=33, oy=33;
+  const g=function(id){return document.getElementById(id);};
+  function sub(r,c){const s=[];for(let i=0;i<3;i++){if(i===r)continue;const row=[];for(let j=0;j<3;j++){if(j===c)continue;row.push(M[i][j]);}s.push(row);}return s;}
+  function det2(m){return m[0][0]*m[1][1]-m[0][1]*m[1][0];}
+  function render(hl){
+    clr(svg);
+    E('rect',{x:6,y:6,width:cs*3+54,height:cs*3+54,rx:14,fill:'none'},svg);
+    // bracket marks
+    for(let i=0;i<3;i++)for(let j=0;j<3;j++){
+      const x=ox+j*cs, y=oy+i*cs;
+      let fill='#fff', strk='#e2ddca';
+      const inRow=hl!=null&&i===0, inCol=hl!=null&&j===hl;
+      if(hl!=null){
+        if(i===0&&j===hl){fill='#fdf3d6';strk='#d4a017';}
+        else if(i===0||j===hl){fill='#f0eee4';}
+      }
+      E('rect',{x,y,width:cs-10,height:cs-10,rx:10,fill,stroke:strk,'stroke-width':(i===0&&j===hl)?2.4:1.3,
+        'data-col':(i===0?j:'')},svg);
+      const t=label(svg,x+(cs-10)/2,y+(cs-10)/2+6,String(M[i][j]),(i===0&&j===hl)?'#b8860b':'#1c2433',22,'middle',700);
+      if(i===0){t.style.cursor='pointer';t.setAttribute('data-col',j);}
+    }
+    // matrix brackets
+    E('path',{d:`M ${ox-8} ${oy} q -10 0 -10 12 M ${ox-18} ${oy} L ${ox-18} ${oy+cs*3-10} q 0 12 10 12`,fill:'none',stroke:'#0a2353','stroke-width':2.4},svg);
+    const rx=ox+cs*3-10;
+    E('path',{d:`M ${rx+8} ${oy} q 10 0 10 12 M ${rx+18} ${oy} L ${rx+18} ${oy+cs*3-10} q 0 12 -10 12`,fill:'none',stroke:'#0a2353','stroke-width':2.4},svg);
+  }
+  function hover(j){
+    const a=M[0][j], mn=det2(sub(0,j)), sign=(j%2===0)?1:-1, contrib=a*sign*mn;
+    g('cofTerm').textContent='a₁'+(j+1)+' = '+a;
+    g('cofSign').textContent=(sign>0?'+':'−')+'1';
+    g('cofMinor').textContent='det = '+mn;
+    g('cofContrib').textContent=(contrib>=0?'+':'−')+Math.abs(contrib);
+    render(j);
+  }
+  svg.addEventListener('mousemove',function(e){
+    const c=e.target.getAttribute&&e.target.getAttribute('data-col');
+    if(c!==''&&c!=null){hover(parseInt(c));}
+  });
+  svg.addEventListener('mouseleave',function(){
+    ['cofTerm','cofSign','cofMinor','cofContrib'].forEach(function(id){g(id).textContent='—';});
+    render(null);
+  });
+  g('cofTotal').textContent='−1';
+  render(null);
+})();
+
+/* ============ MODULE: Trace ============ */
+(function(){
+  const svg=document.getElementById('traceSvg'); if(!svg)return;
+  const g=function(id){return document.getElementById(id);};
+  let M;
+  function rnd(){return Math.floor(Math.random()*13)-6;}
+  function gen(){M=[[rnd(),rnd(),rnd()],[rnd(),rnd(),rnd()],[rnd(),rnd(),rnd()]];}
+  const cs=78, ox=40, oy=22;
+  function render(){
+    clr(svg);
+    for(let i=0;i<3;i++)for(let j=0;j<3;j++){
+      const x=ox+j*cs, y=oy+i*cs, diag=(i===j);
+      E('rect',{x,y,width:cs-10,height:cs-10,rx:9,fill:diag?'#fdf3d6':'#fff',stroke:diag?'#d4a017':'#e2ddca','stroke-width':diag?2.2:1.2},svg);
+      label(svg,x+(cs-10)/2,y+(cs-10)/2+5,String(M[i][j]),diag?'#b8860b':'#48526a',18,'middle',diag?700:600);
+    }
+    g('traceVal').textContent=(M[0][0]+M[1][1]+M[2][2]);
+  }
+  g('traceShuffle').addEventListener('click',function(){gen();render();});
+  gen();render();
+})();
+
+/* ============ generic eigenvector explorer ============ */
+function makeExplorer(cfg){
+  const svg=document.getElementById(cfg.svgId); if(!svg)return null;
+  const W=cfg.W,H=cfg.H, sc=cfg.scale||70, p=plane(svg,W,H,W/2,H/2,sc);
+  const maxR=(W/2)/sc-0.35;
+  const dark=cfg.dark;
+  const col={grid:dark?'#34507e':'#dfe6f2',axis:dark?'#5e7bb0':'#9aa7c2',
+             x:dark?'#7fb0ff':'#1d4f99', ax:dark?'#ffcf5c':'#d4a017', eline:dark?'#ff8b7a':'#c0392b',
+             txt:dark?'#dce6fb':'#1c2433'};
+  let X={x:cfg.x0,y:cfg.y0}, M=cfg.M.slice(), drag=false;
+  function render(){
+    clr(svg);
+    grid(p,W,H,{color:col.grid,axis:col.axis});
+    const a=M[0],b=M[1],c=M[2],d=M[3], eg=eig2(a,b,c,d);
+    // eigen-direction lines
+    if(eg.real){
+      const seen=[];
+      eg.vecs.forEach(function(v){
+        if(seen.some(function(s){return Math.abs(s[0]*v[1]-s[1]*v[0])<1e-3;}))return;
+        seen.push(v);
+        const L=maxR+0.5;
+        arrowPx(svg,p.X(-v[0]*L),p.Y(-v[1]*L),p.X(v[0]*L),p.Y(v[1]*L),col.eline,1.6,'6 5',0.7);
+      });
+    }
+    const ax=matVec(a,b,c,d,X.x,X.y);
+    // proximity to an eigen-direction
+    let onEig=false, lam=null;
+    const nx=Math.hypot(X.x,X.y), nax=Math.hypot(ax[0],ax[1]);
+    if(eg.real){
+      eg.vecs.forEach(function(v){
+        const cross=Math.abs(v[0]*X.y-v[1]*X.x)/(nx||1);
+        if(cross<0.06)onEig=true;
+      });
+    }
+    if(nx>1e-6&&nax>1e-6){
+      const cosA=Math.max(-1,Math.min(1,(X.x*ax[0]+X.y*ax[1])/(nx*nax)));
+      const ang=Math.acos(cosA)*180/Math.PI;
+      lam=(X.x*ax[0]+X.y*ax[1])/(X.x*X.x+X.y*X.y);
+      var isEig=(ang<5||ang>175);
+      if(cfg.svgId==='eigSvg'){
+        document.getElementById('eigX').textContent='('+fmt(X.x,1)+', '+fmt(X.y,1)+')';
+        document.getElementById('eigAx').textContent='('+fmt(ax[0],1)+', '+fmt(ax[1],1)+')';
+        document.getElementById('eigAngle').textContent=fmt(Math.min(ang,180-ang),1)+'°';
+        const vb=document.getElementById('eigVerdictBox'), vt=document.getElementById('eigVerdict'), vl=document.getElementById('eigLambda');
+        if(!eg.real){
+          vb.style.background='#fdeee9';vb.style.borderColor='#c0392b';
+          vt.textContent='Complex eigenvalues — no real direction is fixed!';vl.textContent='λ = e^{±iθ}';
+        }else if(isEig){
+          vb.style.background='#eaf7ee';vb.style.borderColor='#1f8a4c';
+          vt.textContent='🎯 Eigenvector found!';vl.className='v good';vl.textContent='λ = '+fmt(lam,2);
+        }else{
+          vb.style.background='var(--gold-pale)';vb.style.borderColor='var(--gold)';
+          vt.textContent='Not yet — rotate x until Ax lines up…';vl.className='v hot';vl.textContent='';
+        }
+      }
+    }
+    // glow if on eigen direction
+    if(onEig){E('circle',{cx:p.X(0),cy:p.Y(0),r:nx*sc,fill:'none',stroke:col.eline,'stroke-width':1,opacity:0.25},svg);}
+    // arrows
+    vecArrow(p,svg,ax[0],ax[1],col.ax,4);
+    vecArrow(p,svg,X.x,X.y,col.x,4);
+    // x handle
+    E('circle',{cx:p.X(X.x),cy:p.Y(X.y),r:8,fill:col.x,stroke:'#fff','stroke-width':2,cursor:'grab'},svg);
+    label(svg,p.X(X.x)+10,p.Y(X.y)-8,'x',col.x,15,'start',700);
+    label(svg,p.X(ax[0])+10,p.Y(ax[1])+(ax[1]>X.y?16:-8),'Ax',col.ax,15,'start',700);
+  }
+  function setM(m){M=m.slice();render();}
+  function setX(px,py){
+    let x=p.ux(px), y=p.uy(py); let r=Math.hypot(x,y);
+    if(r>maxR){x*=maxR/r;y*=maxR/r;} if(r<0.4){const a=Math.atan2(y,x)||0;x=0.4*Math.cos(a);y=0.4*Math.sin(a);}
+    X={x,y};render();
+  }
+  svg.style.cursor='grab';
+  function down(e){drag=true;svg.style.cursor='grabbing';const q=svgPoint(svg,e);setX(q.x,q.y);e.preventDefault();}
+  function move(e){if(!drag)return;const q=svgPoint(svg,e);setX(q.x,q.y);e.preventDefault();}
+  function up(){drag=false;svg.style.cursor='grab';}
+  svg.addEventListener('mousedown',down);svg.addEventListener('touchstart',down,{passive:false});
+  window.addEventListener('mousemove',move);window.addEventListener('touchmove',move,{passive:false});
+  window.addEventListener('mouseup',up);window.addEventListener('touchend',up);
+  render();
+  return {render,setM,setX:function(x,y){X={x,y};render();}};
+}
+
+/* eigSvg + its controls */
+(function(){
+  const ex=makeExplorer({svgId:'eigSvg',W:480,H:480,scale:72,M:[2,1,1,2],x0:1.6,y0:0.3});
+  if(!ex)return;
+  const fields=['e00','e01','e10','e11'].map(function(id){return document.getElementById(id);});
+  function pushM(){ex.setM(fields.map(function(f){return parseFloat(f.value)||0;}));}
+  fields.forEach(function(f){f.addEventListener('input',pushM);});
+  document.querySelectorAll('#eigPresets .btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('#eigPresets .btn').forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+      const v=btn.getAttribute('data-m').split(',').map(Number);
+      fields[0].value=v[0];fields[1].value=v[1];fields[2].value=v[2];fields[3].value=v[3];pushM();
+    });
+  });
+})();
+
+/* symSvg (dark) */
+makeExplorer({svgId:'symSvg',W:420,H:420,scale:66,M:[2,1,1,2],x0:1.7,y0:-0.6,dark:true});
+
+/* ============ MODULE: characteristic polynomial ============ */
+(function(){
+  const svg=document.getElementById('charSvg'); if(!svg)return;
+  const W=460,H=360, L=46,R=440,T=22,B=300;
+  const g=function(id){return document.getElementById(id);};
+  const fields=['c00','c01','c10','c11'].map(g);
+  function polyStr(tr,det){
+    let s='λ²';
+    if(tr!==0)s+=' '+(tr>0?'− ':'+ ')+Math.abs(tr)+'λ';
+    if(det!==0)s+=' '+(det>0?'+ ':'− ')+Math.abs(det);
+    return s;
+  }
+  function render(){
+    clr(svg);
+    const m=fields.map(function(f){return parseFloat(f.value)||0;});
+    const a=m[0],b=m[1],c=m[2],d=m[3], tr=a+d, det=a*d-b*c, disc=tr*tr-4*det;
+    // lambda range around roots / vertex
+    let lo,hi;
+    if(disc>=0){const r=Math.sqrt(disc); const r1=(tr-r)/2,r2=(tr+r)/2; const pad=Math.max(2,(r2-r1)*0.6); lo=r1-pad;hi=r2+pad;}
+    else{lo=tr/2-4;hi=tr/2+4;}
+    if(hi-lo<3){const m0=(lo+hi)/2;lo=m0-2;hi=m0+2;}
+    const P=function(l){return l*l-tr*l+det;};
+    // sample for y-range
+    let ymin=Infinity,ymax=-Infinity; const SAMP=160;
+    for(let i=0;i<=SAMP;i++){const l=lo+(hi-lo)*i/SAMP, y=P(l); if(y<ymin)ymin=y; if(y>ymax)ymax=y;}
+    ymin=Math.min(ymin,0)-Math.abs(ymax-ymin)*0.08; ymax=Math.max(ymax,0)+Math.abs(ymax-ymin)*0.08;
+    if(ymax-ymin<1)ymax=ymin+1;
+    const X=function(l){return L+(l-lo)/(hi-lo)*(R-L);};
+    const Y=function(y){return B-(y-ymin)/(ymax-ymin)*(B-T);};
+    // axes
+    E('line',{x1:L,y1:Y(0),x2:R,y2:Y(0),stroke:'#9aa7c2','stroke-width':1.6},svg); // lambda axis (p=0)
+    label(svg,R-6,Y(0)-8,'λ','#48526a',14,'end',700);
+    // ticks for lambda integers
+    for(let l=Math.ceil(lo);l<=Math.floor(hi);l++){
+      const x=X(l); E('line',{x1:x,y1:Y(0)-4,x2:x,y2:Y(0)+4,stroke:'#9aa7c2','stroke-width':1},svg);
+      label(svg,x,Y(0)+18,String(l),'#9aa7c2',11,'middle',500);
+    }
+    // parabola
+    let dpath='';
+    for(let i=0;i<=SAMP;i++){const l=lo+(hi-lo)*i/SAMP; dpath+=(i===0?'M':'L')+X(l)+' '+Y(P(l))+' ';}
+    E('path',{d:dpath,fill:'none',stroke:'#1d4f99','stroke-width':2.6},svg);
+    // roots
+    if(disc>=0){
+      const r=Math.sqrt(disc); [(tr-r)/2,(tr+r)/2].forEach(function(rt){
+        E('line',{x1:X(rt),y1:Y(0),x2:X(rt),y2:T,stroke:'#c0392b','stroke-width':1,'stroke-dasharray':'4 4',opacity:.5},svg);
+        E('circle',{cx:X(rt),cy:Y(0),r:6,fill:'#c0392b',stroke:'#fff','stroke-width':2},svg);
+        label(svg,X(rt),Y(0)+34,'λ='+fmt(rt,(Math.abs(rt-Math.round(rt))<1e-6?0:2)),'#c0392b',12,'middle',700);
+      });
+      g('charL1').textContent=fmt((tr+r)/2,(disc===0||Math.abs(((tr+r)/2)-Math.round((tr+r)/2))<1e-6)?0:2);
+      g('charL2').textContent=fmt((tr-r)/2,(disc===0||Math.abs(((tr-r)/2)-Math.round((tr-r)/2))<1e-6)?0:2);
+    }else{
+      const re=tr/2, im=Math.sqrt(-disc)/2;
+      label(svg,(L+R)/2,T+30,'No real roots — eigenvalues are complex','#c0392b',13,'middle',700);
+      g('charL1').textContent=fmt(re,2)+' + '+fmt(im,2)+'i';
+      g('charL2').textContent=fmt(re,2)+' − '+fmt(im,2)+'i';
+    }
+    g('charTr').textContent=fmt(tr,(Math.abs(tr-Math.round(tr))<1e-6?0:2));
+    g('charDet').textContent=fmt(det,(Math.abs(det-Math.round(det))<1e-6?0:2));
+    g('charPoly').textContent=polyStr(tr,det);
+  }
+  fields.forEach(function(f){f.addEventListener('input',render);});
+  document.querySelectorAll('[data-char]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      const v=btn.getAttribute('data-char').split(',').map(Number);
+      fields[0].value=v[0];fields[1].value=v[1];fields[2].value=v[2];fields[3].value=v[3];render();
+    });
+  });
+  render();
+})();
+
+/* ============ MODULE: eigendecomposition step-through ============ */
+(function(){
+  const svg=document.getElementById('decompSvg'); if(!svg)return;
+  const W=480,H=480, p=plane(svg,W,H,W/2,H/2,52);
+  const g=function(id){return document.getElementById(id);};
+  const s2=Math.SQRT1_2;
+  const q1=[s2,s2], q2=[-s2,s2];
+  const steps=[
+    {v:[1,0.5],c:'#7a3ec0',title:'Step 0 · The setup',
+     text:'We use A = ( 2 1 ; 1 2 ), eigenvalues λ₁=3, λ₂=1, with orthonormal eigenvectors q₁=(1,1)/√2 and q₂=(−1,1)/√2. The dashed red lines are the eigen-axes. Press Next.'},
+    {v:[1.0607,-0.3536],c:'#2d6cdf',title:'Step 1 · Rotate by Qᵀ',
+     text:'Qᵀ re-expresses x in the eigenbasis {q₁,q₂}. Think of swivelling your viewpoint so the eigen-axes line up with the screen axes — same vector, brand-new coordinates.'},
+    {v:[3.182,-0.3536],c:'#d4a017',title:'Step 2 · Scale by Λ',
+     text:'Now stretch along each axis by its eigenvalue: the first component ×3, the second ×1. This is pure axis-aligned scaling — no rotation, no shear.'},
+    {v:[2.5,2.0],c:'#1f8a4c',title:'Step 3 · Rotate back by Q',
+     text:'Q turns the eigenbasis back to the original orientation. The result is exactly Ax = (2.5, 2.0). A "complicated" matrix = rotate · scale · rotate-back.'}
+  ];
+  let cur=0, animV=steps[0].v.slice(), raf=null;
+  function drawFrame(vec,color){
+    clr(svg);
+    grid(p,W,H);
+    // eigen axes
+    [q1,q2].forEach(function(q){arrowPx(svg,p.X(-q[0]*4.5),p.Y(-q[1]*4.5),p.X(q[0]*4.5),p.Y(q[1]*4.5),'#c0392b',1.4,'6 5',0.55);});
+    label(svg,p.X(q1[0]*3.8),p.Y(q1[1]*3.8),'q₁','#c0392b',13,'middle',700);
+    label(svg,p.X(q2[0]*3.8),p.Y(q2[1]*3.8),'q₂','#c0392b',13,'middle',700);
+    // ghost of original x
+    vecArrow(p,svg,steps[0].v[0],steps[0].v[1],'#b9a6dd',2,null,0.5);
+    // current vector
+    vecArrow(p,svg,vec[0],vec[1],color,4.4);
+    E('circle',{cx:p.X(vec[0]),cy:p.Y(vec[1]),r:6,fill:color,stroke:'#fff','stroke-width':2},svg);
+    g('decompVec').textContent='('+fmt(vec[0],2)+', '+fmt(vec[1],2)+')';
+  }
+  function setStep(n){
+    cur=n;
+    const from=animV.slice(), to=steps[n].v, color=steps[n].c;
+    g('decompStepTitle').textContent=steps[n].title;
+    g('decompStepText').textContent=steps[n].text;
+    document.querySelectorAll('.dotstep').forEach(function(d){d.classList.toggle('on',+d.getAttribute('data-s')<=n);});
+    if(raf)cancelAnimationFrame(raf);
+    const t0=performance.now(), dur=620;
+    function step(now){
+      let k=Math.min(1,(now-t0)/dur); const e=1-Math.pow(1-k,3);
+      const v=[from[0]+(to[0]-from[0])*e, from[1]+(to[1]-from[1])*e];
+      animV=v; drawFrame(v,color);
+      if(k<1)raf=requestAnimationFrame(step);
+    }
+    raf=requestAnimationFrame(step);
+  }
+  g('decompNext').addEventListener('click',function(){setStep((cur+1)%4);});
+  g('decompReset').addEventListener('click',function(){animV=steps[0].v.slice();setStep(0);});
+  drawFrame(steps[0].v,steps[0].c);
+  document.querySelector('.dotstep[data-s="0"]').classList.add('on');
+})();
+
+/* ============ MODULE: rotation eigenvalues on complex plane ============ */
+(function(){
+  const svg=document.getElementById('rotSvg'); if(!svg)return;
+  const W=380,H=380, p=plane(svg,W,H,W/2,H/2,120);
+  const g=function(id){return document.getElementById(id);};
+  const slider=g('rotTheta');
+  function render(){
+    clr(svg);
+    const th=(+slider.value)*Math.PI/180;
+    grid(p,W,H,{color:'#e7ecf5'});
+    // unit circle
+    E('circle',{cx:p.X(0),cy:p.Y(0),r:120,fill:'none',stroke:'#9aa7c2','stroke-width':1.4,'stroke-dasharray':'3 4'},svg);
+    label(svg,p.X(0)+126,p.Y(0)-6,'Re','#48526a',12,'start',600);
+    label(svg,p.X(0)+8,18,'Im','#48526a',12,'start',600);
+    // angle arc
+    const arc=E('path',{d:`M ${p.X(0.5)} ${p.Y(0)} A 60 60 0 0 ${th>0?0:1} ${p.X(0.5*Math.cos(th))} ${p.Y(0.5*Math.sin(th))}`,fill:'none',stroke:'#d4a017','stroke-width':2},svg);
+    label(svg,p.X(0.62*Math.cos(th/2)),p.Y(0.62*Math.sin(th/2)),'θ','#b8860b',13,'middle',700);
+    // eigenvalues e^{±iθ}
+    const c=Math.cos(th), s=Math.sin(th);
+    arrowPx(svg,p.X(0),p.Y(0),p.X(c),p.Y(s),'#d4a017',2.6);
+    arrowPx(svg,p.X(0),p.Y(0),p.X(c),p.Y(-s),'#c0392b',2.6);
+    E('circle',{cx:p.X(c),cy:p.Y(s),r:7,fill:'#d4a017',stroke:'#fff','stroke-width':2},svg);
+    E('circle',{cx:p.X(c),cy:p.Y(-s),r:7,fill:'#c0392b',stroke:'#fff','stroke-width':2},svg);
+    label(svg,p.X(c)+10,p.Y(s)-6,'e^{iθ}','#b8860b',13,'start',700);
+    label(svg,p.X(c)+10,p.Y(-s)+16,'e^{−iθ}','#c0392b',13,'start',700);
+    g('rotThetaLbl').textContent=slider.value+'°';
+    g('rotEig').textContent=fmt(c,2)+' ± '+fmt(Math.abs(s),2)+'i';
+  }
+  slider.addEventListener('input',render);
+  render();
+})();
+
+/* ============ MODULE: Cholesky gaussian sampler ============ */
+(function(){
+  const svg=document.getElementById('cholSvg'); if(!svg)return;
+  const W=460,H=380, p=plane(svg,W,H,W/2,195,40);
+  const g=function(id){return document.getElementById(id);};
+  const vx=g('cVx'),vy=g('cVy'),rho=g('cRho');
+  let Z=[];
+  function randn(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+  function resample(){Z=[];for(let i=0;i<240;i++)Z.push([randn(),randn()]);}
+  function chol(sx,sy,r){
+    const cov=r*Math.sqrt(sx*sy);
+    const l11=Math.sqrt(sx), l21=cov/l11, in22=sy-l21*l21;
+    return {l11,l21,l22:Math.sqrt(Math.max(0,in22)),pd:in22>1e-9};
+  }
+  function render(){
+    clr(svg);
+    grid(p,W,H,{color:'#e7ecf5'});
+    const sx=+vx.value, sy=+vy.value, r=+rho.value;
+    const L=chol(sx,sy,r);
+    // standard normal cloud (z)
+    Z.forEach(function(z){E('circle',{cx:p.X(z[0]),cy:p.Y(z[1]),r:2.1,fill:'#9fb2d8',opacity:.55},svg);});
+    // shaped cloud x = L z
+    Z.forEach(function(z){const x=L.l11*z[0], y=L.l21*z[0]+L.l22*z[1]; E('circle',{cx:p.X(x),cy:p.Y(y),r:2.3,fill:'#d4a017',opacity:.8},svg);});
+    // covariance ellipses (k=1,2 std) = L * circle
+    [1,2].forEach(function(k){
+      let d='';
+      for(let t=0;t<=64;t++){const a=t/64*2*Math.PI; const cx=k*Math.cos(a),cy=k*Math.sin(a); const x=L.l11*cx, y=L.l21*cx+L.l22*cy; d+=(t===0?'M':'L')+p.X(x)+' '+p.Y(y)+' ';}
+      E('path',{d:d+'Z',fill:'none',stroke:'#0a2353','stroke-width':k===1?2:1.3,opacity:k===1?.85:.5,'stroke-dasharray':k===2?'5 4':''},svg);
+    });
+    g('cVxLbl').textContent=fmt(sx,1);g('cVyLbl').textContent=fmt(sy,1);g('cRhoLbl').textContent=fmt(r,2);
+    g('cholL').textContent='[['+fmt(L.l11,2)+',0],['+fmt(L.l21,2)+','+fmt(L.l22,2)+']]';
+    const pd=g('cholPD'); if(L.pd){pd.textContent='yes ✓';pd.className='v good';}else{pd.textContent='no — singular!';pd.className='v hot';}
+  }
+  [vx,vy,rho].forEach(function(s){s.addEventListener('input',render);});
+  g('cholResample').addEventListener('click',function(){resample();render();});
+  resample();render();
+})();
+
+/*JS-MARKER*/
+})();
+</script>
+
+</body>
+</html>

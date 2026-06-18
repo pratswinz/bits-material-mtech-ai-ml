@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Algebra Visualizer — Ax = 0 and Ax = b</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #1a1a1a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #canvas-container { width: 100vw; height: 100vh; }
+
+        #ui-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 30, 30, 0.92);
+            color: white;
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            width: 340px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            max-height: 94vh;
+            overflow-y: auto;
+        }
+        h1 { font-size: 18px; margin: 0 0 10px 0; color: #4facfe; border-bottom: 1px solid #555; padding-bottom: 10px; }
+        h2 { font-size: 13px; margin: 14px 0 8px 0; color: #4facfe; text-transform: uppercase; letter-spacing: 0.5px; }
+        p  { font-size: 12px; color: #ccc; line-height: 1.4; margin: 5px 0 12px 0; }
+
+        .control-group { margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        label { font-size: 13px; cursor: pointer; user-select: none; }
+
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; flex-shrink: 0; margin-left: 10px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #4facfe; }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .legend-item { display: flex; align-items: center; margin-top: 5px; font-size: 12px; color: #aaa; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; flex-shrink: 0;}
+
+        #equation-display, #matrix-display, #b-display {
+            background: rgba(0,0,0,0.4);
+            padding: 8px 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 12px;
+            text-align: center;
+            border: 1px dashed #555;
+        }
+        #matrix-display { font-size: 14px; }
+
+        .b-controls { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; margin-top: 8px; }
+        .slider-row {
+            display: grid;
+            grid-template-columns: 28px 1fr 44px;
+            gap: 8px;
+            align-items: center;
+            margin: 6px 0;
+            font-size: 12px;
+        }
+        .slider-row input[type="range"] { width: 100%; accent-color: #4facfe; }
+        .slider-row .val { text-align: right; color: #4facfe; font-family: 'Courier New', monospace; }
+
+        .consistency { margin-top: 10px; padding: 7px; border-radius: 4px; text-align: center; font-size: 12px; font-weight: 600; }
+        .consistency.ok { background: rgba(0, 255, 0, 0.12); border: 1px solid #00ff66; color: #88ffaa; }
+        .consistency.no { background: rgba(255, 80, 80, 0.12); border: 1px solid #ff5555; color: #ff9999; }
+
+        button.preset {
+            background: #2a2a2a; color: #ddd; border: 1px solid #555;
+            border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; margin: 2px;
+        }
+        button.preset:hover { background: #3a3a3a; border-color: #4facfe; color: white; }
+
+        .label {
+            color: white; font-family: sans-serif; padding: 3px 7px;
+            background: rgba(0, 0, 0, 0.72); border-radius: 4px;
+            pointer-events: none; font-size: 12px;
+            position: absolute; top: 0; left: 0; white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.2); z-index: 10;
+        }
+
+        .section { border-top: 1px solid #444; margin-top: 12px; padding-top: 8px; }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <div id="ui-panel">
+        <h1>Linear Algebra Visualizer</h1>
+        <p>Explore the geometry of \(Ax = 0\) and \(Ax = b\).</p>
+
+        <div id="matrix-display">
+            \[ A = \begin{bmatrix} 1 & -2 & 1 \\ 2 & -4 & 2 \\ 3 & -6 & 3 \end{bmatrix} \]
+        </div>
+
+        <h2>Ax = 0 (Homogeneous)</h2>
+
+        <div class="control-group">
+            <label>Null Basis <br><span style="color:#aaa; font-size:11px;">\(v_1, v_2\) (In Plane)</span></label>
+            <label class="switch"><input type="checkbox" id="toggleVectors" checked><span class="slider"></span></label>
+        </div>
+
+        <div class="control-group">
+            <label>Null Space <br><span style="color:#aaa; font-size:11px;">Plane \(x_1 - 2x_2 + x_3 = 0\)</span></label>
+            <label class="switch"><input type="checkbox" id="togglePlane"><span class="slider"></span></label>
+        </div>
+
+        <div class="control-group">
+            <label style="color: #ffcc00;">Row Space <br><span style="color:#aaa; font-size:11px;">Line \(\perp\) to Plane</span></label>
+            <label class="switch"><input type="checkbox" id="toggleRowSpace"><span class="slider"></span></label>
+        </div>
+
+        <div class="control-group">
+            <label style="color: #00ff00;">Column Space <br><span style="color:#aaa; font-size:11px;">Line (Output)</span></label>
+            <label class="switch"><input type="checkbox" id="toggleColSpace"><span class="slider"></span></label>
+        </div>
+
+        <div class="section">
+            <h2>Ax = b (Non-Homogeneous)</h2>
+
+            <div class="control-group">
+                <label>Enable \(Ax = b\) mode</label>
+                <label class="switch"><input type="checkbox" id="toggleBMode"><span class="slider"></span></label>
+            </div>
+
+            <div id="b-panel" style="display:none;">
+                <div class="b-controls">
+                    <div style="font-size:11px; color:#aaa; margin-bottom:6px;">Drag to set <strong>b</strong>:</div>
+                    <div class="slider-row">
+                        <label>\(b_1\)</label>
+                        <input type="range" id="b1" min="-5" max="5" step="0.1" value="1">
+                        <span class="val" id="b1val">1.0</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>\(b_2\)</label>
+                        <input type="range" id="b2" min="-10" max="10" step="0.1" value="2">
+                        <span class="val" id="b2val">2.0</span>
+                    </div>
+                    <div class="slider-row">
+                        <label>\(b_3\)</label>
+                        <input type="range" id="b3" min="-15" max="15" step="0.1" value="3">
+                        <span class="val" id="b3val">3.0</span>
+                    </div>
+                    <div style="text-align:center; margin-top:6px;">
+                        <button class="preset" data-b="1,2,3">Consistent</button>
+                        <button class="preset" data-b="2,4,6">Consistent ×2</button>
+                        <button class="preset" data-b="1,1,1">Inconsistent</button>
+                        <button class="preset" data-b="0,0,0">Zero</button>
+                    </div>
+                    <div id="consistency" class="consistency ok">✓ Consistent — b ∈ Col(A)</div>
+                </div>
+
+                <div id="b-display">\(b = \begin{bmatrix}1.0\\2.0\\3.0\end{bmatrix}\)</div>
+
+                <div class="control-group">
+                    <label style="color:#ff8800;">b vector <br><span style="color:#aaa; font-size:11px;">Output-space arrow</span></label>
+                    <label class="switch"><input type="checkbox" id="toggleB" checked><span class="slider"></span></label>
+                </div>
+                <div class="control-group">
+                    <label style="color:#ff66ff;">Particular solution \(x_p\)</label>
+                    <label class="switch"><input type="checkbox" id="toggleXp" checked><span class="slider"></span></label>
+                </div>
+                <div class="control-group">
+                    <label style="color:#ff66ff;">Solution set \(x_p + N(A)\)</label>
+                    <label class="switch"><input type="checkbox" id="toggleSolPlane" checked><span class="slider"></span></label>
+                </div>
+                <div class="control-group">
+                    <label style="color:#ffaa00;">Projection onto Col(A)<br><span style="color:#aaa; font-size:11px;">Least-squares \(\hat{b}\)</span></label>
+                    <label class="switch"><input type="checkbox" id="toggleProj" checked><span class="slider"></span></label>
+                </div>
+            </div>
+        </div>
+
+        <div id="equation-display"><span id="eq-text">\(\text{Rank}(A)=1,\ \text{Nullity}=2\)</span></div>
+
+        <div class="section">
+            <div class="legend-item"><div class="dot" style="background: #00ffff;"></div> Null Space (Input Plane)</div>
+            <div class="legend-item"><div class="dot" style="background: #ffcc00;"></div> Row Space (Perpendicular)</div>
+            <div class="legend-item"><div class="dot" style="background: #00ff00;"></div> Column Space (Output Line)</div>
+            <div class="legend-item"><div class="dot" style="background: #ff8800;"></div> b vector</div>
+            <div class="legend-item"><div class="dot" style="background: #ffaa00;"></div> Projection \(\hat{b}\)</div>
+            <div class="legend-item"><div class="dot" style="background: #ff66ff;"></div> Solution set \(x_p + N(A)\)</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // ============================================================
+        //  COORDINATE MAPPING
+        //  Math (x1, x2, x3)  ->  ThreeJS (x, y, z) = (x1, x3, x2)
+        // ============================================================
+        const mathToThree = ([a,b,c]) => new THREE.Vector3(a, c, b);
+
+        // ============================================================
+        //  MATRIX ALGEBRA
+        // ============================================================
+        const A      = [[1,-2,1],[2,-4,2],[3,-6,3]];
+        const colDir = [1, 2, 3];
+        const colMagSq = 14;
+        const rowDir = [1, -2, 1];
+
+        const projOnCol = (b) => {
+            const c = (b[0]*1 + b[1]*2 + b[2]*3) / colMagSq;
+            return { coef: c, vec: [c, 2*c, 3*c] };
+        };
+        const isConsistent = (b) =>
+            Math.abs(b[1] - 2*b[0]) < 1e-6 && Math.abs(b[2] - 3*b[0]) < 1e-6;
+
+        // ============================================================
+        //  SCENE / CAMERA / RENDERER
+        // ============================================================
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a1a);
+        scene.fog = new THREE.Fog(0x1a1a1a, 15, 60);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(12, 8, 12);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(5, 10, 7);
+        scene.add(dirLight);
+
+        // ============================================================
+        //  AXES + GRID
+        // ============================================================
+        const axesGroup = new THREE.Group();
+        axesGroup.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 6, 0xff4444, 0.5, 0.3)); // x1
+        axesGroup.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 6, 0x44ff44, 0.5, 0.3)); // x2
+        axesGroup.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 6, 0x4444ff, 0.5, 0.3)); // x3
+        axesGroup.add(new THREE.GridHelper(20, 20, 0x444444, 0x222222));
+        scene.add(axesGroup);
+
+        // ============================================================
+        //  NULL BASIS VECTORS  v1=[2,1,0], v2=[-1,0,1]
+        // ============================================================
+        const vectorsGroup = new THREE.Group();
+        const v1 = [2,1,0], v2 = [-1,0,1];
+        vectorsGroup.add(new THREE.ArrowHelper(mathToThree(v1).clone().normalize(), new THREE.Vector3(0,0,0), Math.hypot(...v1), 0xff4444, 0.3, 0.2));
+        vectorsGroup.add(new THREE.ArrowHelper(mathToThree(v2).clone().normalize(), new THREE.Vector3(0,0,0), Math.hypot(...v2), 0x4444ff, 0.3, 0.2));
+        scene.add(vectorsGroup);
+
+        // ============================================================
+        //  NULL SPACE PLANE GEOMETRY BUILDER
+        //  x1 - 2x2 + x3 = 0   =>   x1 = 2*x2 - x3
+        // ============================================================
+        function buildNullPlaneGeom(half, segs) {
+            const g = new THREE.PlaneGeometry(half*2, half*2, segs, segs);
+            const p = g.attributes.position.array;
+            const n = g.attributes.position.count;
+            for (let i = 0; i < n; i++) {
+                const s = p[i*3];     // -> x2
+                const t = p[i*3 + 1]; // -> x3
+                const x1 = 2*s - t, x2 = s, x3 = t;
+                p[i*3]     = x1;
+                p[i*3 + 1] = x3;
+                p[i*3 + 2] = x2;
+            }
+            g.computeVertexNormals();
+            return g;
+        }
+
+        const nullSpacePlane = new THREE.Mesh(
+            buildNullPlaneGeom(8, 20),
+            new THREE.MeshPhysicalMaterial({
+                color: 0x00ffff, side: THREE.DoubleSide, transparent: true, opacity: 0.28,
+                metalness: 0.1, roughness: 0.15, clearcoat: 1.0, depthWrite: false
+            })
+        );
+        nullSpacePlane.visible = false;
+        scene.add(nullSpacePlane);
+
+        // ============================================================
+        //  ROW + COLUMN SPACE RODS
+        // ============================================================
+        function createRod(vec, color, length = 40, radius = 0.06) {
+            const g = new THREE.CylinderGeometry(radius, radius, length, 12);
+            const m = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.3 });
+            const mesh = new THREE.Mesh(g, m);
+            mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), vec.clone().normalize());
+            return mesh;
+        }
+        const rowSpaceGroup = new THREE.Group();
+        rowSpaceGroup.add(createRod(mathToThree(rowDir), 0xffcc00));
+        rowSpaceGroup.visible = false;
+        scene.add(rowSpaceGroup);
+
+        const colSpaceGroup = new THREE.Group();
+        colSpaceGroup.add(createRod(mathToThree(colDir), 0x00ff00));
+        colSpaceGroup.visible = false;
+        scene.add(colSpaceGroup);
+
+        // ============================================================
+        //  Ax = b OBJECTS
+        // ============================================================
+        const bArrow = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1, 0xff8800, 0.4, 0.25);
+        bArrow.visible = false; scene.add(bArrow);
+
+        const bHatArrow = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1, 0xffaa00, 0.4, 0.25);
+        bHatArrow.visible = false; scene.add(bHatArrow);
+
+        // Dashed line: residual r = b - b̂  (from b̂ tip to b tip)
+        const projLineMat  = new THREE.LineDashedMaterial({ color: 0xff5555, dashSize: 0.25, gapSize: 0.18 });
+        const projLineGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+        const projLine     = new THREE.Line(projLineGeom, projLineMat);
+        projLine.visible = false; scene.add(projLine);
+
+        // x_p marker (sphere + arrow from origin)
+        const xpSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.18, 16, 16),
+            new THREE.MeshStandardMaterial({ color: 0xff66ff, emissive: 0xff66ff, emissiveIntensity: 0.5 })
+        );
+        xpSphere.visible = false; scene.add(xpSphere);
+
+        const xpArrow = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1, 0xff66ff, 0.3, 0.2);
+        xpArrow.visible = false; scene.add(xpArrow);
+
+        // Solution plane (null plane translated by x_p)
+        const solPlane = new THREE.Mesh(
+            buildNullPlaneGeom(8, 20),
+            new THREE.MeshPhysicalMaterial({
+                color: 0xff66ff, side: THREE.DoubleSide, transparent: true, opacity: 0.32,
+                metalness: 0.1, roughness: 0.2, clearcoat: 1.0, depthWrite: false
+            })
+        );
+        solPlane.visible = false; scene.add(solPlane);
+
+        // ============================================================
+        //  LABELS
+        // ============================================================
+        function createLabel(text, color='white') {
+            const div = document.createElement('div');
+            div.className = 'label';
+            div.textContent = text;
+            div.style.color = color;
+            div.style.display = 'none';
+            document.body.appendChild(div);
+            return div;
+        }
+        const labelX   = createLabel("x₁", '#ff8888');
+        const labelY   = createLabel("x₃", '#8888ff');
+        const labelZ   = createLabel("x₂", '#88ff88');
+        const labelRow = createLabel("Row Space [1, -2, 1]", "#ffcc00");
+        const labelCol = createLabel("Column Space [1, 2, 3]", "#00ff00");
+        const labelB   = createLabel("b", "#ff8800");
+        const labelBhat= createLabel("b̂ (proj)", "#ffaa00");
+        const labelXp  = createLabel("xₚ", "#ff66ff");
+
+        function positionLabel(pos, element, visible=true) {
+            if (!visible) { element.style.display='none'; return; }
+            const v = pos.clone().project(camera);
+            if (v.z > 1) { element.style.display='none'; return; }
+            element.style.display='block';
+            const w = window.innerWidth, h = window.innerHeight;
+            element.style.left = (v.x * (w/2) + (w/2)) + 'px';
+            element.style.top  = (-(v.y * (h/2)) + (h/2)) + 'px';
+        }
+
+        // ============================================================
+        //  STATE
+        // ============================================================
+        const state = {
+            bMode: false,
+            b: [1, 2, 3],
+            bHat: [1, 2, 3],
+            xp: [1, 0, 0],
+            consistent: true,
+            showB: true, showXp: true, showSolPlane: true, showProj: true
+        };
+
+        function setArrow(arrow, vecMath, color) {
+            const v3 = mathToThree(vecMath);
+            const len = Math.hypot(...vecMath);
+            if (len < 1e-6) { arrow.visible = false; return; }
+            arrow.setDirection(v3.clone().normalize());
+            arrow.setLength(len, Math.min(0.45, len * 0.18), Math.min(0.28, len * 0.10));
+        }
+
+        function updateBVisualization() {
+            const b = state.b;
+            const proj = projOnCol(b);
+            state.bHat = proj.vec;
+            state.consistent = isConsistent(b);
+            // Minimum-norm particular solution (lies on the row space, perpendicular to N(A)).
+            // For consistent b = c*[1,2,3], we need x s.t. x1 - 2x2 + x3 = c and x ∈ row(A).
+            // x = t*[1,-2,1] gives 6t = c => t = c/6 => xp = (c/6)*[1,-2,1].
+            const t = proj.coef / 6;
+            state.xp = [t, -2*t, t];
+
+            // --- b arrow ---
+            setArrow(bArrow, b);
+            bArrow.visible = state.bMode && state.showB && Math.hypot(...b) > 1e-6;
+
+            // --- b_hat arrow + residual dashed line ---
+            if (!state.consistent && Math.hypot(...state.bHat) > 1e-6) {
+                setArrow(bHatArrow, state.bHat);
+                bHatArrow.visible = state.bMode && state.showProj;
+                projLineGeom.setFromPoints([mathToThree(state.bHat), mathToThree(b)]);
+                projLine.computeLineDistances();
+                projLine.visible = state.bMode && state.showProj;
+            } else {
+                bHatArrow.visible = false;
+                projLine.visible = false;
+            }
+
+            // --- x_p sphere + arrow ---
+            const xpThree = mathToThree(state.xp);
+            xpSphere.position.copy(xpThree);
+            const xpLen = Math.hypot(...state.xp);
+            xpSphere.visible = state.bMode && state.showXp;
+            if (xpLen > 1e-6) {
+                setArrow(xpArrow, state.xp);
+                xpArrow.visible = state.bMode && state.showXp;
+            } else {
+                xpArrow.visible = false;
+            }
+
+            // --- shifted solution plane ---
+            solPlane.position.copy(xpThree);
+            solPlane.visible = state.bMode && state.showSolPlane;
+
+            // --- UI: consistency badge ---
+            const cons = document.getElementById('consistency');
+            if (state.consistent) {
+                cons.className = 'consistency ok';
+                cons.innerHTML = '✓ Consistent — b ∈ Col(A) — infinite solutions';
+            } else {
+                cons.className = 'consistency no';
+                cons.innerHTML = '✗ Inconsistent — no exact x; showing least-squares x̂';
+            }
+
+            // --- UI: b/xp formula display ---
+            const c = proj.coef;
+            const xp = state.xp;
+            const bDisp = document.getElementById('b-display');
+            const xpStr = state.consistent
+                ? `x_p = \\tfrac{${c.toFixed(3)}}{6}\\!\\begin{bmatrix}1\\\\-2\\\\1\\end{bmatrix}\\!=\\!\\begin{bmatrix}${xp[0].toFixed(2)}\\\\${xp[1].toFixed(2)}\\\\${xp[2].toFixed(2)}\\end{bmatrix}`
+                : `\\hat{x} = \\tfrac{${c.toFixed(3)}}{6}\\!\\begin{bmatrix}1\\\\-2\\\\1\\end{bmatrix}\\!=\\!\\begin{bmatrix}${xp[0].toFixed(2)}\\\\${xp[1].toFixed(2)}\\\\${xp[2].toFixed(2)}\\end{bmatrix}`;
+            bDisp.innerHTML = `\\(b = \\begin{bmatrix}${b[0].toFixed(1)}\\\\${b[1].toFixed(1)}\\\\${b[2].toFixed(1)}\\end{bmatrix},\\ ${xpStr}\\)`;
+
+            // --- UI: equation panel ---
+            const eq = document.getElementById('eq-text');
+            if (state.bMode) {
+                eq.innerHTML = state.consistent
+                    ? '\\(\\text{All solutions: } x = x_p + N(A)\\)'
+                    : '\\(\\text{Least squares: } A^\\top A\\hat{x} = A^\\top b\\)';
+            } else {
+                eq.innerHTML = '\\(\\text{Rank}(A)=1,\\ \\text{Nullity}=2\\)';
+            }
+
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise([bDisp, eq]).catch(() => {});
+            }
+        }
+
+        // ============================================================
+        //  UI WIRING
+        // ============================================================
+        document.getElementById('toggleVectors').addEventListener('change', (e) => vectorsGroup.visible = e.target.checked);
+        document.getElementById('togglePlane').addEventListener('change',   (e) => nullSpacePlane.visible = e.target.checked);
+        document.getElementById('toggleRowSpace').addEventListener('change',(e) => rowSpaceGroup.visible = e.target.checked);
+        document.getElementById('toggleColSpace').addEventListener('change',(e) => colSpaceGroup.visible = e.target.checked);
+
+        document.getElementById('toggleBMode').addEventListener('change', (e) => {
+            state.bMode = e.target.checked;
+            document.getElementById('b-panel').style.display = state.bMode ? 'block' : 'none';
+            // Auto-show Col(A) (where b lives) and Row Space (where x_p lives) on entering b mode
+            if (state.bMode) {
+                if (!colSpaceGroup.visible) {
+                    colSpaceGroup.visible = true;
+                    document.getElementById('toggleColSpace').checked = true;
+                }
+                if (!rowSpaceGroup.visible) {
+                    rowSpaceGroup.visible = true;
+                    document.getElementById('toggleRowSpace').checked = true;
+                }
+            }
+            updateBVisualization();
+        });
+
+        document.getElementById('toggleB').addEventListener('change',        (e) => { state.showB = e.target.checked; updateBVisualization(); });
+        document.getElementById('toggleXp').addEventListener('change',       (e) => { state.showXp = e.target.checked; updateBVisualization(); });
+        document.getElementById('toggleSolPlane').addEventListener('change', (e) => { state.showSolPlane = e.target.checked; updateBVisualization(); });
+        document.getElementById('toggleProj').addEventListener('change',     (e) => { state.showProj = e.target.checked; updateBVisualization(); });
+
+        ['b1','b2','b3'].forEach((id, idx) => {
+            const inp = document.getElementById(id);
+            const lbl = document.getElementById(id + 'val');
+            inp.addEventListener('input', () => {
+                state.b[idx] = parseFloat(inp.value);
+                lbl.textContent = state.b[idx].toFixed(1);
+                updateBVisualization();
+            });
+        });
+
+        document.querySelectorAll('button.preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const parts = btn.dataset.b.split(',').map(parseFloat);
+                state.b = parts;
+                ['b1','b2','b3'].forEach((id, i) => {
+                    document.getElementById(id).value = parts[i];
+                    document.getElementById(id + 'val').textContent = parts[i].toFixed(1);
+                });
+                updateBVisualization();
+            });
+        });
+
+        // ============================================================
+        //  RENDER LOOP
+        // ============================================================
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            positionLabel(new THREE.Vector3(6.5, 0, 0), labelX);
+            positionLabel(new THREE.Vector3(0, 6.5, 0), labelY);
+            positionLabel(new THREE.Vector3(0, 0, 6.5), labelZ);
+            positionLabel(mathToThree(rowDir).clone().normalize().multiplyScalar(7), labelRow, rowSpaceGroup.visible);
+            positionLabel(mathToThree(colDir).clone().normalize().multiplyScalar(7), labelCol, colSpaceGroup.visible);
+
+            const showB    = state.bMode && state.showB && Math.hypot(...state.b) > 1e-6;
+            const showBhat = state.bMode && state.showProj && !state.consistent && Math.hypot(...state.bHat) > 1e-6;
+            const showXp   = state.bMode && state.showXp && Math.hypot(...state.xp) > 1e-6;
+            positionLabel(mathToThree(state.b).clone().multiplyScalar(1.06),    labelB,    showB);
+            positionLabel(mathToThree(state.bHat).clone().multiplyScalar(1.06), labelBhat, showBhat);
+            positionLabel(mathToThree(state.xp).clone().multiplyScalar(1.12),   labelXp,   showXp);
+
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        updateBVisualization();
+        animate();
+    </script>
+</body>
+</html>
