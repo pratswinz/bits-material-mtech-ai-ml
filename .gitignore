@@ -8,5 +8,8 @@
 *.wmv
 *.flv
 
+# Personal documents
+ids/
+
 # macOS
 .DS_Store
