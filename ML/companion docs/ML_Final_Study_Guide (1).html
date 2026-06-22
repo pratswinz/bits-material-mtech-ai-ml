@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ML Mid-Semester Study Guide</title>
+  <style>
+  :root {
+    --bg:           #fafaf8;
+    --paper:        #ffffff;
+    --text:         #1e293b;
+    --muted:        #64748b;
+    --accent:       #2563eb;
+    --accent-soft:  #eff6ff;
+    --green:        #16a34a;
+    --green-bg:     #f0fdf4;
+    --green-bd:     #bbf7d0;
+    --amber:        #b45309;
+    --amber-bg:     #fffbeb;
+    --amber-bd:     #fcd34d;
+    --red:          #dc2626;
+    --red-bg:       #fef2f2;
+    --red-bd:       #fecaca;
+    --purple:       #7c3aed;
+    --purple-bg:    #f5f3ff;
+    --purple-bd:    #c4b5fd;
+    --part-bg:      #eef2ff;
+    --part-border:  #6366f1;
+    --border:       #e2e8f0;
+    --sidebar-w:    270px;
+    --radius:       10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.75;
+    color: var(--text);
+    background: var(--bg);
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Progress bar ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    width: 0%;
+    z-index: 9999;
+    transition: width 0.1s;
+  }
+
+  /* ── Layout ── */
+  .page { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    background: var(--paper);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 1rem 0.85rem 2.5rem;
+    font-size: 0.78rem;
+  }
+  #sidebar .brand { font-weight: 800; font-size: 0.88rem; color: var(--text); margin-bottom: 0.1rem; }
+  #sidebar .brand-sub { font-size: 0.7rem; color: var(--muted); margin-bottom: 1rem; }
+  #sidebar nav h3 {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin: 1.1rem 0 0.25rem;
+    font-weight: 700;
+  }
+  #sidebar nav h3:first-child { margin-top: 0; }
+  #sidebar ol { list-style: none; padding: 0; margin: 0; }
+  #sidebar li { margin: 0.08rem 0; }
+  #sidebar li a {
+    display: block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    color: var(--text);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.15s, color 0.15s;
+  }
+  #sidebar li a:hover, #sidebar li a.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    text-decoration: none;
+  }
+  #sidebar li.guide-link a { color: var(--green); font-style: italic; }
+  #sidebar li.guide-link a:hover { background: var(--green-bg); }
+
+  /* ── Main content ── */
+  #content {
+    flex: 1;
+    min-width: 0;
+    max-width: 980px;
+    padding: 2.5rem 3rem 5rem;
+    background: var(--paper);
+  }
+
+  /* ── Hero ── */
+  .hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: white;
+    padding: 2rem 2.2rem;
+    border-radius: var(--radius);
+    margin-bottom: 2rem;
+  }
+  .hero h1 { margin: 0 0 0.5rem; font-size: 1.7rem; color: white; border: none; line-height: 1.2; }
+  .hero .meta { font-size: 0.87rem; opacity: 0.85; margin: 0; }
+  .hero .exam-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 0.2rem 0.7rem;
+    border-radius: 99px;
+    font-size: 0.78rem;
+    margin-top: 0.7rem;
+    font-weight: 600;
+  }
+
+  /* ── Headings ── */
+  h1, h2, h3, h4 { scroll-margin-top: 1.2rem; line-height: 1.3; }
+  h2 {
+    font-size: 1.4rem;
+    margin-top: 3rem;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--border);
+    color: #1e293b;
+  }
+  h2#start-here { margin-top: 0; color: var(--accent); border-bottom-color: var(--accent); }
+
+  h2.part-header {
+    background: var(--part-bg);
+    border: none;
+    border-left: 5px solid var(--part-border);
+    padding: 0.8rem 1.2rem;
+    margin-top: 4rem;
+    margin-bottom: 0.4rem;
+    font-size: 1.15rem;
+    color: #3730a3;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  h2.part-header + p.part-sub { color: var(--muted); font-size: 0.85rem; margin: 0 0 0.5rem 1.5rem; }
+
+  h3 { font-size: 1.07rem; margin-top: 1.8rem; margin-bottom: 0.35rem; color: #334155; }
+  h4 { font-size: 0.97rem; margin-top: 1.2rem; color: #475569; }
+
+  p { margin: 0.85em 0; }
+  ul, ol { padding-left: 1.5em; margin: 0.7em 0; }
+  li { margin: 0.3em 0; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+  /* ── Callout base ── */
+  .callout {
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 0.9rem 1.2rem 1rem;
+    margin: 1.1rem 0;
+    border-left-width: 5px;
+    border-left-style: solid;
+  }
+  .callout-label {
+    font-size: 0.73rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.55rem;
+  }
+  .callout p, .callout ul, .callout ol { font-size: 0.94rem; margin-bottom: 0.45rem; }
+  .callout ul, .callout ol { padding-left: 1.3em; }
+  .callout p:last-child, .callout ul:last-child, .callout ol:last-child { margin-bottom: 0; }
+
+  .concept { background: var(--accent-soft); border-color: var(--accent); }
+  .concept .callout-label { color: var(--accent); }
+
+  .starting-guide { background: var(--green-bg); border-color: var(--green); }
+  .starting-guide .callout-label { color: var(--green); }
+  .starting-guide strong { color: #15803d; }
+
+  .worked-example { background: var(--amber-bg); border-color: #d97706; }
+  .worked-example .callout-label { color: var(--amber); }
+  .worked-example .step { margin: 0.5rem 0; padding: 0.4rem 0.7rem; background: rgba(255,255,255,0.6); border-radius: 6px; font-size: 0.92rem; }
+  .worked-example .step strong { color: #92400e; }
+
+  .exam-tip { background: var(--purple-bg); border-color: var(--purple); }
+  .exam-tip .callout-label { color: var(--purple); }
+
+  .watch-out { background: var(--red-bg); border-color: var(--red); }
+  .watch-out .callout-label { color: var(--red); }
+
+  /* ── Starting guide wrapper ── */
+  .starting-guide-wrapper {
+    background: var(--green-bg);
+    border: 1px solid var(--green-bd);
+    border-left: 5px solid var(--green);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 1.1rem 1.4rem 1.2rem;
+    margin: 0.8rem 0 1.8rem;
+  }
+  .starting-guide-wrapper h3 {
+    color: #14532d;
+    font-size: 1rem;
+    margin-top: 0;
+    margin-bottom: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .starting-guide-wrapper h3::before { content: "📗"; }
+  .starting-guide-wrapper p,
+  .starting-guide-wrapper ul,
+  .starting-guide-wrapper ol { font-size: 0.94rem; margin-bottom: 0.5rem; }
+  .starting-guide-wrapper ul, .starting-guide-wrapper ol { padding-left: 1.4em; }
+  .starting-guide-wrapper strong { color: #166534; }
+
+  /* ── Interactive solution reveal ── */
+  .reveal-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.3rem 0.9rem;
+    border-radius: 99px;
+    cursor: pointer;
+    border: none;
+    margin: 0.5rem 0;
+    transition: background 0.15s;
+  }
+  .reveal-btn:hover { background: #1d4ed8; }
+  .solution-box {
+    display: none;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.9rem 1.1rem;
+    margin-top: 0.5rem;
+    font-size: 0.93rem;
+  }
+  .solution-box.open { display: block; }
+  .solution-step {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    padding: 0.4rem 0;
+    border-bottom: 1px dashed #e2e8f0;
+  }
+  .solution-step:last-child { border-bottom: none; }
+  .step-num {
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-top: 0.1rem;
+  }
+  .step-content { flex: 1; }
+
+  /* ── Blockquote ── */
+  blockquote {
+    background: #f0f9ff;
+    border-left: 4px solid #38bdf8;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 0.7rem 1rem;
+    margin: 1em 0;
+    color: #0c4a6e;
+    font-size: 0.92rem;
+  }
+  blockquote p { margin: 0; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; margin: 1.1em 0; font-size: 0.9rem; display: table; }
+  th, td { border: 1px solid var(--border); padding: 0.5rem 0.7rem; text-align: left; vertical-align: top; }
+  th { background: #f1f5f9; font-weight: 600; color: #334155; }
+  tr:nth-child(even) td { background: #fafbfd; }
+
+  /* ── Code ── */
+  code { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: 0.86em; background: #f1f5f9; padding: 0.12em 0.38em; border-radius: 4px; color: #b91c1c; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 1.1rem; border-radius: var(--radius); overflow-x: auto; font-size: 0.84rem; margin: 1em 0; }
+  pre code { background: none; padding: 0; color: inherit; }
+
+  /* ── Math ── */
+  .math.display { overflow-x: auto; padding: 0.5em 0; }
+
+  /* ── Formula sheet ── */
+  .formula-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.85rem;
+    margin: 1rem 0;
+  }
+  .formula-card {
+    background: var(--accent-soft);
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+    overflow-x: auto;
+  }
+  .formula-card h4 { margin: 0 0 0.4rem; color: var(--accent); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .formula-card p { margin: 0.25rem 0; font-size: 0.88rem; }
+  .formula-card mjx-container { font-size: 1rem !important; }
+
+  /* ── Back to top ── */
+  .back-top { text-align: right; margin-top: 2.5rem; margin-bottom: -0.5rem; font-size: 0.8rem; }
+  .back-top a { color: var(--muted); }
+  .back-top a:hover { color: var(--accent); text-decoration: none; }
+
+  /* ── Responsive ── */
+  @media (max-width: 860px) {
+    .page { flex-direction: column; }
+    #sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); max-height: 40vh; }
+    #sidebar li a { white-space: normal; }
+    #content { padding: 1.5rem 1.1rem 3rem; }
+  }
+
+  @media print {
+    #sidebar, #progress-bar { display: none; }
+    #content { max-width: none; padding: 0; }
+    body, html { background: white; }
+    .reveal-btn { display: none; }
+    .solution-box { display: block !important; }
+  }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+</head>
+<body>
+<div id="progress-bar"></div>
+<div class="page">
+  <aside id="sidebar">
+    <div class="brand">ML Study Guide</div>
+    <div class="brand-sub">Mid-Semester · AIMLCZG565 · BITS WILP</div>
+    <nav>
+      <h3>Getting Started</h3>
+      <ol>
+        <li><a href="#start-here">START HERE — Read This First</a></li>
+      </ol>
+      <h3>Part I — Intro to ML</h3>
+      <ol>
+        <li class="guide-link"><a href="#starting-guide-i">Starting Guide — Part I</a></li>
+        <li><a href="#intro-ml">1. What is Machine Learning?</a></li>
+        <li><a href="#types-learning">2. Types of Learning</a></li>
+      </ol>
+      <h3>Part II — ML Workflow &amp; Data</h3>
+      <ol>
+        <li class="guide-link"><a href="#starting-guide-ii">Starting Guide — Part II</a></li>
+        <li><a href="#data-quality">3. Data Quality Issues</a></li>
+        <li><a href="#missing-outliers">4. Missing Values &amp; Outliers</a></li>
+        <li><a href="#feature-scaling">5. Feature Scaling</a></li>
+        <li><a href="#feature-engineering">6. Feature Engineering</a></li>
+        <li><a href="#data-splitting">7. Data Splitting &amp; Validation</a></li>
+      </ol>
+      <h3>Part III — Linear Regression</h3>
+      <ol>
+        <li class="guide-link"><a href="#starting-guide-iii">Starting Guide — Part III</a></li>
+        <li><a href="#linear-regression">8. Linear Regression</a></li>
+        <li><a href="#cost-gradient">9. Cost Function &amp; Gradient Descent</a></li>
+        <li><a href="#normal-equation">10. Normal Equation</a></li>
+        <li><a href="#polynomial-regression">11. Polynomial Regression</a></li>
+        <li><a href="#bias-variance">12. Bias–Variance Trade-off</a></li>
+        <li><a href="#regularization">13. Regularization (Ridge &amp; Lasso)</a></li>
+        <li><a href="#r-squared">14. R² &amp; Model Evaluation</a></li>
+      </ol>
+      <h3>Part IV — Classification &amp; Logistic Regression</h3>
+      <ol>
+        <li class="guide-link"><a href="#starting-guide-iv">Starting Guide — Part IV</a></li>
+        <li><a href="#lr-fails">15. Why Linear Reg Fails for Classification</a></li>
+        <li><a href="#classification-basics">16. Classification Basics</a></li>
+        <li><a href="#sigmoid-logistic">17. Sigmoid &amp; Logistic Regression</a></li>
+        <li><a href="#log-loss">18. Log-Loss &amp; Training</a></li>
+        <li><a href="#weights-interpretation">19. Weights Interpretation</a></li>
+        <li><a href="#multiclass">20. Multi-Class Classification</a></li>
+      </ol>
+      <h3>Part V — Evaluation Metrics</h3>
+      <ol>
+        <li class="guide-link"><a href="#starting-guide-v">Starting Guide — Part V</a></li>
+        <li><a href="#confusion-matrix">21. Confusion Matrix</a></li>
+        <li><a href="#precision-recall">22. Precision, Recall &amp; F1</a></li>
+        <li><a href="#roc-auc">23. ROC Curve &amp; AUC</a></li>
+      </ol>
+      <h3>Part VI — Decision Trees</h3>
+      <ol>
+        <li class="guide-link"><a href="#starting-guide-vi">Starting Guide — Part VI</a></li>
+        <li><a href="#decision-trees">24. Decision Trees &amp; ID3</a></li>
+        <li><a href="#entropy-ig">25. Entropy &amp; Information Gain</a></li>
+        <li><a href="#gain-ratio">26. Gain Ratio</a></li>
+        <li><a href="#overfitting-pruning">27. Overfitting &amp; Pruning</a></li>
+      </ol>
+      <h3>Part VII — Exam Prep</h3>
+      <ol>
+        <li class="guide-link"><a href="#starting-guide-vii">Starting Guide — Part VII</a></li>
+        <li><a href="#exam-patterns">28. Exam Patterns &amp; Strategy</a></li>
+        <li><a href="#formula-sheet">29. Quick-Reference Formula Sheet</a></li>
+        <li><a href="#worked-templates">30. Worked Templates</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <main id="content">
+    <div class="hero" id="top">
+      <h1>Machine Learning — Complete Mid-Semester Study Guide</h1>
+      <p class="meta"><strong>BITS Pilani WILP · AIMLCZG565 Machine Learning</strong><br>
+      Compiled from CS1–CS6 companion docs, 6 years of MidSem papers &amp; sample QPs</p>
+      <span class="exam-tag">📅 Syllabus: CS1 → CS6 · Up to Decision Trees</span>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         START HERE
+    ══════════════════════════════════════════════ -->
+    <h2 id="start-here">START HERE — Read This First (Step-by-Step)</h2>
+
+    <p><strong>New to this guide?</strong> Follow these steps before diving into the numbered sections.</p>
+
+    <h3>Step 1: How to use this file</h3>
+    <ol>
+      <li>Open <strong><code>ML_Final_Study_Guide.html</code></strong> in any browser (Chrome/Safari/Firefox).</li>
+      <li>Use the <strong>left navigation panel</strong> to jump to any topic. It tracks your scroll position.</li>
+      <li>All formulas render with MathJax — no extra app needed.</li>
+      <li><strong>Study method per topic:</strong> Read concept → cover the answer → try the example on paper → reveal → move on.</li>
+    </ol>
+
+    <h3>Step 2: What does the MidSem look like?</h3>
+    <p>Every MidSem paper has <strong>5–6 questions, 25–30 marks total, 2 hours, Closed Book</strong>:</p>
+    <table>
+      <thead><tr><th>Question</th><th>Topic</th><th>Typical Marks</th><th>Where to study</th></tr></thead>
+      <tbody>
+        <tr><td>Q1</td><td>Introduction to ML (Mitchell's definition, types of learning)</td><td>4–6</td><td><a href="#intro-ml">Part I</a></td></tr>
+        <tr><td>Q2</td><td>ML Workflow &amp; Data Quality (find 5–6 issues in a dataset)</td><td>3–6</td><td><a href="#data-quality">Part II</a></td></tr>
+        <tr><td>Q3</td><td>Linear Regression / Regularization / Bias–Variance</td><td>4–6</td><td><a href="#linear-regression">Part III</a></td></tr>
+        <tr><td>Q4</td><td>Logistic Regression / Confusion Matrix / Feature Scaling</td><td>4–6</td><td><a href="#classification-basics">Part IV</a></td></tr>
+        <tr><td>Q5</td><td>Evaluation Metrics (Precision, Recall, F1)</td><td>4–6</td><td><a href="#confusion-matrix">Part V</a></td></tr>
+        <tr><td>Q6</td><td>Decision Trees (Entropy, Information Gain, root node)</td><td>4–6</td><td><a href="#decision-trees">Part VI</a></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Step 3: If you only have 2 hours to study</h3>
+    <div class="callout exam-tip">
+      <div class="callout-label">⚡ Crash-Course Order</div>
+      <ol>
+        <li><strong><a href="#start-here">START HERE</a></strong> — understand the exam pattern (10 min)</li>
+        <li><strong><a href="#intro-ml">Mitchell's T/P/E</a></strong> — appears in every single paper (10 min)</li>
+        <li><strong><a href="#data-quality">Data Quality Issues</a></strong> — memorise the 6 types (15 min)</li>
+        <li><strong><a href="#bias-variance">Bias–Variance &amp; Regularization</a></strong> — very high-yield (20 min)</li>
+        <li><strong><a href="#confusion-matrix">Confusion Matrix calculations</a></strong> — guaranteed question (20 min)</li>
+        <li><strong><a href="#entropy-ig">Entropy &amp; Information Gain</a></strong> — practice one full example (25 min)</li>
+        <li><strong><a href="#formula-sheet">Formula Sheet</a></strong> — scan and memorise key formulas (20 min)</li>
+      </ol>
+    </div>
+
+    <hr>
+
+    <!-- ══════════════════════════════════════════════
+         PART I
+    ══════════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-i">Part I — Introduction to Machine Learning</h2>
+    <p class="part-sub">Sections 1–2 · Always Q1 on the exam</p>
+
+    <div class="starting-guide-wrapper" id="starting-guide-i">
+      <h3>Starting Guide — Part I</h3>
+      <p><strong>What this part covers:</strong> What ML is, how it's defined, the 3 families of learning, and how to set up a learning problem.</p>
+      <p><strong>Guaranteed exam question:</strong> "Tom Mitchell defined ML as… In this setting, what is E, T, and P?" — this appears in almost every paper.</p>
+      <p><strong>Before you start, know:</strong></p>
+      <ul>
+        <li>ML = making a computer improve at a task by learning from examples — no explicit programming.</li>
+        <li>The 3 families: <strong>Supervised</strong> (labelled data), <strong>Unsupervised</strong> (find hidden structure), <strong>Reinforcement</strong> (learn from rewards).</li>
+        <li>Within supervised: <strong>Classification</strong> (predict a category) vs <strong>Regression</strong> (predict a number).</li>
+      </ul>
+      <p><strong>Try this first:</strong> "A spam filter learns which emails are spam from 10,000 labelled examples." → Supervised learning, Classification. T = classify email as spam/not. P = accuracy. E = labelled email dataset.</p>
+    </div>
+
+    <h2 id="intro-ml">1. What is Machine Learning?</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Mitchell's Definition (the most important thing to memorise)</div>
+      <p><em>"A computer program is said to learn from <strong>experience E</strong> with respect to some <strong>task T</strong> and some <strong>performance measure P</strong>, if its performance on T, as measured by P, improves with experience E."</em></p>
+      <ul>
+        <li><strong>T (Task)</strong> — what the system does (e.g., classify emails, predict house price)</li>
+        <li><strong>P (Performance)</strong> — how you measure success (accuracy, MSE, F1-score)</li>
+        <li><strong>E (Experience)</strong> — the data the system learns from (training dataset)</li>
+      </ul>
+    </div>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Worked Example — Identify T, P, E</div>
+      <p><strong>Scenario:</strong> A self-driving car learns to drive safely by observing millions of hours of human driving and receives a reward signal when it reaches the destination without incident.</p>
+      <button class="reveal-btn">▶ Show answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">T</div><div class="step-content"><strong>Task:</strong> Drive safely in urban environments (navigate roads, avoid obstacles, obey traffic rules)</div></div>
+        <div class="solution-step"><div class="step-num">P</div><div class="step-content"><strong>Performance:</strong> Number of successful trips without incidents; distance driven safely; time to destination</div></div>
+        <div class="solution-step"><div class="step-num">E</div><div class="step-content"><strong>Experience:</strong> Millions of hours of human driving data + reward signal from real-world driving outcomes</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Type of learning:</strong> Reinforcement Learning (gets a reward/feedback, not pre-labelled data)</div></div>
+      </div>
+    </div>
+
+    <h3>Why ML instead of classical programming?</h3>
+    <table>
+      <thead><tr><th>Classical Programming</th><th>Machine Learning</th></tr></thead>
+      <tbody>
+        <tr><td>You write explicit rules</td><td>System learns rules from data</td></tr>
+        <tr><td>Rules break when world changes</td><td>Model adapts with new data</td></tr>
+        <tr><td>Good when rules are known</td><td>Good when rules are hard to articulate (images, speech)</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="types-learning">2. Types of Learning</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 The Three Families</div>
+      <ul>
+        <li><strong>Supervised Learning</strong> — data has labels (y). Goal: learn f(x) → y.
+          <ul>
+            <li><em>Classification</em>: y is a category (spam/not spam, disease/healthy)</li>
+            <li><em>Regression</em>: y is a number (house price, temperature)</li>
+          </ul>
+        </li>
+        <li><strong>Unsupervised Learning</strong> — no labels. Goal: find structure in x.
+          <ul>
+            <li><em>Clustering</em>: group similar items (K-means)</li>
+            <li><em>Density estimation</em>: model distribution of data</li>
+          </ul>
+        </li>
+        <li><strong>Reinforcement Learning</strong> — agent takes actions, receives rewards. Goal: maximise cumulative reward.</li>
+      </ul>
+    </div>
+
+    <table>
+      <thead><tr><th>Scenario</th><th>Type</th><th>Sub-type</th></tr></thead>
+      <tbody>
+        <tr><td>Predict insurance claim amount from age, vehicle type</td><td>Supervised</td><td>Regression</td></tr>
+        <tr><td>Classify sentiment of reviews as positive/negative/neutral</td><td>Supervised</td><td>Classification</td></tr>
+        <tr><td>Group DNA sequences into clusters to find disease links</td><td>Unsupervised</td><td>Clustering</td></tr>
+        <tr><td>Self-driving car improves over millions of miles driven</td><td>Reinforcement</td><td>—</td></tr>
+        <tr><td>Detect job applicants who lie using density estimation</td><td>Supervised (generative)</td><td>Classification</td></tr>
+        <tr><td>Predict tomorrow's rainfall in mm</td><td>Supervised</td><td>Regression</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Discriminative vs Generative Classifiers</div>
+      <p><strong>Discriminative</strong> (e.g., Logistic Regression): directly models P(y|x) — "given these features, what class?"</p>
+      <p><strong>Generative</strong> (e.g., Naïve Bayes): models P(x|y) — "how was this data generated for each class?" Needed when you want density estimation or to detect outliers (P(x|y) required).</p>
+      <p><strong>Exam tip:</strong> If asked "classify AND detect outliers via density estimation" → recommend <strong>Generative</strong> classifier.</p>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ══════════════════════════════════════════════
+         PART II
+    ══════════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-ii">Part II — ML Workflow &amp; Data</h2>
+    <p class="part-sub">Sections 3–7 · Always appears as Q2 — find issues in a messy dataset; data splitting tested in 2024</p>
+
+    <div class="starting-guide-wrapper" id="starting-guide-ii">
+      <h3>Starting Guide — Part II</h3>
+      <p><strong>The most reliable exam question:</strong> You are given a small, deliberately messy dataset table. "Identify at least 5 data quality issues and suggest how to resolve them."</p>
+      <p><strong>Memorise these 6 issue types</strong> — find one of each in any table:</p>
+      <ol>
+        <li><strong>Missing values</strong> — a cell is blank</li>
+        <li><strong>Outliers</strong> — a value is implausibly extreme (Age = 350, CGPA = 87.5)</li>
+        <li><strong>Inconsistent format</strong> — same data written differently (dates: "15-Aug-2022" vs "2022-08-15")</li>
+        <li><strong>Duplicate rows</strong> — same record appears twice</li>
+        <li><strong>Wrong data type / unit mismatch</strong> — weight in "120lbs" vs rest in "kg"; email "dev[at]mail.com"</li>
+        <li><strong>Inconsistent encoding</strong> — result stored as "Positive/Negative" in some rows but "1/0" in others</li>
+      </ol>
+    </div>
+
+    <h2 id="data-quality">3. Data Quality Issues</h2>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Classic Exam Dataset — Spot All Issues</div>
+      <p>This exact dataset (or a variant) has appeared in every single midsem paper from 2023–2026:</p>
+      <table>
+        <thead><tr><th>TXN-ID</th><th>NAME</th><th>AGE</th><th>WEIGHT</th><th>BLOOD GROUP</th><th>COVID RESULT</th></tr></thead>
+        <tbody>
+          <tr><td>T003</td><td>Akbar</td><td>38</td><td>60kg</td><td>Iam+ve</td><td>Positive</td></tr>
+          <tr><td>T005</td><td>THenali</td><td>22</td><td>78kg</td><td>B-ve</td><td>1</td></tr>
+          <tr><td>T007</td><td>Rajuu</td><td><strong>350</strong></td><td>48kg</td><td>O+ve</td><td>Positive</td></tr>
+          <tr><td>T008</td><td>HARI</td><td>32</td><td><strong>120lbs</strong></td><td>AB-ve</td><td>Negative</td></tr>
+          <tr><td>T009</td><td>Inba</td><td>25</td><td><strong>(missing)</strong></td><td>O+ve</td><td>0</td></tr>
+          <tr><td>T010</td><td><strong>SysUsr789</strong></td><td>20</td><td>68kg</td><td>O-ve</td><td>Negative</td></tr>
+        </tbody>
+      </table>
+      <button class="reveal-btn">▶ Show all issues &amp; solutions</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Outlier (Age=350, T007):</strong> Age of 350 is biologically impossible. Resolution: Replace with mean age of other records, or flag for manual verification.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Unit mismatch (Weight=120lbs, T008):</strong> All other weights are in kg; this one is in lbs. Resolution: Convert using 1 lb = 0.453 kg → 120 lbs ≈ 54.4 kg via data transformation.</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Missing value (Weight missing, T009):</strong> Weight cell is empty. Resolution: Impute with mean/median weight, or use KNN-imputation.</div></div>
+        <div class="solution-step"><div class="step-num">4</div><div class="step-content"><strong>Inconsistent format/noise in Name (SysUsr789, T010):</strong> Name field has an alphanumeric system ID instead of a person's name. Resolution: Flag for manual review and replace with correct name.</div></div>
+        <div class="solution-step"><div class="step-num">5</div><div class="step-content"><strong>Inconsistent Blood Group encoding (Iam+ve, T003):</strong> "Iam+ve" is not a valid blood group format; should be "AB+ve" or similar. Resolution: Apply binning/standardisation; replace with NULL or correct value.</div></div>
+        <div class="solution-step"><div class="step-num">6</div><div class="step-content"><strong>Inconsistent COVID Result encoding (T005=1, T009=0):</strong> Most records use "Positive/Negative" but T005 and T009 use "1/0". Resolution: Data transformation — standardise all to "Positive/Negative" (or all to 0/1).</div></div>
+      </div>
+    </div>
+
+    <h2 id="missing-outliers">4. Missing Values &amp; Outliers</h2>
+
+    <h3>Handling Missing Values</h3>
+    <table>
+      <thead><tr><th>Method</th><th>When to use</th><th>Risk</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Delete row</strong></td><td>Very few missing rows (&lt;5%)</td><td>Loses data</td></tr>
+        <tr><td><strong>Mean/Median imputation</strong></td><td>Numerical features, data is MAR</td><td>Reduces variance</td></tr>
+        <tr><td><strong>Mode imputation</strong></td><td>Categorical features</td><td>Introduces bias</td></tr>
+        <tr><td><strong>KNN imputation</strong></td><td>When relationships between features exist</td><td>Computationally expensive</td></tr>
+        <tr><td><strong>Model-based imputation</strong></td><td>Complex structured data</td><td>More assumptions</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Detecting and Handling Outliers</h3>
+    <div class="callout concept">
+      <div class="callout-label">💡 Two main detection methods</div>
+      <p><strong>Z-score:</strong> \( z = \frac{x - \mu}{\sigma} \). Values with |z| &gt; 2 or 3 are outliers. Assumes approximately normal distribution.</p>
+      <p><strong>IQR method:</strong> \( Q1 - 1.5 \times IQR \) to \( Q3 + 1.5 \times IQR \). Any value outside this range is flagged. More robust than z-score.</p>
+      <p>Where \( IQR = Q3 - Q1 \) (interquartile range).</p>
+    </div>
+
+    <h2 id="feature-scaling">5. Feature Scaling</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Why Scale? (Very frequently tested)</div>
+      <p>Gradient descent uses step sizes proportional to the gradient. If one feature has range [0, 1] and another [0, 1,000,000], the gradient will be dominated by the large-scale feature. The contour lines become elongated ellipses, forcing many more iterations to converge.</p>
+      <p><strong>Scaling makes gradient descent faster</strong> (fewer iterations to converge) by making cost-function contours more circular.</p>
+    </div>
+
+    <table>
+      <thead><tr><th>Statement</th><th>True or False?</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td>Feature scaling guarantees convergence to global minimum</td><td><strong>False</strong></td><td>Local minima can still exist (e.g., neural nets). Scaling only speeds convergence, doesn't change topology.</td></tr>
+        <tr><td>Feature scaling prevents gradient descent from getting stuck in local optima</td><td><strong>False</strong></td><td>Linear regression cost function is convex (no local optima). Scaling doesn't affect this.</td></tr>
+        <tr><td>Feature scaling speeds up gradient descent</td><td><strong>True</strong></td><td>More circular contours → fewer iterations needed.</td></tr>
+        <tr><td>Feature scaling prevents X<sup>T</sup>X from being singular</td><td><strong>False</strong></td><td>Singularity occurs from linearly dependent features, not from scale differences.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Two main scaling methods</h3>
+    <div class="formula-grid">
+      <div class="formula-card">
+        <h4>Min-Max Normalisation</h4>
+        <p>\[ x' = \frac{x - x_{\min}}{x_{\max} - x_{\min}} \]</p>
+        <p>Maps all values to [0, 1]. Sensitive to outliers.</p>
+      </div>
+      <div class="formula-card">
+        <h4>Z-score Standardisation</h4>
+        <p>\[ x' = \frac{x - \mu}{\sigma} \]</p>
+        <p>Maps to mean=0, std=1. More robust when outliers exist.</p>
+      </div>
+    </div>
+
+    <div class="callout watch-out">
+      <div class="callout-label">⚠️ Must scale before k-NN and Gradient Descent</div>
+      <p>k-NN uses distance — unscaled features with large ranges dominate the distance calculation. For instance, income (thousands) + age (tens) → income controls everything. <strong>Always scale before k-NN.</strong></p>
+    </div>
+
+    <h2 id="feature-engineering">6. Feature Engineering</h2>
+
+    <ul>
+      <li><strong>One-hot encoding</strong> — convert categorical variables into binary columns (e.g., Blood Group → O+ve: 1/0, A+ve: 1/0, …)</li>
+      <li><strong>Binning</strong> — group continuous values into ranges (Age → Young/Middle/Senior)</li>
+      <li><strong>Polynomial features</strong> — create x², x·y features to capture non-linear relationships</li>
+      <li><strong>Interaction terms</strong> — multiply two features to capture joint effects</li>
+      <li><strong>Removing redundant features</strong> — if Age and Date-of-Birth both present, keep one (Age = f(DOB))</li>
+    </ul>
+
+    <h2 id="data-splitting">7. Data Splitting &amp; Validation</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 The Core Principle — Never Touch the Test Set</div>
+      <p>A model is evaluated honestly only on data it has <em>never seen during training</em>. The standard workflow:</p>
+      <ol>
+        <li><strong>Train set (≈60–70%)</strong> — the model learns from this data.</li>
+        <li><strong>Validation set (≈15–20%)</strong> — used to tune hyperparameters and choose models (optional but best practice).</li>
+        <li><strong>Test set (≈15–20%)</strong> — locked away; evaluated only once at the very end to report final performance.</li>
+      </ol>
+      <p><strong>Why keep test set separate?</strong> If you peek at the test set to make modelling decisions, test accuracy no longer reflects real-world performance — you've <em>leaked</em> information from the test set into training decisions.</p>
+    </div>
+
+    <table>
+      <thead><tr><th>Split Strategy</th><th>When to use</th><th>Key point</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Random split</strong></td><td>Large dataset, balanced classes</td><td>Simple; use <code>random_state</code> for reproducibility</td></tr>
+        <tr><td><strong>Stratified split</strong></td><td>Imbalanced classes</td><td>Each split preserves the original class proportions. Essential when one class is rare (e.g., 5% positive).</td></tr>
+        <tr><td><strong>K-fold cross-validation</strong></td><td>Small datasets</td><td>Data split into k folds; model trained k times (each fold is the val set once). Average score is more reliable than one split.</td></tr>
+        <tr><td><strong>Stratified K-fold</strong></td><td>Small + imbalanced datasets</td><td>Combines stratification with k-fold; every fold has the same class ratio.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 Stratified Split — Exam favourite (2024 papers)</div>
+      <p><strong>Q: You have a loan-approval dataset: 87% rejected, 13% approved. You randomly split 70/30. What risk does this create and what should you do instead?</strong></p>
+      <p><strong>Risk:</strong> A random split may put nearly all approved cases in training or test — the splits no longer represent the true class distribution. The model could be trained with very few approved examples.</p>
+      <p><strong>Fix: Stratified split.</strong> Ensures both 70% train and 30% test contain approximately 87% rejected / 13% approved each, preserving the real-world distribution.</p>
+    </div>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Cross-Validation — Why it matters</div>
+      <p><strong>Q:</strong> You train a model on a 1000-sample dataset and get 92% accuracy on the test set. Your colleague used 5-fold CV and got 84% ± 3%. Which estimate is more trustworthy?</p>
+      <button class="reveal-btn">▶ Show answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Single 80/20 split</strong>: The 92% is based on 200 test samples — it can be lucky or unlucky depending on which 200 examples ended up in the test set. High variance estimate.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>5-fold CV</strong>: Each of the 5 test folds uses 200 different samples. The model trains and evaluates on all 1000 data points across 5 runs. The ±3% gives a confidence interval — much more representative.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>5-fold CV is more trustworthy</strong>. The 92% single-split estimate is likely inflated (overly optimistic). CV's lower but stable estimate better reflects real generalisation performance.</div></div>
+      </div>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ══════════════════════════════════════════════
+         PART III
+    ══════════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-iii">Part III — Linear Regression</h2>
+    <p class="part-sub">Sections 8–14 · Appears in Q3; bias–variance, regularization, and polynomial regression always tested</p>
+
+    <div class="starting-guide-wrapper" id="starting-guide-iii">
+      <h3>Starting Guide — Part III</h3>
+      <p><strong>In one sentence:</strong> Fit a line (or hyperplane) to data by minimising the average squared prediction error, then dial in regularization to prevent overfitting.</p>
+      <p><strong>Key questions the exam asks:</strong></p>
+      <ul>
+        <li>Given training/validation error patterns → does the model underfit or overfit?</li>
+        <li>Large dataset → gradient descent or normal equation? (Answer: gradient descent — O(n³) matrix inversion is too slow)</li>
+        <li>Ridge vs Lasso — which reduces coefficients to zero? (Lasso)</li>
+        <li>What does increasing λ do to bias and variance?</li>
+      </ul>
+    </div>
+
+    <h2 id="linear-regression">8. Linear Regression</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 The Model</div>
+      <p>Predict a continuous value \(\hat{y}\) from features \(\mathbf{x}\):</p>
+      <p>\[ \hat{y} = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \cdots + \theta_n x_n = \boldsymbol{\theta}^T \mathbf{x} \]</p>
+      <p>\(\theta_0\) = intercept (bias term), \(\theta_1, \ldots, \theta_n\) = weights (slopes).</p>
+      <p><strong>Interpretation of a coefficient:</strong> If \(\theta_j = 2.5\), then for every unit increase in \(x_j\), the predicted output increases by 2.5 (holding all other features constant).</p>
+    </div>
+
+    <h2 id="cost-gradient">9. Cost Function &amp; Gradient Descent</h2>
+
+    <h3>Mean Squared Error (MSE) — the cost function</h3>
+    <p>\[ J(\boldsymbol{\theta}) = \frac{1}{2m} \sum_{i=1}^{m} \left(\hat{y}^{(i)} - y^{(i)}\right)^2 \]</p>
+    <p>where \(m\) = number of training examples. The factor \(\frac{1}{2}\) is a convenience that cancels during differentiation.</p>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Three Flavours of Gradient Descent</div>
+      <table>
+        <thead><tr><th>Variant</th><th>Update uses</th><th>Pros</th><th>Cons</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Batch GD</strong></td><td>All m examples per step</td><td>Smooth convergence; guaranteed for convex</td><td>Slow on large datasets</td></tr>
+          <tr><td><strong>Stochastic GD (SGD)</strong></td><td>1 random example per step</td><td>Fast; can escape local minima</td><td>Noisy; may not converge exactly</td></tr>
+          <tr><td><strong>Mini-batch GD</strong></td><td>k examples per step (k=32–256)</td><td>Balance of speed &amp; stability; GPU-efficient</td><td>Extra hyperparameter (batch size)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Gradient Descent Update Rule</h3>
+    <p>\[ \theta_j \leftarrow \theta_j - \alpha \frac{\partial J}{\partial \theta_j} \]</p>
+    <p>For linear regression (MSE cost): \(\frac{\partial J}{\partial \theta_j} = \frac{1}{m}\sum_{i=1}^{m}(\hat{y}^{(i)} - y^{(i)}) \cdot x_j^{(i)}\)</p>
+
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 Learning Rate Exam Trap</div>
+      <p><strong>If J(θ) increases over iterations</strong> → learning rate α is <em>too large</em> → <strong>decrease α</strong>. The algorithm is overshooting the minimum.</p>
+      <p><strong>If J(θ) decreases very slowly</strong> → α may be too small → try a larger α (but not too large).</p>
+      <p><strong>Rule of thumb:</strong> Try α = 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1 and plot J vs iterations.</p>
+    </div>
+
+    <h2 id="normal-equation">10. Normal Equation</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Closed-Form Solution</div>
+      <p>\[ \boldsymbol{\theta} = (X^T X)^{-1} X^T \mathbf{y} \]</p>
+      <p><strong>No iterations, no learning rate</strong> — computes optimal θ directly.</p>
+      <p><strong>Dimensions check (common exam question):</strong> If m=28 training examples, n=4 features (plus bias):</p>
+      <ul>
+        <li>X is <strong>28 × 5</strong> (m rows × (n+1) cols including x₀=1)</li>
+        <li>y is <strong>28 × 1</strong></li>
+        <li>θ is <strong>5 × 1</strong></li>
+      </ul>
+    </div>
+
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 When to use Normal Equation vs Gradient Descent?</div>
+      <p><strong>Normal Equation:</strong> Computing \((X^TX)^{-1}\) costs \(O(n^3)\) where n = number of features. For large n (e.g., n = 300,000), this is computationally infeasible.</p>
+      <p><strong>Gradient Descent is preferred</strong> when: n is very large (e.g., &gt;10,000 features), or m is very large (millions of examples).</p>
+      <p><strong>Normal Equation preferred</strong> when: n is small (≤ ~10,000) — exact answer, no learning rate to tune.</p>
+    </div>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Exam Question — GD vs Normal Equation</div>
+      <p><strong>Q:</strong> You have n=2,000,000 instances and m=300,000 features. Which approach for linear regression — gradient descent or normal equation? Why?</p>
+      <button class="reveal-btn">▶ Show answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Gradient Descent.</strong> Computing \((X^TX)^{-1}\) for 300,000 features requires inverting a 300,000 × 300,000 matrix. Matrix inversion is \(O(n^3)\), which is approximately \((3 \times 10^5)^3 = 2.7 \times 10^{16}\) operations — completely infeasible. Gradient descent scales much better and only requires computing gradients incrementally.</div></div>
+      </div>
+    </div>
+
+    <h2 id="polynomial-regression">11. Polynomial Regression</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Motivation — Fitting Non-Linear Data</div>
+      <p>Real data is rarely perfectly linear. <strong>Polynomial regression</strong> extends linear regression by adding powers of input features, enabling the model to fit curved relationships while still using the linear regression framework.</p>
+      <p>For a single feature x, a degree-d polynomial model adds features \(x, x^2, x^3, \ldots, x^d\):</p>
+      <p>\[ \hat{y} = \theta_0 + \theta_1 x + \theta_2 x^2 + \cdots + \theta_d x^d \]</p>
+      <p>This is still a <em>linear model</em> in the <strong>parameters θ</strong> — we just engineered new features. We can use all the same tools: MSE cost, gradient descent, normal equation.</p>
+    </div>
+
+    <table>
+      <thead><tr><th>Degree</th><th>Model complexity</th><th>Risk</th><th>Typical behaviour</th></tr></thead>
+      <tbody>
+        <tr><td><strong>d = 1</strong></td><td>Linear (straight line)</td><td>Underfitting (high bias)</td><td>Poor fit if data is curved</td></tr>
+        <tr><td><strong>d = 2–3</strong></td><td>Moderate</td><td>Balanced</td><td>Usually captures real patterns well</td></tr>
+        <tr><td><strong>d = 8+</strong></td><td>Very complex</td><td>Overfitting (high variance)</td><td>Fits training data perfectly; oscillates wildly on new data</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 Polynomial Degree &amp; Regularization — 2024 Exam Style</div>
+      <p>A typical 2024 MidSem question compared four models (A: linear, B: degree-8, C: degree-8 + Ridge, D: degree-8 + Lasso) and asked to rank their training RMSE, test RMSE, and identify high bias vs high variance:</p>
+      <ul>
+        <li><strong>Model A (linear on curved data):</strong> High training RMSE AND high test RMSE → <strong>high bias (underfitting)</strong>.</li>
+        <li><strong>Model B (degree-8, no regularization):</strong> Very low training RMSE, high test RMSE → <strong>high variance (overfitting)</strong>.</li>
+        <li><strong>Model C (degree-8 + Ridge):</strong> Slightly higher training RMSE than B; lower test RMSE — penalises all large weights evenly. <strong>Good generalisation if λ well-tuned</strong>.</li>
+        <li><strong>Model D (degree-8 + Lasso):</strong> Sets many of the degree-8 coefficients exactly to zero → effectively reduces the polynomial degree. <strong>Automatic model simplification + feature selection</strong>.</li>
+      </ul>
+      <p><strong>RMSE ranking (training, lowest to highest):</strong> B &lt; C ≈ D &lt; A.<br>
+      <strong>RMSE ranking (test, lowest to highest):</strong> C ≈ D &lt; A &lt; B.</p>
+    </div>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Choosing the Right Polynomial Degree</div>
+      <p><strong>Q:</strong> You fit polynomial models of degree 1 through 10 to a dataset. Training MSE keeps decreasing. Validation MSE decreases until degree 4 then increases. What should you do?</p>
+      <button class="reveal-btn">▶ Show answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Degree 4 is the sweet spot.</strong> Below degree 4: validation MSE is still high → model is too simple (underfitting). Above degree 4: validation MSE rises even though training MSE drops → model is memorising noise (overfitting).</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Training MSE always decreases</strong> as degree increases — a model with more parameters can always fit training data better. This is why you must never use training error alone to choose model complexity.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Choose degree 4.</strong> To confirm: apply regularization (Ridge/Lasso) and compare test RMSE across degrees. Alternatively, use cross-validation to estimate generalisation error at each degree.</div></div>
+      </div>
+    </div>
+
+    <h2 id="bias-variance">12. Bias–Variance Trade-off</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 The Core Idea</div>
+      <p>\[ \text{Total Error} = \text{Bias}^2 + \text{Variance} + \text{Irreducible Noise} \]</p>
+      <ul>
+        <li><strong>Bias</strong> = error from wrong assumptions (model too simple). High bias → underfitting → high training AND test error.</li>
+        <li><strong>Variance</strong> = error from sensitivity to training data fluctuations (model too complex). High variance → overfitting → low training error but high test error.</li>
+        <li><strong>Irreducible noise</strong> = inherent randomness in data — cannot be reduced.</li>
+      </ul>
+    </div>
+
+    <table>
+      <thead><tr><th>Observation</th><th>Diagnosis</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Training error ≈ validation error, both HIGH</td><td>High bias (underfitting)</td><td>More features, more complex model, reduce λ</td></tr>
+        <tr><td>Training error LOW, validation error HIGH</td><td>High variance (overfitting)</td><td>More training data, regularization (increase λ), simpler model, early stopping</td></tr>
+        <tr><td>Training error ≈ validation error, both LOW</td><td>Well-fitted model ✓</td><td>Deploy!</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Classic Exam Scenario — Ridge Regression</div>
+      <p><strong>Q:</strong> You use Ridge Regression. Training error and validation error are almost equal and fairly high. Does the model have high bias or high variance? Should you increase or decrease λ?</p>
+      <button class="reveal-btn">▶ Show answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Diagnosis:</strong> Both errors are high and equal → the model is <strong>underfitting</strong> → <strong>high bias</strong>.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>What to do:</strong> <strong>Decrease λ</strong>. Higher λ increases regularization → more bias (simpler model). We need less regularization to allow the model to fit the data better.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Rule:</strong> ↑ λ → ↑ bias, ↓ variance. ↓ λ → ↓ bias, ↑ variance. Cross-validation finds the sweet spot.</div></div>
+      </div>
+    </div>
+
+    <h2 id="regularization">13. Regularization (Ridge &amp; Lasso)</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Why Regularization?</div>
+      <p>Overfitting happens when a model learns noise in training data. Regularization adds a <strong>penalty term</strong> to the cost function that discourages large coefficients (large weights = overfit signal).</p>
+    </div>
+
+    <div class="formula-grid">
+      <div class="formula-card">
+        <h4>L2 Regularization — Ridge</h4>
+        <p>\[ J(\boldsymbol{\theta}) = \text{MSE} + \lambda \sum_{j=1}^{n} \theta_j^2 \]</p>
+        <p>Penalises the <em>squared</em> size of coefficients. Shrinks all coefficients towards zero but <strong>never exactly to zero</strong>. Uses all features.</p>
+        <p>Use when: all features are potentially relevant.</p>
+      </div>
+      <div class="formula-card">
+        <h4>L1 Regularization — Lasso</h4>
+        <p>\[ J(\boldsymbol{\theta}) = \text{MSE} + \lambda \sum_{j=1}^{n} |\theta_j| \]</p>
+        <p>Penalises the <em>absolute</em> size of coefficients. Can set some coefficients <strong>exactly to zero → automatic feature selection</strong>. Produces sparse models.</p>
+        <p>Use when: many features, expect some to be irrelevant.</p>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th></th><th>Ridge (L2)</th><th>Lasso (L1)</th></tr></thead>
+      <tbody>
+        <tr><td>Penalty</td><td>\(\lambda \|\boldsymbol{\theta}\|_2^2\)</td><td>\(\lambda \|\boldsymbol{\theta}\|_1\)</td></tr>
+        <tr><td>Coefficients set to zero?</td><td>No (approaches zero)</td><td>Yes (exact zeros possible)</td></tr>
+        <tr><td>Feature selection?</td><td>No</td><td>Yes</td></tr>
+        <tr><td>Best for</td><td>All features matter (multicollinearity)</td><td>High-dim, sparse, irrelevant features present</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 Which regularization? — Exam favourite</div>
+      <p><strong>Q: "Dataset with hundreds of predictors, many redundant or irrelevant" → which regularization?</strong></p>
+      <p>→ <strong>Lasso (L1)</strong>. It drives irrelevant feature coefficients exactly to zero, effectively performing automatic feature selection and producing an interpretable sparse model.</p>
+    </div>
+
+    <h2 id="r-squared">14. R² &amp; Model Evaluation for Regression</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 R-squared (Coefficient of Determination)</div>
+      <p>\[ R^2 = 1 - \frac{SS_{\text{res}}}{SS_{\text{tot}}} = 1 - \frac{\sum(y_i - \hat{y}_i)^2}{\sum(y_i - \bar{y})^2} \]</p>
+      <ul>
+        <li>R² = 1.0 → perfect fit (model explains all variance)</li>
+        <li>R² = 0.0 → model performs no better than predicting the mean</li>
+        <li>R² &lt; 0 → model is worse than predicting the mean (possible with regularization)</li>
+      </ul>
+      <p><strong>Interpretation:</strong> R² = 0.76 means the model explains 76% of the variance in y. The remaining 24% is unexplained by the model.</p>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ══════════════════════════════════════════════
+         PART IV
+    ══════════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-iv">Part IV — Classification &amp; Logistic Regression</h2>
+    <p class="part-sub">Sections 15–20 · Appears as Q4; sigmoid behaviour, weight interpretation, and the LR→classification gap frequently tested</p>
+
+    <div class="starting-guide-wrapper" id="starting-guide-iv">
+      <h3>Starting Guide — Part IV</h3>
+      <p><strong>In one sentence:</strong> Logistic regression uses a sigmoid to squash a linear score into a probability, then optimises log-loss via gradient descent.</p>
+      <p><strong>Key questions the exam asks:</strong></p>
+      <ul>
+        <li>Why can't you use linear regression directly for classification? (unbounded outputs, non-convex cost)</li>
+        <li>J(θ)=0 → is the model good? (No — it's overfitting the training data)</li>
+        <li>Large weights → what happens to the sigmoid? (It becomes a step function → overfitting)</li>
+        <li>Why must you scale features before logistic regression?</li>
+        <li>Interpret a weight: "θ₁ = 0.5" → what does it mean in terms of log-odds?</li>
+      </ul>
+    </div>
+
+    <h2 id="lr-fails">15. Why Linear Regression Fails for Classification</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 The Problem — Outputs Are Unbounded</div>
+      <p>Linear regression outputs \(\hat{y} = \boldsymbol{\theta}^T \mathbf{x}\), which can take any value from −∞ to +∞. For classification, we need a <strong>probability</strong>, which must stay in [0, 1].</p>
+      <p>Two concrete problems when you force linear regression onto binary labels:</p>
+      <ul>
+        <li><strong>Probabilities go out of range</strong>: Linear output can produce values like −0.3 or 1.7 — meaningless as probabilities.</li>
+        <li><strong>Non-convex cost function</strong>: Using MSE loss with a sigmoid output creates a loss surface with many local minima. Gradient descent can get stuck and fail to find the global minimum.</li>
+        <li><strong>Sensitive to outliers</strong>: An extreme training example can pull the linear regression line significantly, shifting the decision boundary in unpredictable ways.</li>
+      </ul>
+    </div>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 The Fix — Logistic Regression</div>
+      <p>Instead of predicting y directly, we model the <strong>probability</strong> that y = 1:</p>
+      <p>\[ P(y=1|\mathbf{x}) = \sigma(\boldsymbol{\theta}^T \mathbf{x}) = \frac{1}{1 + e^{-\boldsymbol{\theta}^T \mathbf{x}}} \]</p>
+      <p>The sigmoid function \(\sigma(z) = \frac{1}{1+e^{-z}}\) <strong>squashes any real number into (0, 1)</strong>, making the output a valid probability.</p>
+      <p>We then use <strong>cross-entropy (log-loss)</strong> instead of MSE — this gives a convex loss surface, guaranteeing gradient descent finds the global minimum.</p>
+    </div>
+
+    <table>
+      <thead><tr><th></th><th>Linear Regression on Binary Labels</th><th>Logistic Regression</th></tr></thead>
+      <tbody>
+        <tr><td>Output range</td><td>−∞ to +∞ ❌</td><td>(0, 1) ✓</td></tr>
+        <tr><td>Interpretation</td><td>Not a probability ❌</td><td>P(y=1|x) ✓</td></tr>
+        <tr><td>Cost function</td><td>MSE → non-convex ❌</td><td>Log-loss → convex ✓</td></tr>
+        <tr><td>Sensitive to outliers?</td><td>Yes (bad) ❌</td><td>Less sensitive ✓</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 Classic Exam Q: "Why not use linear regression for classification?"</div>
+      <p>Full marks answer must mention <strong>three things</strong>: (1) outputs not bounded to [0,1] — invalid probabilities; (2) MSE on binary labels creates non-convex cost with local minima; (3) the model is sensitive to outliers in a way that distorts the decision boundary.</p>
+    </div>
+
+    <h2 id="classification-basics">16. Classification Basics</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Decision Boundary</div>
+      <p>A classification model learns a <strong>decision boundary</strong> — a surface that separates classes in feature space.</p>
+      <ul>
+        <li><strong>Linear boundary</strong>: a straight line (2D), plane (3D), or hyperplane (nD). Linear models draw this.</li>
+        <li><strong>Non-linear boundary</strong>: curves, circles, complex shapes. Decision trees and neural networks can draw these.</li>
+      </ul>
+      <p>Logistic regression draws a <strong>linear decision boundary</strong> in the original feature space.</p>
+    </div>
+
+    <h2 id="sigmoid-logistic">17. Sigmoid Function &amp; Logistic Regression</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 The Sigmoid (S-curve)</div>
+      <p>\[ \sigma(z) = \frac{1}{1 + e^{-z}} \]</p>
+      <p>Maps any real number z to the range (0, 1). Output is interpreted as a <strong>probability</strong>.</p>
+      <ul>
+        <li>z → +∞: σ(z) → 1 (predict class 1)</li>
+        <li>z → −∞: σ(z) → 0 (predict class 0)</li>
+        <li>z = 0: σ(z) = 0.5 (decision boundary)</li>
+      </ul>
+    </div>
+
+    <p>For logistic regression: \( z = \boldsymbol{\theta}^T \mathbf{x} = \theta_0 + \theta_1 x_1 + \cdots \), so:</p>
+    <p>\[ P(y=1 | \mathbf{x}) = \sigma(\boldsymbol{\theta}^T \mathbf{x}) = \frac{1}{1 + e^{-\boldsymbol{\theta}^T \mathbf{x}}} \]</p>
+
+    <p><strong>Predict class 1</strong> if P(y=1|x) ≥ 0.5, i.e., when \(\boldsymbol{\theta}^T \mathbf{x} \geq 0\).</p>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Sigmoid &amp; Overfitting — Classic Exam Question</div>
+      <p><strong>Q:</strong> Plot σ(wx) for w ∈ {1, 10, 100}. How does increasing w cause overfitting?</p>
+      <button class="reveal-btn">▶ Show answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>w=1:</strong> Smooth, gradual curve — gentle transition from 0 to 1 over a wide range of x.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>w=10:</strong> Steeper curve — transitions from 0 to 1 much more rapidly near x=0.</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>w=100:</strong> Almost a step function at x=0 — essentially 0 for x&lt;0, 1 for x&gt;0.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Why overfitting:</strong> Very large weights make the sigmoid hyper-confident. Even a tiny distance from the decision boundary results in a probability near 0 or 1. The model perfectly memorises the training data boundary but generalises poorly — a classic sign of overfitting. Fix: L2 regularization penalises large weights.</div></div>
+      </div>
+    </div>
+
+    <h2 id="log-loss">18. Log-Loss (Cross-Entropy) &amp; Training</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Why not use MSE for classification?</div>
+      <p>MSE + sigmoid gives a non-convex cost function with many local minima. <strong>Log-loss gives a convex cost</strong> → gradient descent guaranteed to find the global minimum.</p>
+    </div>
+
+    <p>\[ J(\boldsymbol{\theta}) = -\frac{1}{m} \sum_{i=1}^{m} \left[ y^{(i)} \log(\hat{p}^{(i)}) + (1 - y^{(i)}) \log(1 - \hat{p}^{(i)}) \right] \]</p>
+    <p>where \(\hat{p}^{(i)} = \sigma(\boldsymbol{\theta}^T \mathbf{x}^{(i)})\).</p>
+
+    <p><strong>Intuition:</strong> When y=1, we want \(\hat{p}\) close to 1 → −log(1) = 0 (no penalty). If \(\hat{p}\) is near 0 → −log(0) = ∞ (huge penalty). When y=0, the second term does the same work.</p>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 J(θ)=0 — True or False Statements (Appears in every paper)</div>
+      <p><strong>Q:</strong> You train logistic regression and achieve J(θ₀,θ₁) = 0. Which statements are true?</p>
+      <ul>
+        <li>a) The model will work perfectly on unseen data.</li>
+        <li>b) h_θ(x⁽ⁱ⁾) = y⁽ⁱ⁾ for every training example.</li>
+        <li>c) θ₀ and θ₁ must both be 0.</li>
+        <li>d) J(θ) cannot be 0.</li>
+      </ul>
+      <button class="reveal-btn">▶ Show answers</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">a</div><div class="step-content"><strong>FALSE.</strong> J=0 means perfect fit on training data → the model is <strong>overfitted</strong>. It memorised training data and will likely perform poorly on unseen data.</div></div>
+        <div class="solution-step"><div class="step-num">b</div><div class="step-content"><strong>TRUE.</strong> If J=0, the log-loss sum equals zero, which means every term must be 0, which means h_θ(x⁽ⁱ⁾) = y⁽ⁱ⁾ exactly for all training examples.</div></div>
+        <div class="solution-step"><div class="step-num">c</div><div class="step-content"><strong>FALSE.</strong> θ=0 gives h_θ(x)=0.5 for all x — not necessarily 0 loss. The parameters can take any values that perfectly separate the training classes.</div></div>
+        <div class="solution-step"><div class="step-num">d</div><div class="step-content"><strong>FALSE.</strong> J can be 0 if the training data is linearly separable and large weights push all predictions to exactly 0 or 1.</div></div>
+      </div>
+    </div>
+
+    <h2 id="weights-interpretation">19. Interpretation of Weights (Log-Odds)</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Coefficients = Change in Log-Odds</div>
+      <p>Starting from the sigmoid and taking the log-odds (logit):</p>
+      <p>\[ \text{logit}(P(y=1)) = \log\frac{P(y=1)}{P(y=0)} = \boldsymbol{\theta}^T \mathbf{x} = \theta_0 + \theta_1 x_1 + \cdots \]</p>
+      <p>So <strong>θⱼ = the change in log-odds of the positive class for a one-unit increase in xⱼ</strong> (all other features fixed).</p>
+      <ul>
+        <li>θⱼ &gt; 0 → increasing xⱼ increases probability of y=1</li>
+        <li>θⱼ &lt; 0 → increasing xⱼ decreases probability of y=1</li>
+        <li>θⱼ ≈ 0 → feature xⱼ has little effect</li>
+      </ul>
+    </div>
+
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 Feature Scaling &amp; Logistic Regression</div>
+      <p><strong>Q: Why is feature scaling important for logistic regression?</strong></p>
+      <p>Because logistic regression is trained via gradient descent. Without scaling, features with large ranges dominate the gradient and the algorithm takes much longer to converge (or may oscillate). Scaling ensures all features contribute roughly equally to each gradient step.</p>
+    </div>
+
+    <h2 id="multiclass">20. Multi-Class Classification</h2>
+
+    <table>
+      <thead><tr><th>Strategy</th><th>How it works</th><th>When to use</th></tr></thead>
+      <tbody>
+        <tr><td><strong>One-vs-Rest (OvR)</strong></td><td>Train k binary classifiers, one for each class vs all others. Predict the class whose classifier is most confident.</td><td>Default; works well in practice</td></tr>
+        <tr><td><strong>Softmax (Multinomial)</strong></td><td>Single model outputs a probability vector over all k classes. \(\text{softmax}(z_k) = \frac{e^{z_k}}{\sum_j e^{z_j}}\). Probabilities sum to 1.</td><td>When classes are mutually exclusive</td></tr>
+      </tbody>
+    </table>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ══════════════════════════════════════════════
+         PART V
+    ══════════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-v">Part V — Evaluation Metrics</h2>
+    <p class="part-sub">Sections 21–23 · Guaranteed Q5 — always involves confusion matrix calculations</p>
+
+    <div class="starting-guide-wrapper" id="starting-guide-v">
+      <h3>Starting Guide — Part V</h3>
+      <p><strong>The most calculable part of the exam.</strong> Every paper has a confusion matrix question — memorise the formulas and you will always get full marks.</p>
+      <p><strong>The one thing to memorise:</strong> TP, FP, FN, TN are always relative to the class you call "Positive".</p>
+      <p><strong>Quick drill:</strong> Given CM with TP=60, FP=120, FN=0, TN=20:
+        Precision = 60/180 = 33.3%; Recall = 60/60 = 100%</p>
+    </div>
+
+    <h2 id="confusion-matrix">21. The Confusion Matrix</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Reading a Confusion Matrix</div>
+      <table>
+        <thead><tr><th></th><th>Predicted POSITIVE</th><th>Predicted NEGATIVE</th></tr></thead>
+        <tbody>
+          <tr><th>Actual POSITIVE</th><td><strong>TP</strong> (True Positive) ✓</td><td><strong>FN</strong> (False Negative — missed)</td></tr>
+          <tr><th>Actual NEGATIVE</th><td><strong>FP</strong> (False Positive — false alarm)</td><td><strong>TN</strong> (True Negative) ✓</td></tr>
+        </tbody>
+      </table>
+      <ul>
+        <li><strong>TP:</strong> Correctly predicted positive — hit</li>
+        <li><strong>FP:</strong> Predicted positive but actually negative — false alarm / Type I error</li>
+        <li><strong>FN:</strong> Predicted negative but actually positive — missed / Type II error</li>
+        <li><strong>TN:</strong> Correctly predicted negative</li>
+      </ul>
+    </div>
+
+    <h2 id="precision-recall">22. Precision, Recall, F1-score, Specificity</h2>
+
+    <div class="formula-grid">
+      <div class="formula-card">
+        <h4>Accuracy</h4>
+        <p>\[ \frac{TP + TN}{TP + FP + FN + TN} \]</p>
+        <p>Misleading on imbalanced data!</p>
+      </div>
+      <div class="formula-card">
+        <h4>Precision</h4>
+        <p>\[ \frac{TP}{TP + FP} \]</p>
+        <p>Of predicted positives, how many correct? Minimise false alarms.</p>
+      </div>
+      <div class="formula-card">
+        <h4>Recall (Sensitivity / TPR)</h4>
+        <p>\[ \frac{TP}{TP + FN} \]</p>
+        <p>Of actual positives, how many caught? Minimise missed cases.</p>
+      </div>
+      <div class="formula-card">
+        <h4>Specificity (TNR)</h4>
+        <p>\[ \frac{TN}{TN + FP} \]</p>
+        <p>Of actual negatives, how many correctly identified?</p>
+      </div>
+      <div class="formula-card">
+        <h4>F1-score</h4>
+        <p>\[ \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}} \]</p>
+        <p>Harmonic mean — balances both. Best for imbalanced data.</p>
+      </div>
+      <div class="formula-card">
+        <h4>False Positive Rate (FPR)</h4>
+        <p>\[ \frac{FP}{FP + TN} = 1 - \text{Specificity} \]</p>
+        <p>Used to plot ROC curve.</p>
+      </div>
+    </div>
+
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 When to use Precision vs Recall?</div>
+      <ul>
+        <li><strong>Maximise Precision</strong> when False Positives are costly — e.g., spam filter (don't flag important emails as spam), medical test where treatment has side effects.</li>
+        <li><strong>Maximise Recall</strong> when False Negatives are costly — e.g., cancer detection (don't miss any cancer), fraud detection (don't miss fraud).</li>
+        <li><strong>Use F1</strong> when you need balance between both.</li>
+      </ul>
+    </div>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Full Confusion Matrix Calculation (Credit Card Fraud)</div>
+      <p><strong>Given:</strong> Test set of 200 transactions. The model produces:</p>
+      <table>
+        <thead><tr><th></th><th>Predicted Fraud</th><th>Predicted Not Fraud</th></tr></thead>
+        <tbody>
+          <tr><th>Actual Fraud</th><td>60</td><td>0</td></tr>
+          <tr><th>Actual Not Fraud</th><td>120</td><td>20</td></tr>
+        </tbody>
+      </table>
+      <p>Calculate Precision, Recall, and Accuracy for the <strong>Fraud class</strong>.</p>
+      <button class="reveal-btn">▶ Show full solution</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Label TP, FP, FN, TN (Fraud = Positive):</strong><br>
+          TP = 60 (predicted Fraud, actual Fraud)<br>
+          FN = 0 (predicted Not Fraud, actual Fraud — missed none!)<br>
+          FP = 120 (predicted Fraud, actual Not Fraud — false alarms)<br>
+          TN = 20 (predicted Not Fraud, actual Not Fraud)</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Precision (Fraud):</strong> \(\frac{TP}{TP+FP} = \frac{60}{60+120} = \frac{60}{180} = 33.3\%\)<br><em>Only 1 in 3 fraud alerts is real — too many false alarms.</em></div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Recall (Fraud):</strong> \(\frac{TP}{TP+FN} = \frac{60}{60+0} = 100\%\)<br><em>Caught every single fraud transaction — perfect recall!</em></div></div>
+        <div class="solution-step"><div class="step-num">4</div><div class="step-content"><strong>Accuracy:</strong> \(\frac{60+20}{200} = \frac{80}{200} = 40\%\)<br><em>Very low accuracy despite catching all fraud — model is biased towards predicting Fraud.</em></div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Observations:</strong> The classifier has perfect recall for fraud but terrible precision (120 false alarms for 60 real frauds). This would flood the investigation team. The trade-off between precision and recall must be tuned via the decision threshold.</div></div>
+      </div>
+    </div>
+
+    <h3>Multi-class Precision &amp; Recall</h3>
+    <p>For a 3-class confusion matrix (Class A, B, C), to find precision/recall for Class B:</p>
+    <ul>
+      <li><strong>TP</strong> = correctly predicted B (diagonal cell for B)</li>
+      <li><strong>FP</strong> = other classes predicted as B (other rows in B's predicted column)</li>
+      <li><strong>FN</strong> = B instances predicted as other classes (other columns in B's actual row)</li>
+    </ul>
+
+    <div class="callout watch-out">
+      <div class="callout-label">⚠️ Accuracy Paradox — Class Imbalance (Exam favourite)</div>
+      <p>If 95% of loan applications are rejected, a model that <em>always</em> predicts "reject" achieves <strong>95% accuracy</strong> — but is completely useless (it never detects approvals).</p>
+      <p><strong>Accuracy is misleading on imbalanced datasets.</strong> Use Precision, Recall, F1, or AUC instead. This scenario appears in every paper that has a confusion matrix question.</p>
+      <p><strong>Always compute F1 and check the confusion matrix</strong> when class distribution is skewed.</p>
+    </div>
+
+    <h2 id="roc-auc">23. ROC Curve &amp; AUC</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 ROC Curve</div>
+      <p>A ROC curve plots <strong>True Positive Rate (Recall)</strong> on the y-axis vs <strong>False Positive Rate</strong> on the x-axis as the classification threshold varies from 1 → 0.</p>
+      <ul>
+        <li><strong>AUC = 1.0</strong>: Perfect classifier</li>
+        <li><strong>AUC = 0.5</strong>: Random classifier (diagonal line)</li>
+        <li><strong>AUC &gt; 0.7</strong>: Acceptable; &gt;0.8 good; &gt;0.9 excellent</li>
+      </ul>
+      <p>AUC = probability that a randomly chosen positive instance ranks higher than a randomly chosen negative instance.</p>
+    </div>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 TPR/FPR at Different Thresholds</div>
+      <p><strong>Given:</strong> True labels = [1, 0, 1, 0, 1], predicted probabilities = [0.9, 0.7, 0.6, 0.3, 0.2]</p>
+      <p>P=3, N=2. Calculate TPR and FPR at threshold &gt;0.8 and threshold &gt;0.5.</p>
+      <button class="reveal-btn">▶ Show solution</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Threshold &gt; 0.8:</strong> Only prob=0.9 is predicted positive.<br>
+        TP=1 (prob=0.9, true=1), FP=0, FN=2, TN=2<br>
+        TPR = 1/3 ≈ 0.33; FPR = 0/2 = 0.0<br>
+        ROC point: (0.0, 0.33)</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Threshold &gt; 0.5:</strong> Probs 0.9, 0.7, 0.6 are predicted positive.<br>
+        TP=2 (probs 0.9, 0.6 with true=1), FP=1 (prob=0.7 with true=0), FN=1, TN=1<br>
+        TPR = 2/3 ≈ 0.67; FPR = 1/2 = 0.5<br>
+        ROC point: (0.5, 0.67)</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">As threshold decreases: TPR increases (catch more positives) but FPR also increases (more false alarms). The ROC curve plots this trade-off.</div></div>
+      </div>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ══════════════════════════════════════════════
+         PART VI
+    ══════════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-vi">Part VI — Decision Trees</h2>
+    <p class="part-sub">Sections 24–27 · Always Q6; entropy + information gain calculation is guaranteed 4–6 marks</p>
+
+    <div class="starting-guide-wrapper" id="starting-guide-vi">
+      <h3>Starting Guide — Part VI</h3>
+      <p><strong>In one sentence:</strong> A decision tree repeatedly splits data by the attribute that gives the highest information gain (= greatest reduction in entropy).</p>
+      <p><strong>The exam always asks you to:</strong> compute entropy of the target class, compute entropy of each feature, compute information gain, pick the root node (the one with highest IG).</p>
+      <p><strong>Entropy formula:</strong> \(H(S) = -\sum_c p_c \log_2 p_c\) — where p_c is the fraction of class c in set S.</p>
+      <p><strong>Key facts to memorise:</strong></p>
+      <ul>
+        <li>H = 0 (pure node, all same class), H = 1 (50-50 split on 2 classes, maximum impurity)</li>
+        <li>IG = H(parent) − weighted average H(children)</li>
+        <li>Pick the attribute with the <strong>highest IG</strong> (= lowest weighted entropy) as root.</li>
+      </ul>
+    </div>
+
+    <h2 id="decision-trees">24. Decision Trees &amp; ID3 Algorithm</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 What is a Decision Tree?</div>
+      <p>A tree-structured model where each <strong>internal node</strong> tests an attribute, each <strong>branch</strong> is an attribute value, and each <strong>leaf node</strong> is a class prediction.</p>
+      <p><strong>ID3 algorithm:</strong> At each node, choose the attribute with the highest Information Gain → split the data → recurse. Stop when all instances in a node are the same class (pure leaf), or no attributes remain (use majority class).</p>
+    </div>
+
+    <h2 id="entropy-ig">25. Entropy &amp; Information Gain — Full Calculation</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Entropy Formula</div>
+      <p>\[ H(S) = -\sum_{c=1}^{k} p_c \log_2 p_c \]</p>
+      <p>where \(p_c\) = fraction of examples in class c, k = number of classes.</p>
+      <p><strong>Key values:</strong></p>
+      <ul>
+        <li>All one class: H = 0 (pure)</li>
+        <li>50-50 (2 classes): H = 1.0 bit (maximum impurity)</li>
+        <li>33-33-33 (3 classes): H = log₂(3) ≈ 1.585 bits</li>
+      </ul>
+    </div>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Information Gain Formula</div>
+      <p>\[ IG(S, A) = H(S) - \sum_{v \in \text{values}(A)} \frac{|S_v|}{|S|} \cdot H(S_v) \]</p>
+      <p>where S_v = subset of S where attribute A = v. The second term is the <strong>weighted average entropy</strong> of the children after splitting on A.</p>
+    </div>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Full ID3 Example — Entropy &amp; Information Gain (Dec 2025 MidSem style)</div>
+      <p><strong>Given dataset (12 records):</strong> 8 "Major" crash severity, 4 "Minor". Consider attribute "Driver Condition" with values {Alcohol, Sober} and "Weather" with values {Good, Bad}.</p>
+      <p>Distribution: Alcohol: 4 Major, 1 Minor; Sober: 4 Major, 3 Minor; Good: 5 Major, 2 Minor; Bad: 3 Major, 2 Minor.</p>
+      <button class="reveal-btn">▶ Show full calculation</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Parent Entropy H(S):</strong><br>
+        p(Major) = 8/12, p(Minor) = 4/12<br>
+        \(H(S) = -\frac{8}{12}\log_2\frac{8}{12} - \frac{4}{12}\log_2\frac{4}{12}\)<br>
+        = −(0.667 × (−0.585)) − (0.333 × (−1.585)) = 0.390 + 0.528 = <strong>0.918 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Driver Condition — entropy of each branch:</strong><br>
+        Alcohol (5 total: 4 Maj, 1 Min): \(H = -\frac{4}{5}\log_2\frac{4}{5} - \frac{1}{5}\log_2\frac{1}{5} = 0.722\)<br>
+        Sober (7 total: 4 Maj, 3 Min): \(H = -\frac{4}{7}\log_2\frac{4}{7} - \frac{3}{7}\log_2\frac{3}{7} = 0.985\)<br>
+        Weighted avg = \(\frac{5}{12}(0.722) + \frac{7}{12}(0.985) = 0.301 + 0.574 = 0.875\)<br>
+        <strong>IG(Driver) = 0.918 − 0.875 = 0.043</strong></div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Weather Condition — entropy of each branch:</strong><br>
+        Good (7 total: 5 Maj, 2 Min): \(H = -\frac{5}{7}\log_2\frac{5}{7} - \frac{2}{7}\log_2\frac{2}{7} = 0.863\)<br>
+        Bad (5 total: 3 Maj, 2 Min): \(H = -\frac{3}{5}\log_2\frac{3}{5} - \frac{2}{5}\log_2\frac{2}{5} = 0.971\)<br>
+        Weighted avg = \(\frac{7}{12}(0.863) + \frac{5}{12}(0.971) = 0.503 + 0.405 = 0.908\)<br>
+        <strong>IG(Weather) = 0.918 − 0.908 = 0.010</strong></div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Choose root node:</strong> IG(Driver Condition) = 0.043 &gt; IG(Weather) = 0.010. Therefore, <strong>Driver Condition</strong> is selected as the root node.</div></div>
+      </div>
+    </div>
+
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Entropy Calculation — Node Split (2024 MidSem Makeup style)</div>
+      <p><strong>Q:</strong> A node has {12, 8} objects of class 1 and class 2. After splitting on attribute B: Left child {9,1}, Right child {3,7}. Compute entropy of parent, children, and IG.</p>
+      <button class="reveal-btn">▶ Show solution</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Parent (20 total: 12 class1, 8 class2):</strong><br>
+        \(H = -\frac{12}{20}\log_2\frac{12}{20} - \frac{8}{20}\log_2\frac{8}{20} = -(0.6 \times (-0.737)) - (0.4 \times (-1.322))\)<br>
+        = 0.442 + 0.529 = <strong>0.971 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Left child (10 total: 9 class1, 1 class2):</strong><br>
+        \(H_L = -\frac{9}{10}\log_2\frac{9}{10} - \frac{1}{10}\log_2\frac{1}{10} = 0.469\)</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Right child (10 total: 3 class1, 7 class2):</strong><br>
+        \(H_R = -\frac{3}{10}\log_2\frac{3}{10} - \frac{7}{10}\log_2\frac{7}{10} = 0.881\)</div></div>
+        <div class="solution-step"><div class="step-num">4</div><div class="step-content"><strong>Weighted entropy after split:</strong><br>
+        \(\frac{10}{20}(0.469) + \frac{10}{20}(0.881) = 0.235 + 0.441 = 0.675\)</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>IG = 0.971 − 0.675 = 0.296 bits</strong><br>
+        The split on attribute B reduced impurity by 0.296 bits — a significant improvement.</div></div>
+      </div>
+    </div>
+
+    <h2 id="gain-ratio">26. Gain Ratio (C4.5)</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 The Problem with Information Gain</div>
+      <p>IG <strong>favours attributes with many unique values</strong> (e.g., Transaction ID, Name) — a unique-value attribute perfectly separates every example but creates useless leaves.</p>
+      <p><strong>Gain Ratio</strong> normalises IG by the <strong>Split Information (SplitInfo)</strong> — the entropy of the attribute's value distribution:</p>
+      <p>\[ \text{SplitInfo}(S, A) = -\sum_{v} \frac{|S_v|}{|S|} \log_2 \frac{|S_v|}{|S|} \]</p>
+      <p>\[ \text{GainRatio}(S, A) = \frac{IG(S, A)}{\text{SplitInfo}(S, A)} \]</p>
+      <p>An attribute with many distinct values has high SplitInfo → low GainRatio → penalised.</p>
+    </div>
+
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 IG vs Gain Ratio — Standard Exam Answer</div>
+      <p><strong>Q: "What is the limitation of Information Gain, and how can it be addressed?"</strong></p>
+      <p>→ IG tends to favour attributes with many distinct values (e.g., IDs, dates), which may not create meaningful splits. This is addressed by <strong>Gain Ratio</strong> (used in C4.5), which penalises attributes with high cardinality by dividing IG by the split information of the attribute itself.</p>
+    </div>
+
+    <h2 id="overfitting-pruning">27. Overfitting &amp; Pruning in Decision Trees</h2>
+
+    <div class="callout concept">
+      <div class="callout-label">💡 Why Decision Trees Overfit</div>
+      <p>A fully grown decision tree will achieve ~100% accuracy on training data by memorising every training example (creating very specific rules that only apply to those exact examples). On new data, it performs poorly.</p>
+      <p><strong>Signs of overfitting in DT:</strong> training accuracy near 100% + test accuracy much lower.</p>
+      <p><strong>The exam trap:</strong> "Assessing a decision tree using only training data is detrimental." → TRUE. The training accuracy can be 100% while test accuracy is much lower.</p>
+    </div>
+
+    <table>
+      <thead><tr><th>Technique</th><th>How it works</th><th>Advantage</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Pre-pruning (Early stopping)</strong></td><td>Stop growing the tree when: depth limit reached; node has too few samples; IG below threshold; chi-squared test fails</td><td>Fast, simple. But "myopic" — may stop before capturing XOR-like interactions</td></tr>
+        <tr><td><strong>Post-pruning</strong></td><td>Grow full tree → prune back branches that don't improve validation set performance (reduced error pruning)</td><td>Can capture complex interactions first, then simplify. Generally more effective</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Handling Continuous Attributes (C4.5)</h3>
+    <p>C4.5 handles continuous features by:</p>
+    <ol>
+      <li>Sort instances by the continuous attribute value</li>
+      <li>Identify <strong>candidate split points</strong> = midpoints between adjacent values where the class label changes</li>
+      <li>Evaluate IG (or Gain Ratio) at each candidate threshold</li>
+      <li>Choose the threshold with the highest IG</li>
+    </ol>
+
+    <h3>Handling Missing Values in Decision Trees</h3>
+    <p>C4.5 uses <strong>probabilistic (fractional) splitting</strong>: instances with missing attribute values are distributed fractionally across all branches, proportional to how other non-missing instances split.</p>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ══════════════════════════════════════════════
+         PART VII — EXAM PREP
+    ══════════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-vii">Part VII — Exam Preparation</h2>
+    <p class="part-sub">Sections 28–30 · Patterns, formula sheet &amp; worked templates</p>
+
+    <div class="starting-guide-wrapper" id="starting-guide-vii">
+      <h3>Starting Guide — Part VII</h3>
+      <p><strong>What to do 24 hours before the exam:</strong></p>
+      <ol>
+        <li>Run through the formula sheet — tick off everything you know</li>
+        <li>Do one full entropy+IG calculation from scratch</li>
+        <li>Do one full confusion matrix calculation from scratch</li>
+        <li>Review the bias–variance table and regularization rules</li>
+        <li>Memorise Mitchell's definition and the T/P/E identification drill</li>
+      </ol>
+    </div>
+
+    <h2 id="exam-patterns">28. Exam Patterns &amp; Recurring Question Types</h2>
+
+    <p>Analysis of <strong>8 MidSem papers (2023–2026)</strong> reveals these recurring questions:</p>
+
+    <table>
+      <thead><tr><th>Question Pattern</th><th>Papers appeared</th><th>Key points to cover</th></tr></thead>
+      <tbody>
+        <tr><td>Mitchell's T/P/E identification + performance measures</td><td>Every paper</td><td>Name T, P, E; name 2 performance measures; identify learning type (supervised/unsupervised/RL)</td></tr>
+        <tr><td>Messy dataset — find 5–6 quality issues</td><td>Every paper (some use same dataset!)</td><td>Use the 6-type checklist: missing, outlier, inconsistent format, duplicate, unit mismatch, encoding inconsistency</td></tr>
+        <tr><td>Ridge regression high bias scenario</td><td>2023, 2023-2, 2024 Makeup, Sample QP</td><td>Equal high training &amp; val error → underfitting → decrease λ</td></tr>
+        <tr><td>GD vs Normal Equation for large data</td><td>2023, 2023-2, Sample QP</td><td>Normal equation O(n³) → GD for large n</td></tr>
+        <tr><td>J(θ)=0 true/false statements</td><td>2023, 2023-2, Sample QP</td><td>False: works on unseen; True: fits training exactly; False: θ≠0 necessarily; False: J can be 0</td></tr>
+        <tr><td>Feature scaling T/F statements</td><td>2024 Makeup</td><td>Speeds convergence = True; guarantees global min = False; prevents singularity = False; prevents local optima = False</td></tr>
+        <tr><td>Confusion matrix → Precision, Recall, F1</td><td>Every paper</td><td>Apply formulas; interpret in context; discuss precision-recall trade-off</td></tr>
+        <tr><td>ID3 decision tree — entropy &amp; IG calculation</td><td>Every paper</td><td>Compute H(S), H per attribute value, weighted avg H, IG; choose root with highest IG</td></tr>
+        <tr><td>Overfit DT — why training accuracy misleads</td><td>Sample QP, 2023, 2024</td><td>Full tree achieves ~100% training accuracy but generalises poorly → always evaluate on test/validation data</td></tr>
+        <tr><td>Lasso vs Ridge — which for feature selection?</td><td>2024 Regular, 2024 Makeup</td><td>Lasso for sparse/irrelevant features; Ridge when all features matter</td></tr>
+        <tr><td>Entropy bits question (4 classes uniform)</td><td>2024 Regular</td><td>H = log₂(4) = 2 bits; non-uniform → lower entropy; rare event needs more bits</td></tr>
+        <tr><td>Overfitting symptoms &amp; sigmoid overfitting</td><td>2024 Regular, Makeup</td><td>High train acc + low val acc; large weights → step function → overfit</td></tr>
+        <tr><td>Polynomial regression Model A/B/C/D comparison</td><td>2024 Regular, 2024 Makeup</td><td>Linear = underfitting; degree-8 no reg = overfitting; degree-8 + Lasso = feature selection; rank RMSE train vs test</td></tr>
+        <tr><td>Stratified split for imbalanced dataset</td><td>2024 Regular</td><td>Random split risks distorting class distribution; stratified split preserves class ratios in each fold</td></tr>
+        <tr><td>Why LR fails for classification</td><td>2024 Makeup, 2025</td><td>Outputs unbounded (not a probability); MSE on binary → non-convex cost; sensitive to outliers. Fix: sigmoid + log-loss</td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="formula-sheet">29. Quick-Reference Formula Sheet</h2>
+
+    <h3>Core ML Formulas</h3>
+    <div class="formula-grid">
+      <div class="formula-card">
+        <h4>Mitchell's Definition</h4>
+        <p>T = Task; P = Performance; E = Experience.<br>Performance on T improves with E, measured by P.</p>
+      </div>
+      <div class="formula-card">
+        <h4>MSE Cost Function</h4>
+        <p>\[ J(\boldsymbol{\theta}) = \frac{1}{2m}\sum_{i=1}^m \bigl(\hat{y}^{(i)} - y^{(i)}\bigr)^2 \]</p>
+      </div>
+      <div class="formula-card">
+        <h4>GD Update Rule</h4>
+        <p>\[ \theta_j \leftarrow \theta_j - \alpha \frac{\partial J}{\partial \theta_j} \]</p>
+        <p>MSE gradient: \[ \frac{1}{m}\sum_i\bigl(\hat{y}^{(i)}-y^{(i)}\bigr)x_j^{(i)} \]</p>
+      </div>
+      <div class="formula-card">
+        <h4>Normal Equation</h4>
+        <p>\[ \boldsymbol{\theta} = (X^T X)^{-1} X^T \mathbf{y} \]</p>
+        <p>Exact solution; use only for small n. Cost: O(n³)</p>
+      </div>
+      <div class="formula-card">
+        <h4>Ridge (L2)</h4>
+        <p>\[ J = \text{MSE} + \lambda\sum_j \theta_j^2 \]</p>
+        <p>Shrinks all weights. Never sets exactly to zero.</p>
+      </div>
+      <div class="formula-card">
+        <h4>Lasso (L1)</h4>
+        <p>\[ J = \text{MSE} + \lambda\sum_j |\theta_j| \]</p>
+        <p>Can zero out coefficients → feature selection.</p>
+      </div>
+      <div class="formula-card">
+        <h4>Sigmoid</h4>
+        <p>\[ \sigma(z) = \frac{1}{1+e^{-z}} \]</p>
+        <p>Maps ℝ → (0,1). Decision boundary at z = 0.</p>
+      </div>
+      <div class="formula-card">
+        <h4>Log-Loss (Cross-Entropy)</h4>
+        <p>\[ J = -\frac{1}{m}\sum_i\bigl[y^{(i)}\log\hat{p}^{(i)} + (1-y^{(i)})\log(1-\hat{p}^{(i)})\bigr] \]</p>
+      </div>
+      <div class="formula-card">
+        <h4>Log-Odds</h4>
+        <p>\[ \log\frac{P(y=1)}{P(y=0)} = \boldsymbol{\theta}^T\mathbf{x} \]</p>
+        <p>θⱼ = change in log-odds per unit xⱼ increase</p>
+      </div>
+      <div class="formula-card">
+        <h4>R-squared</h4>
+        <p>\[ R^2 = 1 - \frac{SS_{\text{res}}}{SS_{\text{tot}}} \]</p>
+        <p>Range: (−∞, 1]. 1 = perfect fit, 0 = mean baseline.</p>
+      </div>
+      <div class="formula-card">
+        <h4>Z-score Scaling</h4>
+        <p>\[ x' = \frac{x - \mu}{\sigma} \]</p>
+        <p>Output: mean = 0, std = 1</p>
+      </div>
+      <div class="formula-card">
+        <h4>IQR Outlier Rule</h4>
+        <p>Outlier if \(x < Q_1 - 1.5 \times IQR\) or \(x > Q_3 + 1.5 \times IQR\)</p>
+        <p>\(IQR = Q_3 - Q_1\)</p>
+      </div>
+      <div class="formula-card">
+        <h4>Polynomial Regression (degree d)</h4>
+        <p>\[ \hat{y} = \theta_0 + \theta_1 x + \theta_2 x^2 + \cdots + \theta_d x^d \]</p>
+        <p>Still linear in θ; features engineered as powers of x.</p>
+      </div>
+      <div class="formula-card">
+        <h4>Min-Max Normalisation</h4>
+        <p>\[ x' = \frac{x - x_{\min}}{x_{\max} - x_{\min}} \]</p>
+        <p>Maps all values to [0, 1].</p>
+      </div>
+    </div>
+
+    <h3>Evaluation Metric Formulas</h3>
+    <div class="formula-grid">
+      <div class="formula-card">
+        <h4>Accuracy</h4>
+        <p>\[ \frac{TP+TN}{TP+FP+FN+TN} \]</p>
+        <p>⚠️ Misleading on imbalanced data</p>
+      </div>
+      <div class="formula-card">
+        <h4>Precision</h4>
+        <p>\[ \frac{TP}{TP+FP} \]</p>
+        <p>Minimise if FP is costly (spam filter)</p>
+      </div>
+      <div class="formula-card">
+        <h4>Recall (TPR)</h4>
+        <p>\[ \frac{TP}{TP+FN} \]</p>
+        <p>Maximise if FN is costly (cancer, fraud)</p>
+      </div>
+      <div class="formula-card">
+        <h4>Specificity (TNR)</h4>
+        <p>\[ \frac{TN}{TN+FP} \]</p>
+      </div>
+      <div class="formula-card">
+        <h4>FPR (x-axis of ROC)</h4>
+        <p>\[ \frac{FP}{FP+TN} = 1 - \text{Specificity} \]</p>
+      </div>
+      <div class="formula-card">
+        <h4>F1-score</h4>
+        <p>\[ \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}} \]</p>
+        <p>Best summary for imbalanced data</p>
+      </div>
+    </div>
+
+    <h3>Decision Tree Formulas</h3>
+    <div class="formula-grid">
+      <div class="formula-card">
+        <h4>Entropy</h4>
+        <p>\[ H(S) = -\sum_c p_c \log_2 p_c \]</p>
+        <p>H=0 (pure node), H=1 (50/50 binary)</p>
+      </div>
+      <div class="formula-card">
+        <h4>Information Gain</h4>
+        <p>\[ IG(S,A) = H(S) - \sum_v \frac{|S_v|}{|S|}H(S_v) \]</p>
+        <p>Higher IG → better split attribute</p>
+      </div>
+      <div class="formula-card">
+        <h4>Split Information</h4>
+        <p>\[ \text{SplitInfo}(S,A) = -\sum_v \frac{|S_v|}{|S|}\log_2\frac{|S_v|}{|S|} \]</p>
+      </div>
+      <div class="formula-card">
+        <h4>Gain Ratio (C4.5)</h4>
+        <p>\[ \text{GainRatio}(S,A) = \frac{IG(S,A)}{\text{SplitInfo}(S,A)} \]</p>
+        <p>Penalises high-cardinality attributes</p>
+      </div>
+      <div class="formula-card">
+        <h4>Entropy (2 classes)</h4>
+        <p>If p = fraction of class 1:</p>
+        <p>\[ H = -p\log_2 p - (1-p)\log_2(1-p) \]</p>
+      </div>
+      <div class="formula-card">
+        <h4>Bits for k classes</h4>
+        <p>Minimum bits for k equally likely classes:</p>
+        <p>\[ \log_2 k \quad\text{(e.g., 4 classes → 2 bits)} \]</p>
+      </div>
+    </div>
+
+    <h2 id="worked-templates">30. Worked Templates — One Per Question Type</h2>
+
+    <h3>Template A — Mitchell's T/P/E (Guaranteed Q1)</h3>
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Template: Weather Prediction</div>
+      <p><strong>Q:</strong> A system uses historical weather data to predict whether tomorrow will be Sunny, Rainy, or Windy. What is T, P, E? Name 2 performance measures.</p>
+      <button class="reveal-btn">▶ Show template answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">T</div><div class="step-content"><strong>Task:</strong> Predict tomorrow's weather as Sunny, Rainy, or Windy. This is a <em>supervised classification</em> task.</div></div>
+        <div class="solution-step"><div class="step-num">P</div><div class="step-content"><strong>Performance:</strong> The fraction of days on which the weather is predicted correctly. Performance measures: <em>Accuracy, Precision/Recall, F1-score, AUC-ROC</em>.</div></div>
+        <div class="solution-step"><div class="step-num">E</div><div class="step-content"><strong>Experience:</strong> The historical weather dataset — past records of weather conditions and their actual outcomes.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">Learning type: <strong>Supervised learning</strong> (labelled historical data). If asked about rainfall amount (continuous) → Regression, P = MSE or R².</div></div>
+      </div>
+    </div>
+
+    <h3>Template B — Data Quality (Guaranteed Q2)</h3>
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 5-second checklist for any dataset table</div>
+      <ol>
+        <li>Scan for <strong>blank/empty cells</strong> → missing value</li>
+        <li>Scan for <strong>extreme numbers</strong> (age 350, CGPA 87.5) → outlier</li>
+        <li>Scan for <strong>same column, different formats</strong> (dates, blood groups) → inconsistent format</li>
+        <li>Scan for <strong>identical rows</strong> → duplicate</li>
+        <li>Scan for <strong>wrong units or wrong encoding</strong> (lbs vs kg, 1/0 vs Yes/No) → unit mismatch / encoding error</li>
+        <li>Scan for <strong>non-sensical entries</strong> (SysUsr789 as a name, negative weight) → invalid data / noise</li>
+      </ol>
+    </div>
+
+    <h3>Template C — Entropy + IG Calculation (Guaranteed Q6)</h3>
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Step-by-Step Entropy Template</div>
+      <p><strong>Given:</strong> Target class has [Yes=9, No=5] → 14 total. Feature A has {val1: 6 total (5Y, 1N), val2: 8 total (4Y, 4N)}.</p>
+      <button class="reveal-btn">▶ Show template</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Parent entropy H(S):</strong><br>
+        p(Yes) = 9/14, p(No) = 5/14<br>
+        \(H(S) = -\frac{9}{14}\log_2\frac{9}{14} - \frac{5}{14}\log_2\frac{5}{14}\)<br>
+        ≈ −(0.643 × (−0.638)) − (0.357 × (−1.485)) = 0.410 + 0.530 = <strong>0.940 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Entropy of val1 (6 total: 5Y, 1N):</strong><br>
+        \(H_{v1} = -\frac{5}{6}\log_2\frac{5}{6} - \frac{1}{6}\log_2\frac{1}{6} = 0.650\)</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Entropy of val2 (8 total: 4Y, 4N):</strong><br>
+        \(H_{v2} = -\frac{4}{8}\log_2\frac{4}{8} - \frac{4}{8}\log_2\frac{4}{8} = 1.000\) (maximum — 50-50 split)</div></div>
+        <div class="solution-step"><div class="step-num">4</div><div class="step-content"><strong>Weighted average entropy:</strong><br>
+        \(\text{Weighted} = \frac{6}{14}(0.650) + \frac{8}{14}(1.000) = 0.279 + 0.571 = 0.850\)</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>IG(A) = H(S) − Weighted = 0.940 − 0.850 = 0.090 bits</strong><br>
+        Compare with IG of other attributes; the attribute with the <strong>highest IG</strong> becomes the root node.</div></div>
+      </div>
+    </div>
+
+    <h3>Template D — Confusion Matrix (Guaranteed Q5)</h3>
+    <div class="callout worked-example">
+      <div class="callout-label">🔢 Medical Diagnosis — Rare Disease</div>
+      <p><strong>Given:</strong> Model A: TP=180, FP=200, FN=20, TN=9600 (out of 10,000 patients). Calculate Precision, Recall, F1, Specificity. Which model is better for medical use?</p>
+      <button class="reveal-btn">▶ Show full solution</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Precision:</strong> \(\frac{180}{180+200} = \frac{180}{380} = 47.4\%\) — Less than half of "disease" predictions are correct.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Recall:</strong> \(\frac{180}{180+20} = \frac{180}{200} = 90.0\%\) — Catches 90% of actual disease cases. Very important in medicine.</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Specificity:</strong> \(\frac{9600}{9600+200} = 97.9\%\)</div></div>
+        <div class="solution-step"><div class="step-num">4</div><div class="step-content"><strong>F1:</strong> \(\frac{2 \times 0.474 \times 0.900}{0.474+0.900} = \frac{0.853}{1.374} = 62.1\%\)</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Medical context:</strong> In disease detection, <strong>FN (missed disease) is far more costly</strong> than FP (unnecessary follow-up test). A model with higher Recall is preferred even at the cost of lower Precision. If comparing models, choose the one with highest Recall/F1 for the disease class.</div></div>
+      </div>
+    </div>
+
+    <h3>Template E — Bias–Variance Diagnosis</h3>
+
+    <table>
+      <thead><tr><th>Observation in exam question</th><th>Diagnosis</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>Train error ≈ val error, both HIGH</td><td>High bias (underfitting)</td><td>Decrease λ, add features, more complex model, more training time</td></tr>
+        <tr><td>Train error LOW, val error HIGH (large gap)</td><td>High variance (overfitting)</td><td>Increase λ, get more data, simpler model, early stopping, dropout</td></tr>
+        <tr><td>Training error continuously decreases, test error increases after iteration 5</td><td>Overfitting in progress</td><td>Apply early stopping at iteration 5</td></tr>
+        <tr><td>Large coefficients (β₁=85, β₂=−72) + train acc 0.94, val acc 0.70</td><td>Overfitting (large weights → steep sigmoid)</td><td>L1/L2 regularization, early stopping, more data</td></tr>
+        <tr><td>R²(test) = 0.42 for polynomial degree-8 model</td><td>Overfitting (worse than simpler model on test)</td><td>Add regularization, reduce polynomial degree</td></tr>
+      </tbody>
+    </table>
+
+    <hr>
+
+    <div class="callout exam-tip">
+      <div class="callout-label">🎯 Final 5-minute Checklist Before the Exam</div>
+      <ol>
+        <li>Mitchell's T/P/E — I can identify these for any scenario ✓</li>
+        <li>The 6 data quality issue types — I can spot them in a table ✓</li>
+        <li>Entropy formula — I can compute H(S) from scratch ✓</li>
+        <li>IG formula — I know it's H(parent) − weighted H(children) ✓</li>
+        <li>Confusion matrix — TP/FP/FN/TN, Precision = TP/(TP+FP), Recall = TP/(TP+FN) ✓</li>
+        <li>Ridge vs Lasso — Lasso zeros coefficients (feature selection) ✓</li>
+        <li>Bias-variance: equal high errors → underfitting → decrease λ ✓</li>
+        <li>J(θ)=0 → overfitting, not a good model ✓</li>
+        <li>GD vs Normal Equation: large dataset → GD (normal eq is O(n³)) ✓</li>
+        <li>Scaling: speeds GD convergence = TRUE; guarantees global min = FALSE ✓</li>
+      </ol>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <p style="text-align:center; color: var(--muted); font-size:0.82rem; margin-top:3rem;">
+      ML Study Guide · AIMLCZG565 · BITS Pilani WILP · Compiled Jun 2026
+    </p>
+
+  </main>
+</div>
+
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = total > 0 ? (window.scrollY / total) * 100 : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// Reveal buttons
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('reveal-btn')) {
+    const box = e.target.nextElementSibling;
+    if (box && box.classList.contains('solution-box')) {
+      box.classList.toggle('open');
+      e.target.textContent = box.classList.contains('open') ? '▼ Hide solution' : '▶ Show solution';
+      if (e.target.textContent === '▼ Hide solution') e.target.textContent = '▼ Hide';
+      else e.target.textContent = '▶ Show';
+    }
+  }
+});
+
+// Fix reveal button text
+document.querySelectorAll('.reveal-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const box = this.nextElementSibling;
+    if (box.classList.contains('open')) {
+      this.textContent = this.textContent.replace('▼', '▶').replace('Hide', 'Show').replace('answer', 'answer');
+    }
+  });
+});
+
+// Active sidebar link tracking
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('#sidebar a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === '#' + entry.target.id);
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

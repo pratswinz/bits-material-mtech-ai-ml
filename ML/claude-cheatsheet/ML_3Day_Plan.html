@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ML 3-Day Study Plan — AIMLCZG565</title>
+<style>
+:root{--navy:#1e3a5f;--blue:#2563eb;--green:#059669;--amber:#d97706;--purple:#7c3aed;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
+header{background:linear-gradient(135deg,#1e3a5f,#059669);color:#fff;padding:1.8rem 1.5rem;text-align:center}
+header h1{font-size:1.5rem} header p{font-size:.88rem;opacity:.9;margin-top:.3rem}
+header a{color:#a7f3d0}
+.wrap{max-width:820px;margin:0 auto;padding:1.5rem 1rem 3rem}
+.day{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:1.2rem 0;overflow:hidden}
+.day-h{background:var(--navy);color:#fff;padding:.8rem 1.2rem;display:flex;justify-content:space-between;align-items:center}
+.day-h h2{font-size:1.05rem;margin:0}
+.day-h span{font-size:.75rem;opacity:.85}
+.day-b{padding:1rem 1.2rem}
+.block{margin:.8rem 0;padding:.75rem 1rem;background:#f8fafc;border-radius:8px;border-left:4px solid var(--blue)}
+.block.eve{border-color:var(--amber)}
+.block.test{border-color:var(--green)}
+.block h3{font-size:.88rem;color:var(--navy);margin-bottom:.4rem}
+.block ul{font-size:.88rem;padding-left:1.2rem}
+.block li{margin:.25rem 0}
+.block a{color:var(--blue)}
+.tag{font-size:.7rem;background:#eff6ff;color:var(--blue);padding:2px 8px;border-radius:99px;margin-left:4px}
+.note{font-size:.82rem;color:var(--muted);margin-top:1rem;padding:1rem;background:#fffbeb;border-radius:8px;border:1px solid #fcd34d}
+</style>
+</head>
+<body>
+<header>
+<h1>ML Mid-Sem — 3-Day Plan</h1>
+<p><a href="index.html">← Hub</a> · ~6–7 hrs/day · Theory → PYQ → Revision</p>
+</header>
+<div class="wrap">
+
+<div class="day">
+<div class="day-h"><h2>Day 1 — Foundations</h2><span>CS1 · CS2 · Intro PYQs</span></div>
+<div class="day-b">
+<div class="block">
+<h3>Morning (2.5 h) — What is ML &amp; data</h3>
+<ul>
+<li><a href="ML_Theory_Guide.html#intro-ml">Mitchell's T/P/E</a> — memorise definition word-for-word</li>
+<li><a href="ML_Theory_Guide.html#types-learning">Supervised / Unsupervised / RL</a> + classification vs regression</li>
+<li><a href="ML_Theory_Guide.html#data-quality">6 data quality issue types</a> — missing, outlier, duplicate, format, unit, encoding</li>
+<li><a href="ML_Theory_Guide.html#feature-scaling">Min-max &amp; z-score</a> — formulas + when to use</li>
+</ul>
+</div>
+<div class="block">
+<h3>Afternoon (2.5 h) — Practice</h3>
+<ul>
+<li><a href="ML_PYQ_Workbook.html#type1">TYPE 1</a> — 4 scenarios + weather E/T/P + AlphaGo</li>
+<li><a href="ML_PYQ_Workbook.html#type2">TYPE 2</a> — student &amp; B.Tech dataset (find 6–7 issues each)</li>
+<li><a href="ML_PYQ_Workbook.html#type9">TYPE 9</a> — scaling T/F (4 statements)</li>
+</ul>
+</div>
+<div class="block eve">
+<h3>Evening (1.5 h) — Self-test</h3>
+<ul>
+<li>Without notes: write Mitchell's definition + one example each of supervised, unsupervised, RL</li>
+<li>Scan a fake dataset table — list 5 quality issues in 5 minutes</li>
+<li><a href="ML_Revision_Sheet.html">Revision sheet Part I–II</a> — skim once</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="day">
+<div class="day-h"><h2>Day 2 — Regression &amp; Regularization</h2><span>CS3 · Ridge/Lasso · GD PYQs</span></div>
+<div class="day-b">
+<div class="block">
+<h3>Morning (2.5 h) — Linear regression</h3>
+<ul>
+<li><a href="ML_Theory_Guide.html#linear-regression">Linear model + MSE</a></li>
+<li><a href="ML_Theory_Guide.html#cost-gradient">Gradient descent</a> — one full iteration by hand</li>
+<li><a href="ML_Theory_Guide.html#normal-equation">Normal equation</a> vs GD — when to use which</li>
+<li><a href="ML_Theory_Guide.html#bias-variance">Bias–variance</a> — train vs test gap diagnosis</li>
+</ul>
+</div>
+<div class="block">
+<h3>Afternoon (3 h) — Regularization + numerical</h3>
+<ul>
+<li><a href="ML_Theory_Guide.html#regularization">Ridge vs Lasso</a> — update rules differ</li>
+<li><a href="ML_PYQ_Workbook.html#type3">TYPE 3</a> — Dec 2025 Ridge GD (must do on paper)</li>
+<li><a href="ML_PYQ_Workbook.html#midsem">Mid sem numerical</a> — RR-CHD 2 iterations Ridge + Lasso</li>
+<li><a href="ML_PYQ_Workbook.html#type5">TYPE 5</a> — polynomial overfit + RMSE models</li>
+<li><a href="ML_PYQ_Workbook.html#type6">TYPE 6</a> — L1 vs L2 table</li>
+</ul>
+</div>
+<div class="block eve">
+<h3>Evening (1.5 h)</h3>
+<ul>
+<li><a href="ML_PYQ_Workbook.html#june2026">June 2026 Q1</a> — coefficient interpretation + kWh→Wh</li>
+<li><a href="ML_Revision_Sheet.html">Revision sheet Part III</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="day">
+<div class="day-h"><h2>Day 3 — Classification, Metrics, Trees</h2><span>CS4–CS7 · June 2026 paper · Mock</span></div>
+<div class="day-b">
+<div class="block">
+<h3>Morning (2.5 h) — Logistic &amp; metrics</h3>
+<ul>
+<li><a href="ML_Theory_Guide.html#sigmoid-logistic">Sigmoid + log-loss</a></li>
+<li><a href="ML_Theory_Guide.html#confusion-matrix">Confusion matrix</a> — TP/FP/FN/TN</li>
+<li><a href="ML_Theory_Guide.html#precision-recall">Precision, Recall, F1</a> — accuracy trap on imbalanced data</li>
+<li><a href="ML_PYQ_Workbook.html#type4">TYPE 4</a> — medical diagnosis + cost</li>
+<li><a href="ML_PYQ_Workbook.html#type8">TYPE 8</a> — logistic interpretation</li>
+</ul>
+</div>
+<div class="block">
+<h3>Afternoon (2.5 h) — Decision trees + June paper</h3>
+<ul>
+<li><a href="ML_Theory_Guide.html#entropy-ig">Entropy + Information Gain</a> — full calculation</li>
+<li><a href="ML_PYQ_Workbook.html#type7">TYPE 7</a> — 14-sample loan IG</li>
+<li><a href="ML_PYQ_Workbook.html#june2026">June 2026 Q2–Q5</a> — entropy, min-max, fraud metrics, spam bias-variance</li>
+<li><a href="ML_Theory_Guide.html#cs7">k-NN</a> (if time) — lazy learning, curse of dimensionality</li>
+</ul>
+</div>
+<div class="block test">
+<h3>Evening (2 h) — Mock + final revision</h3>
+<ul>
+<li><a href="ML_PYQ_Workbook.html#mock">Mock exam Q1–6</a> — try closed-book first, then check answers</li>
+<li>Print <a href="ML_Revision_Sheet.html">ML_Revision_Sheet.html</a></li>
+<li><a href="ML_Theory_Guide.html#formula-sheet">Formula sheet</a> — tick what you know</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="note">
+<strong>Exam day checklist:</strong> Mitchell E/T/P · 6 data issues · one GD step with Ridge penalty · Ridge vs Lasso update · entropy with log₂ · IG formula · precision/recall/F1 from matrix · bias vs variance from train/test · coefficient unit change.
+</div>
+</div>
+</body>
+</html>
