@@ -16,7 +16,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .plan-banner a:hover{opacity:.95}
 .plan-banner span{display:block;font-size:.82rem;font-weight:400;opacity:.9;margin-top:.25rem}
 .grid{max-width:900px;margin:1.5rem auto 2rem;padding:0 1rem;display:grid;gap:1.2rem}
-@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:700px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;text-decoration:none;color:inherit;transition:box-shadow .2s,transform .2s;display:block}
 .card:hover{box-shadow:0 8px 24px rgba(0,0,0,.08);transform:translateY(-2px)}
 .card h2{font-size:1.1rem;margin-bottom:.5rem;color:var(--navy)}
@@ -38,18 +39,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 <p>AIMLCZG565 · All study files live in <code>ML/claude-cheatsheet/</code></p>
 </div>
 <div class="plan-banner">
-<a href="ML_3Day_Plan.html">📅 Start here — 3-Day Study Plan<span>Day 1: Intro &amp; Data · Day 2: Regression &amp; Regularization · Day 3: Metrics &amp; Trees</span></a>
+<a href="ML_3Day_Plan.html">📅 Start with the 3-Day Plan<span>Theory → PYQs → revision · ~6–7 hrs/day</span></a>
 </div>
 <div class="grid">
+<a class="card" href="ML_3Day_Plan.html" style="grid-column:1/-1;border-color:#059669">
+<h2>📅 3-Day Study Plan</h2>
+<p>Day-by-day schedule linking theory → PYQs → revision.</p>
+<span class="tag rev">Start here</span>
+</a>
 <a class="card" href="ML_Theory_Guide.html">
 <h2>📘 Theory Guide</h2>
 <p>CS1–CS7 concepts, formulas, worked examples. From <code>companion docs/</code>.</p>
 <span class="tag theory">Concepts</span>
 </a>
+<a class="card" href="ML_Past_Papers.html">
+<h2>📋 Past Papers 2023–2026</h2>
+<p>Every official paper from <code>Sem 1/ML/Question papers/</code> — tagged Mid/End · Regular/Makeup.</p>
+<span class="tag pyq">All papers</span>
+</a>
 <a class="card" href="ML_PYQ_Workbook.html">
 <h2>📝 PYQ Workbook</h2>
-<p>June 2026 mid sem, TYPE 1–11, mock exam, Ridge/Lasso numerical.</p>
-<span class="tag pyq">Practice</span>
+<p>TYPE 1–11 practice, mock exam, Ridge/Lasso numerical.</p>
+<span class="tag pyq">By topic</span>
 </a>
 <a class="card" href="ML_Revision_Sheet.html">
 <h2>⚡ Revision Sheet</h2>
@@ -61,9 +72,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 <h3>Source folders</h3>
 <ul>
 <li><code>ML/companion docs/</code> — CS1–CS7 companions</li>
-<li><code>ML/questions/</code> — practice PDF, June 2026 images</li>
+<li><code>Sem 1/ML/Question papers/</code> — 2023–2026 mid &amp; end sem (see Past Papers HTML)</li>
 <li><code>ML/mid sem/</code> — Ridge/Lasso numerical</li>
-<li><code>ML/Cheat_Sheet/Cheat_Sheet_ML.pdf</code> — original PDF cheat sheet (kept)</li>
+<li><code>ML/claude-cheatsheet/assets/</code> — SVG diagrams (inlined in HTML — works offline)</li>
 </ul>
 </div>
 </body>

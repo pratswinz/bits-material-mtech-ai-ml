@@ -1,0 +1,6 @@
+/* Shared styles for formula + diagram blocks — include in workbook & past papers */
+.formula{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.65rem 1rem;margin:.6rem 0;font-size:.92rem}
+.formula h5{margin:0 0 .35rem;font-size:.72rem;text-transform:uppercase;color:#2563eb;letter-spacing:.04em}
+.diagram{margin:.75rem 0;text-align:center}
+.diagram img,.diagram object{max-width:100%;height:auto;border:1px solid var(--border,#e2e8f0);border-radius:8px;background:#fff}
+.diagram figcaption{font-size:.75rem;color:#64748b;margin-top:.35rem}

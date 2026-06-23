@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200" font-family="system-ui,sans-serif">
+  <rect width="420" height="200" fill="#f8fafc" rx="8"/>
+  <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Information Gain - Split Flow</text>
+  <rect x="170" y="35" width="80" height="36" rx="6" fill="#f3e8ff" stroke="#7c3aed"/>
+  <text x="210" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Parent H(S)</text>
+  <line x1="190" y1="71" x2="100" y2="95" stroke="#64748b"/>
+  <line x1="230" y1="71" x2="320" y2="95" stroke="#64748b"/>
+  <rect x="50" y="95" width="100" height="36" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="100" y="118" text-anchor="middle" font-size="10" fill="#1e3a5f">Child A</text>
+  <rect x="270" y="95" width="100" height="36" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="320" y="118" text-anchor="middle" font-size="10" fill="#1e3a5f">Child B</text>
+  <text x="210" y="155" text-anchor="middle" font-size="11" fill="#1e3a5f">H_after = weighted average of child entropies</text>
+  <text x="210" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#059669">IG = H(S) - H_after (pick max IG)</text>
+  <text x="210" y="192" text-anchor="middle" font-size="10" fill="#64748b">H = -sum p_k log2(p_k) | pure node H=0</text>
+</svg>

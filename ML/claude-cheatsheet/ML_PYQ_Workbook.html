@@ -30,8 +30,17 @@ table{border-collapse:collapse;width:100%;margin:.6rem 0;font-size:.85rem}
 th,td{border:1px solid var(--border);padding:.4rem .55rem;text-align:left}
 th{background:#eff6ff}
 .exam-img{max-width:100%;border:1px solid var(--border);border-radius:8px;margin:.5rem 0}
+.formula{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.65rem 1rem;margin:.6rem 0;font-size:.92rem}
+.formula h5{margin:0 0 .35rem;font-size:.72rem;text-transform:uppercase;color:var(--blue);letter-spacing:.04em}
+.diagram{margin:.75rem 0;text-align:center}
+.diagram img{max-width:100%;height:auto;border:1px solid var(--border);border-radius:8px;background:#fff}
+.diagram figcaption{font-size:.75rem;color:var(--muted);margin-top:.35rem}
 .tag{display:inline-block;background:#f3e8ff;color:var(--purple);padding:2px 8px;border-radius:12px;font-size:.7rem}
 @media(max-width:800px){.shell{flex-direction:column}aside{width:100%;height:auto;position:relative}}
+
+.svg-wrap{display:inline-block;max-width:100%;vertical-align:top}
+.svg-wrap svg{max-width:100%;height:auto;border:1px solid var(--border);border-radius:8px;background:#fff;display:block}
+
 </style>
 </head>
 <body>
@@ -53,6 +62,8 @@ th{background:#eff6ff}
 <a href="#type7">TYPE 7 — Trees / Entropy</a>
 <a href="#type8">TYPE 8 — Logistic</a>
 <a href="#type9">TYPE 9 — Scaling T/F</a>
+<a href="#type10">TYPE 10 — Robustness</a>
+<a href="#type11">TYPE 11 — Normal Eq.</a>
 <a href="#midsem">Mid Sem Numerical (Ridge/Lasso)</a>
 <a href="#mock">Mock Exam Q1–6</a>
 </aside>
@@ -72,6 +83,28 @@ th{background:#eff6ff}
 <h4>(a)(ii) kWh → Wh</h4>
 <div class="step">1 kWh = 1000 Wh → coefficient becomes \(7.5/1000 = 0.0075\) per Wh. Prediction unchanged if input scaled consistently.</div>
 <h4>(b) \(\partial J/\partial\theta_3 = -12\)</h4>
+<div class="formula"><h5>Gradient descent</h5>\(\theta_j \leftarrow \theta_j - \alpha\frac{\partial J}{\partial\theta_j}\)</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="GD flow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 140" font-family="system-ui,sans-serif">
+  <defs><marker id="a-u1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2563eb"/></marker></defs>
+  <rect width="520" height="140" fill="#f8fafc" rx="8"/>
+  <text x="260" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Gradient Descent - One Iteration</text>
+  <rect x="20" y="40" width="90" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="65" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Predict</text>
+  <text x="65" y="72" text-anchor="middle" font-size="9" fill="#64748b">h = theta^T x</text>
+  <line x1="110" y1="62" x2="130" y2="62" stroke="#2563eb" marker-end="url(#a-u1)"/>
+  <rect x="130" y="40" width="90" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="175" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Error</text>
+  <text x="175" y="72" text-anchor="middle" font-size="9" fill="#64748b">e = h - y</text>
+  <line x1="220" y1="62" x2="240" y2="62" stroke="#2563eb" marker-end="url(#a-u1)"/>
+  <rect x="240" y="40" width="100" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="290" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Gradient</text>
+  <text x="290" y="72" text-anchor="middle" font-size="9" fill="#64748b">dJ/dtheta</text>
+  <line x1="340" y1="62" x2="360" y2="62" stroke="#2563eb" marker-end="url(#a-u1)"/>
+  <rect x="360" y="40" width="130" height="44" rx="6" fill="#ecfdf5" stroke="#059669"/>
+  <text x="425" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Update</text>
+  <text x="425" y="72" text-anchor="middle" font-size="9" fill="#64748b">theta -= alpha * grad</text>
+  <text x="260" y="115" text-anchor="middle" font-size="11" fill="#7c3aed">Ridge adds (lambda/m)*theta | Lasso adds alpha*lambda*sign(theta)</text>
+</svg></div><figcaption>Predict → error → gradient → update</figcaption></figure>
 <div class="ans">Negative gradient → increasing \(\theta_3\) lowers cost → GD increases weight: \(\theta_3 \leftarrow \theta_3 + 12\alpha\).</div>
 <h4>(c) Strongest feature?</h4>
 <div class="ans">Largest |coef| = AC count (45). Caveat: compare on same scale — raw magnitude misleading before normalization.</div>
@@ -84,6 +117,21 @@ th{background:#eff6ff}
 <div class="step">\(p_{Yes}=0.6,\ p_{No}=0.4\)</div>
 <div class="step">\(H = -0.6\log_2(0.6) - 0.4\log_2(0.4) = 0.442 + 0.529\)</div>
 <div class="ans"><strong>Entropy ≈ 0.971 bits</strong></div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="IG tree"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200" font-family="system-ui,sans-serif">
+  <rect width="420" height="200" fill="#f8fafc" rx="8"/>
+  <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Information Gain - Split Flow</text>
+  <rect x="170" y="35" width="80" height="36" rx="6" fill="#f3e8ff" stroke="#7c3aed"/>
+  <text x="210" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Parent H(S)</text>
+  <line x1="190" y1="71" x2="100" y2="95" stroke="#64748b"/>
+  <line x1="230" y1="71" x2="320" y2="95" stroke="#64748b"/>
+  <rect x="50" y="95" width="100" height="36" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="100" y="118" text-anchor="middle" font-size="10" fill="#1e3a5f">Child A</text>
+  <rect x="270" y="95" width="100" height="36" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="320" y="118" text-anchor="middle" font-size="10" fill="#1e3a5f">Child B</text>
+  <text x="210" y="155" text-anchor="middle" font-size="11" fill="#1e3a5f">H_after = weighted average of child entropies</text>
+  <text x="210" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#059669">IG = H(S) - H_after (pick max IG)</text>
+  <text x="210" y="192" text-anchor="middle" font-size="10" fill="#64748b">H = -sum p_k log2(p_k) | pure node H=0</text>
+</svg></div><figcaption>IG = H(parent) − weighted H(children)</figcaption></figure>
 <h4>Bonus — IG on "Existing Loan = No"</h4>
 <div class="step">No loan branch: 5 Yes, 0 No → H=0 · Has loan: 1 Yes, 4 No → H≈0.722</div>
 <div class="step">Weighted H = 0.361 · <strong>IG = 0.971 − 0.361 = 0.610</strong></div>
@@ -100,6 +148,26 @@ th{background:#eff6ff}
 <tr><td>S4</td><td>710</td><td><strong>1.00</strong></td></tr></table>
 <div class="ans">New applicant 650 → \((650-590)/120 = \mathbf{0.50}\)</div>
 <div class="step">Logistic update: \(z=w^Tx\), \(\hat y=\sigma(z)\), \(\nabla w_j=\frac1m\sum(\hat y-y)x_j\), \(w_j\leftarrow w_j-\eta\nabla w_j\)</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Min-max"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" font-family="system-ui,sans-serif">
+  <rect width="400" height="160" fill="#f8fafc" rx="8"/>
+  <text x="200" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Min-Max Normalization</text>
+  <line x1="40" y1="100" x2="360" y2="100" stroke="#cbd5e1" stroke-width="2"/>
+  <circle cx="80" cy="100" r="5" fill="#2563eb"/>
+  <text x="80" y="120" text-anchor="middle" font-size="9" fill="#64748b">x_min = 0.00</text>
+  <circle cx="200" cy="100" r="5" fill="#2563eb"/>
+  <text x="200" y="120" text-anchor="middle" font-size="9" fill="#64748b">x</text>
+  <circle cx="360" cy="100" r="5" fill="#2563eb"/>
+  <text x="360" y="120" text-anchor="middle" font-size="9" fill="#64748b">x_max = 1.00</text>
+  <text x="200" y="145" text-anchor="middle" font-size="12" fill="#7c3aed">x_prime = (x - x_min) / (x_max - x_min)</text>
+</svg></div><div class="svg-wrap" role="img" aria-label="Sigmoid" style="margin-top:.5rem"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 180" font-family="system-ui,sans-serif">
+  <rect width="400" height="180" fill="#f8fafc" rx="8"/>
+  <text x="200" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Logistic Regression</text>
+  <line x1="50" y1="130" x2="350" y2="130" stroke="#cbd5e1"/>
+  <line x1="200" y1="40" x2="200" y2="130" stroke="#cbd5e1" stroke-dasharray="4"/>
+  <path d="M 60,125 Q 120,125 160,120 T 240,70 T 340,48" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+  <text x="200" y="155" text-anchor="middle" font-size="11" fill="#7c3aed">sigma(z) = 1 / (1 + exp(-z)) | threshold z=0 gives p=0.5</text>
+  <text x="200" y="172" text-anchor="middle" font-size="10" fill="#64748b">z = theta^T x | update with cross-entropy gradient</text>
+</svg></div></figure>
 </div>
 
 <div class="q">
@@ -113,6 +181,22 @@ th{background:#eff6ff}
 <tr><td>FPR</td><td><strong>0.91%</strong></td></tr>
 <tr><td>F1</td><td><strong>38.3%</strong></td></tr></table>
 <div class="ans">High accuracy is misleading — only 45% fraud caught. Prefer Model B (80% recall) for fraud.</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Confusion matrix"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 220" font-family="system-ui,sans-serif">
+  <rect width="380" height="220" fill="#f8fafc" rx="8"/>
+  <text x="190" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Confusion Matrix</text>
+  <text x="190" y="42" text-anchor="middle" font-size="10" fill="#64748b">Actual = rows | Predicted = columns</text>
+  <text x="155" y="68" font-size="10" fill="#64748b">Pred +</text>
+  <text x="255" y="68" font-size="10" fill="#64748b">Pred -</text>
+  <rect x="120" y="78" width="90" height="55" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+  <text x="165" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">TP</text>
+  <rect x="210" y="78" width="90" height="55" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="255" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">FN</text>
+  <rect x="120" y="133" width="90" height="55" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="165" y="162" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">FP</text>
+  <rect x="210" y="133" width="90" height="55" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+  <text x="255" y="162" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">TN</text>
+  <text x="190" y="205" text-anchor="middle" font-size="10" fill="#7c3aed">Prec=TP/(TP+FP) | Rec=TP/(TP+FN) | F1=2PR/(P+R)</text>
+</svg></div></figure>
 </div>
 
 <div class="q">
@@ -121,6 +205,19 @@ th{background:#eff6ff}
 <table><tr><th>Model</th><th>Train</th><th>Test</th><th>Diagnosis</th></tr>
 <tr><td>A (2 features)</td><td>61%</td><td>60%</td><td><strong>High bias</strong> — underfitting</td></tr>
 <tr><td>B (47 features)</td><td>99%</td><td>67%</td><td><strong>High variance</strong> — overfitting</td></tr></table>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Bias variance"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 180" font-family="system-ui,sans-serif">
+  <rect width="440" height="180" fill="#f8fafc" rx="8"/>
+  <text x="220" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Bias-Variance Diagnosis</text>
+  <rect x="20" y="40" width="120" height="70" rx="6" fill="#fef2f2" stroke="#dc2626"/>
+  <text x="80" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#dc2626">High Bias</text>
+  <text x="80" y="88" text-anchor="middle" font-size="9" fill="#64748b">underfit</text>
+  <rect x="160" y="40" width="120" height="70" rx="6" fill="#ecfdf5" stroke="#059669"/>
+  <text x="220" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#059669">Good Fit</text>
+  <rect x="300" y="40" width="120" height="70" rx="6" fill="#fffbeb" stroke="#d97706"/>
+  <text x="360" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">High Variance</text>
+  <text x="360" y="88" text-anchor="middle" font-size="9" fill="#64748b">overfit</text>
+  <text x="220" y="135" text-anchor="middle" font-size="10" fill="#1e3a5f">Fix bias: more features | Fix variance: Ridge/Lasso, more data</text>
+</svg></div></figure>
 </div>
 </section>
 
@@ -139,6 +236,22 @@ th{background:#eff6ff}
 <div class="ans">Rainfall amount → <strong>regression</strong> (RMSE, MAE)</div>
 <h4>AlphaGo</h4>
 <div class="step">(i) Human games → Supervised · (ii) Self-play → Reinforcement</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Mitchell ETP"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" font-family="system-ui,sans-serif">
+  <rect width="400" height="120" fill="#f8fafc" rx="8"/>
+  <text x="200" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Tom Mitchell  E, T, P</text>
+  <rect x="30" y="40" width="100" height="60" rx="6" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="80" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">E</text>
+  <text x="80" y="78" text-anchor="middle" font-size="9" fill="#64748b">Experience</text>
+  <text x="80" y="90" text-anchor="middle" font-size="8" fill="#64748b">training data</text>
+  <rect x="150" y="40" width="100" height="60" rx="6" fill="#d1fae5" stroke="#059669"/>
+  <text x="200" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">T</text>
+  <text x="200" y="78" text-anchor="middle" font-size="9" fill="#64748b">Task</text>
+  <text x="200" y="90" text-anchor="middle" font-size="8" fill="#64748b">what to do</text>
+  <rect x="270" y="40" width="100" height="60" rx="6" fill="#f3e8ff" stroke="#7c3aed"/>
+  <text x="320" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#7c3aed">P</text>
+  <text x="320" y="78" text-anchor="middle" font-size="9" fill="#64748b">Performance</text>
+  <text x="320" y="90" text-anchor="middle" font-size="8" fill="#64748b">accuracy, MSE&</text>
+</svg></div></figure>
 </div>
 </section>
 
@@ -163,6 +276,27 @@ th{background:#eff6ff}
 <div class="step">\(\partial J/\partial\theta_0 = -8/3 = -2.667\)</div>
 <div class="step">\(\partial J/\partial\theta_1 = -19/3 + 2/3 = -5.667\) (Ridge penalty on θ₁)</div>
 <div class="step">Update: θ₀=0.133, θ₁=1.283 · Cost: 4.667 → 3.006 ✓</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="GD flow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 140" font-family="system-ui,sans-serif">
+  <defs><marker id="a-u8" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2563eb"/></marker></defs>
+  <rect width="520" height="140" fill="#f8fafc" rx="8"/>
+  <text x="260" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Gradient Descent - One Iteration</text>
+  <rect x="20" y="40" width="90" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="65" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Predict</text>
+  <text x="65" y="72" text-anchor="middle" font-size="9" fill="#64748b">h = theta^T x</text>
+  <line x1="110" y1="62" x2="130" y2="62" stroke="#2563eb" marker-end="url(#a-u8)"/>
+  <rect x="130" y="40" width="90" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="175" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Error</text>
+  <text x="175" y="72" text-anchor="middle" font-size="9" fill="#64748b">e = h - y</text>
+  <line x1="220" y1="62" x2="240" y2="62" stroke="#2563eb" marker-end="url(#a-u8)"/>
+  <rect x="240" y="40" width="100" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="290" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Gradient</text>
+  <text x="290" y="72" text-anchor="middle" font-size="9" fill="#64748b">dJ/dtheta</text>
+  <line x1="340" y1="62" x2="360" y2="62" stroke="#2563eb" marker-end="url(#a-u8)"/>
+  <rect x="360" y="40" width="130" height="44" rx="6" fill="#ecfdf5" stroke="#059669"/>
+  <text x="425" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Update</text>
+  <text x="425" y="72" text-anchor="middle" font-size="9" fill="#64748b">theta -= alpha * grad</text>
+  <text x="260" y="115" text-anchor="middle" font-size="11" fill="#7c3aed">Ridge adds (lambda/m)*theta | Lasso adds alpha*lambda*sign(theta)</text>
+</svg></div></figure>
 </div>
 <div class="q">
 <p class="src">Revision — x=[2,4,7,8,10], y=[1,2,2.5,3.5,5.5], θ₁=0.5</p>
@@ -177,6 +311,22 @@ th{background:#eff6ff}
 <p class="src">Dec 2025 Medical — 1000 patients, 150 diseased, TP=120, FP=85</p>
 <div class="step">FN=30, TN=765 · Accuracy=88.5% · Precision=58.5% · Recall=80% · F1=0.676</div>
 <div class="ans">Cost = 30×$10,000 + 85×$500 = <strong>$342,500</strong> → prioritize recall</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Confusion matrix"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 220" font-family="system-ui,sans-serif">
+  <rect width="380" height="220" fill="#f8fafc" rx="8"/>
+  <text x="190" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Confusion Matrix</text>
+  <text x="190" y="42" text-anchor="middle" font-size="10" fill="#64748b">Actual = rows | Predicted = columns</text>
+  <text x="155" y="68" font-size="10" fill="#64748b">Pred +</text>
+  <text x="255" y="68" font-size="10" fill="#64748b">Pred -</text>
+  <rect x="120" y="78" width="90" height="55" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+  <text x="165" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">TP</text>
+  <rect x="210" y="78" width="90" height="55" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="255" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">FN</text>
+  <rect x="120" y="133" width="90" height="55" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+  <text x="165" y="162" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">FP</text>
+  <rect x="210" y="133" width="90" height="55" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+  <text x="255" y="162" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">TN</text>
+  <text x="190" y="205" text-anchor="middle" font-size="10" fill="#7c3aed">Prec=TP/(TP+FP) | Rec=TP/(TP+FN) | F1=2PR/(P+R)</text>
+</svg></div></figure>
 </div>
 </section>
 
@@ -186,6 +336,19 @@ th{background:#eff6ff}
 <div class="q">
 <p class="src">Polynomial deg-2 vs deg-15</p>
 <div class="step">A (deg 2): train≈test → <strong>high bias</strong> · B (deg 15): train≈0, test high → <strong>high variance</strong></div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Bias variance"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 180" font-family="system-ui,sans-serif">
+  <rect width="440" height="180" fill="#f8fafc" rx="8"/>
+  <text x="220" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Bias-Variance Diagnosis</text>
+  <rect x="20" y="40" width="120" height="70" rx="6" fill="#fef2f2" stroke="#dc2626"/>
+  <text x="80" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#dc2626">High Bias</text>
+  <text x="80" y="88" text-anchor="middle" font-size="9" fill="#64748b">underfit</text>
+  <rect x="160" y="40" width="120" height="70" rx="6" fill="#ecfdf5" stroke="#059669"/>
+  <text x="220" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#059669">Good Fit</text>
+  <rect x="300" y="40" width="120" height="70" rx="6" fill="#fffbeb" stroke="#d97706"/>
+  <text x="360" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">High Variance</text>
+  <text x="360" y="88" text-anchor="middle" font-size="9" fill="#64748b">overfit</text>
+  <text x="220" y="135" text-anchor="middle" font-size="10" fill="#1e3a5f">Fix bias: more features | Fix variance: Ridge/Lasso, more data</text>
+</svg></div></figure>
 <div class="ans">Don't use higher degree — use regularization, CV, more data</div>
 </div>
 <div class="q">
@@ -204,6 +367,18 @@ th{background:#eff6ff}
 <div class="q">
 <p class="src">L1 vs L2 — many irrelevant features → <strong>Lasso (L1)</strong> zeros them out</p>
 <p class="src">Overfit logistic with large weights → add L2/L1, reduce features, tune λ via CV</p>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Ridge vs Lasso"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150" font-family="system-ui,sans-serif">
+  <rect width="420" height="150" fill="#f8fafc" rx="8"/>
+  <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Ridge vs Lasso Updates</text>
+  <rect x="30" y="40" width="170" height="95" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="115" y="58" text-anchor="middle" font-size="11" font-weight="600" fill="#2563eb">Ridge L2</text>
+  <text x="115" y="78" text-anchor="middle" font-size="10" fill="#1e3a5f">J = MSE + lambda*sum(theta^2)</text>
+  <text x="115" y="96" text-anchor="middle" font-size="9" fill="#64748b">shrinks weights, rarely zero</text>
+  <rect x="220" y="40" width="170" height="95" rx="6" fill="#f3e8ff" stroke="#7c3aed"/>
+  <text x="305" y="58" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed">Lasso L1</text>
+  <text x="305" y="78" text-anchor="middle" font-size="10" fill="#1e3a5f">J = MSE + lambda*sum(|theta|)</text>
+  <text x="305" y="96" text-anchor="middle" font-size="9" fill="#64748b">can zero weights - feature selection</text>
+</svg></div></figure>
 </div>
 </section>
 
@@ -214,6 +389,21 @@ th{background:#eff6ff}
 <p class="src">Dec 2025 — 14 samples: 9R, 5D · Income High/Low</p>
 <div class="step">Parent H = 0.940 · H(High)=0.811 · H(Low)=1.000</div>
 <div class="step">Weighted = 0.892 · <strong>IG = 0.048</strong> — compare other features for root</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Entropy IG"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200" font-family="system-ui,sans-serif">
+  <rect width="420" height="200" fill="#f8fafc" rx="8"/>
+  <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Information Gain - Split Flow</text>
+  <rect x="170" y="35" width="80" height="36" rx="6" fill="#f3e8ff" stroke="#7c3aed"/>
+  <text x="210" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Parent H(S)</text>
+  <line x1="190" y1="71" x2="100" y2="95" stroke="#64748b"/>
+  <line x1="230" y1="71" x2="320" y2="95" stroke="#64748b"/>
+  <rect x="50" y="95" width="100" height="36" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="100" y="118" text-anchor="middle" font-size="10" fill="#1e3a5f">Child A</text>
+  <rect x="270" y="95" width="100" height="36" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="320" y="118" text-anchor="middle" font-size="10" fill="#1e3a5f">Child B</text>
+  <text x="210" y="155" text-anchor="middle" font-size="11" fill="#1e3a5f">H_after = weighted average of child entropies</text>
+  <text x="210" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#059669">IG = H(S) - H_after (pick max IG)</text>
+  <text x="210" y="192" text-anchor="middle" font-size="10" fill="#64748b">H = -sum p_k log2(p_k) | pure node H=0</text>
+</svg></div></figure>
 </div>
 <div class="q">
 <p class="src">4 equal classes → H = log₂(4) = <strong>2 bits</strong></div>
@@ -228,6 +418,15 @@ th{background:#eff6ff}
 <div class="step">Large CGPA coef ≠ guaranteed admission (sigmoid = probability)</div>
 <div class="step">Months vs years: divide coef by 12 if input in years</div>
 <div class="step">Boundary w=[−36,0,0,4,9] on [1,x₁,x₂,x₁²,x₂²] → \(4x_1^2+9x_2^2=36\) ellipse</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Logistic"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 180" font-family="system-ui,sans-serif">
+  <rect width="400" height="180" fill="#f8fafc" rx="8"/>
+  <text x="200" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Logistic Regression</text>
+  <line x1="50" y1="130" x2="350" y2="130" stroke="#cbd5e1"/>
+  <line x1="200" y1="40" x2="200" y2="130" stroke="#cbd5e1" stroke-dasharray="4"/>
+  <path d="M 60,125 Q 120,125 160,120 T 240,70 T 340,48" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+  <text x="200" y="155" text-anchor="middle" font-size="11" fill="#7c3aed">sigma(z) = 1 / (1 + exp(-z)) | threshold z=0 gives p=0.5</text>
+  <text x="200" y="172" text-anchor="middle" font-size="10" fill="#64748b">z = theta^T x | update with cross-entropy gradient</text>
+</svg></div></figure>
 </div>
 </section>
 
@@ -239,6 +438,60 @@ th{background:#eff6ff}
 <div class="step">(b) Trees need scaling → <strong>FALSE</strong> (scale-invariant splits)</div>
 <div class="step">(c) Min-max sensitive to outliers → <strong>TRUE</strong></div>
 <div class="step">(d) Z-score in [0,1] → <strong>FALSE</strong> (unbounded)</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Scaling"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" font-family="system-ui,sans-serif">
+  <rect width="400" height="160" fill="#f8fafc" rx="8"/>
+  <text x="200" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Min-Max Normalization</text>
+  <line x1="40" y1="100" x2="360" y2="100" stroke="#cbd5e1" stroke-width="2"/>
+  <circle cx="80" cy="100" r="5" fill="#2563eb"/>
+  <text x="80" y="120" text-anchor="middle" font-size="9" fill="#64748b">x_min = 0.00</text>
+  <circle cx="200" cy="100" r="5" fill="#2563eb"/>
+  <text x="200" y="120" text-anchor="middle" font-size="9" fill="#64748b">x</text>
+  <circle cx="360" cy="100" r="5" fill="#2563eb"/>
+  <text x="360" y="120" text-anchor="middle" font-size="9" fill="#64748b">x_max = 1.00</text>
+  <text x="200" y="145" text-anchor="middle" font-size="12" fill="#7c3aed">x_prime = (x - x_min) / (x_max - x_min)</text>
+</svg></div></figure>
+</div>
+</section>
+
+
+<!-- TYPE 10 -->
+<section id="type10">
+<h2>TYPE 10 — Model Robustness</h2>
+<div class="q">
+<p class="src">ML/questions/ML Midsem Practice — TYPE 10</p>
+<p>Three models on two datasets (noise vs outliers). State <strong>Affected</strong> or <strong>Less Affected</strong> with justification.</p>
+<table><tr><th>Model</th><th>Noise</th><th>Outliers</th></tr>
+<tr><td>Linear Regression</td><td><strong>Affected</strong></td><td><strong>Affected</strong></td></tr>
+<tr><td>Decision Tree</td><td><strong>Affected</strong></td><td><strong>Less Affected</strong></td></tr>
+<tr><td>Random Forest</td><td><strong>Less Affected</strong></td><td><strong>Less Affected</strong></td></tr></table>
+<div class="step"><strong>LR + noise/outliers:</strong> MSE squares errors — every point pulls the line; outliers dominate.</div>
+<div class="step"><strong>Tree + noise:</strong> Overfits with extra splits. <strong>Tree + outliers:</strong> Outlier often isolated in its own leaf.</div>
+<div class="step"><strong>RF:</strong> Bagging + averaging many trees smooths noise and dilutes outlier impact.</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Robustness"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 180" font-family="system-ui,sans-serif">
+  <rect width="440" height="180" fill="#f8fafc" rx="8"/>
+  <text x="220" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Bias-Variance Diagnosis</text>
+  <rect x="20" y="40" width="120" height="70" rx="6" fill="#fef2f2" stroke="#dc2626"/>
+  <text x="80" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#dc2626">High Bias</text>
+  <text x="80" y="88" text-anchor="middle" font-size="9" fill="#64748b">underfit</text>
+  <rect x="160" y="40" width="120" height="70" rx="6" fill="#ecfdf5" stroke="#059669"/>
+  <text x="220" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#059669">Good Fit</text>
+  <rect x="300" y="40" width="120" height="70" rx="6" fill="#fffbeb" stroke="#d97706"/>
+  <text x="360" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">High Variance</text>
+  <text x="360" y="88" text-anchor="middle" font-size="9" fill="#64748b">overfit</text>
+  <text x="220" y="135" text-anchor="middle" font-size="10" fill="#1e3a5f">Fix bias: more features | Fix variance: Ridge/Lasso, more data</text>
+</svg></div></figure>
+</div>
+</section>
+
+<!-- TYPE 11 -->
+<section id="type11">
+<h2>TYPE 11 — Normal Equation Dimensions</h2>
+<div class="q">
+<p class="src">ML/questions/ML Midsem Practice — TYPE 11</p>
+<p>\(m=28\) samples, \(n=4\) features (add bias \(x_0=1\)). Dimensions of \(X\), \(y\), \(	heta\) in \(	heta=(X^TX)^{-1}X^Ty\)?</p>
+<div class="ans"><strong>\(X\): 28×5</strong> · <strong>\(y\): 28×1</strong> · <strong>\(	heta\): 5×1</strong></div>
+<div class="step">\(X^T\): 5×28 · \(X^TX\): 5×5 · \((X^TX)^{-1}X^Ty\): 5×1 ✓</div>
+<div class="step">Wrong coordinate in any dimension → 0 marks (per official rubric).</div>
 </div>
 </section>
 
@@ -247,6 +500,38 @@ th{background:#eff6ff}
 <h2>Mid Sem — Ridge &amp; Lasso (2 Iterations)</h2>
 <span class="tag">ML/mid sem/ML_LinReg_Regularization_Solution.pdf</span>
 <p>RR-CHD from Diastolic (x₁) &amp; BMI (x₂). w₀=5, w₁=w₂=−0.03, α=0.02, λ=5</p>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Ridge Lasso"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150" font-family="system-ui,sans-serif">
+  <rect width="420" height="150" fill="#f8fafc" rx="8"/>
+  <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Ridge vs Lasso Updates</text>
+  <rect x="30" y="40" width="170" height="95" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="115" y="58" text-anchor="middle" font-size="11" font-weight="600" fill="#2563eb">Ridge L2</text>
+  <text x="115" y="78" text-anchor="middle" font-size="10" fill="#1e3a5f">J = MSE + lambda*sum(theta^2)</text>
+  <text x="115" y="96" text-anchor="middle" font-size="9" fill="#64748b">shrinks weights, rarely zero</text>
+  <rect x="220" y="40" width="170" height="95" rx="6" fill="#f3e8ff" stroke="#7c3aed"/>
+  <text x="305" y="58" text-anchor="middle" font-size="11" font-weight="600" fill="#7c3aed">Lasso L1</text>
+  <text x="305" y="78" text-anchor="middle" font-size="10" fill="#1e3a5f">J = MSE + lambda*sum(|theta|)</text>
+  <text x="305" y="96" text-anchor="middle" font-size="9" fill="#64748b">can zero weights - feature selection</text>
+</svg></div><div class="svg-wrap" role="img" aria-label="GD" style="margin-top:.5rem"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 140" font-family="system-ui,sans-serif">
+  <defs><marker id="a-u17" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2563eb"/></marker></defs>
+  <rect width="520" height="140" fill="#f8fafc" rx="8"/>
+  <text x="260" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Gradient Descent - One Iteration</text>
+  <rect x="20" y="40" width="90" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="65" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Predict</text>
+  <text x="65" y="72" text-anchor="middle" font-size="9" fill="#64748b">h = theta^T x</text>
+  <line x1="110" y1="62" x2="130" y2="62" stroke="#2563eb" marker-end="url(#a-u17)"/>
+  <rect x="130" y="40" width="90" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="175" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Error</text>
+  <text x="175" y="72" text-anchor="middle" font-size="9" fill="#64748b">e = h - y</text>
+  <line x1="220" y1="62" x2="240" y2="62" stroke="#2563eb" marker-end="url(#a-u17)"/>
+  <rect x="240" y="40" width="100" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="290" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Gradient</text>
+  <text x="290" y="72" text-anchor="middle" font-size="9" fill="#64748b">dJ/dtheta</text>
+  <line x1="340" y1="62" x2="360" y2="62" stroke="#2563eb" marker-end="url(#a-u17)"/>
+  <rect x="360" y="40" width="130" height="44" rx="6" fill="#ecfdf5" stroke="#059669"/>
+  <text x="425" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Update</text>
+  <text x="425" y="72" text-anchor="middle" font-size="9" fill="#64748b">theta -= alpha * grad</text>
+  <text x="260" y="115" text-anchor="middle" font-size="11" fill="#7c3aed">Ridge adds (lambda/m)*theta | Lasso adds alpha*lambda*sign(theta)</text>
+</svg></div></figure>
 <table><tr><th>Patient</th><th>x₁</th><th>x₂</th><th>y</th><th>h(x)</th><th>error</th></tr>
 <tr><td>1</td><td>80</td><td>35</td><td>1.81</td><td>1.55</td><td>−0.26</td></tr>
 <tr><td>2</td><td>80</td><td>25</td><td>1.22</td><td>1.85</td><td>+0.63</td></tr>
@@ -306,7 +591,7 @@ th{background:#eff6ff}
 </section>
 
 <p style="margin-top:2rem;color:var(--muted);font-size:.82rem">
-Theory for these topics → <a href="ML_Theory_Guide.html">ML_Theory_Guide.html</a> · Formulas → <a href="ML_Revision_Sheet.html">ML_Revision_Sheet.html</a>
+Theory for these topics → <a href="ML_Theory_Guide.html">ML_Theory_Guide.html</a> · Formulas → <a href="ML_Revision_Sheet.html">ML_Revision_Sheet.html</a> · All papers → <a href="ML_Past_Papers.html">ML_Past_Papers.html</a>
 </p>
 </main>
 </div>
