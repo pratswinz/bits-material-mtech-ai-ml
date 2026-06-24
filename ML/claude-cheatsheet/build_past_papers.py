@@ -6,7 +6,18 @@ import re
 from pathlib import Path
 
 from svg_inline import SVG_WRAP_CSS, reset_uid, svg_div, svg_figure
-from table_format import TABLE_CSS, format_content
+from solution_format import SOL_CSS, format_solution, prepare_solution_raw
+from table_format import (
+    TABLE_CSS,
+    format_content,
+    format_stem,
+    enrich_jan2026_q6_solution,
+    enrich_mar2026_endsem_q6_solution,
+    enrich_knn_gower_solution,
+    enrich_gbm_solution,
+    enrich_lwlr_solution,
+)
+from math_format import format_math_in_html
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "ML_Past_Papers.html"
@@ -24,6 +35,19 @@ PAPERS = [
 ]
 
 # (keyword list, formula html, diagram filename or None)
+# Order matters for generic keys; enrich() checks PRIORITY first.
+PRIORITY_ENRICHMENTS = [
+    (["k-means algorithm", "centroid-based clustering", "gaussian mixture model", "gmm with two"],
+     r"<h5>K-Means &amp; GMM</h5>Assign to nearest centroid → update mean · GMM: soft responsibilities \(\gamma_{ik}\) · hard vs soft assignment",
+     None),
+    (["dataset a", "dataset b", "noisy / irrelevant", "outliers introduced", "model l1:", "model t:"],
+     r"<h5>Bias–Variance</h5>Train≈Test high→bias · Train low, Test high→variance · \(R^2=1-SS_{res}/SS_{tot}\)",
+     "bias-variance.svg"),
+    (["log-odds", "guarantees", "cgpa", "logistic regression parameters", "θ₂"],
+     r"<h5>Logistic</h5>\(\sigma(z)=1/(1+e^{-z})\) · BCE: \(-[y\log\hat p+(1-y)\log(1-\hat p)]\)",
+     "logistic-sigmoid.svg"),
+]
+
 ENRICHMENTS = [
     (["entropy", "information gain", "decision tree", "id3", "ig("],
      r"<h5>Entropy &amp; IG</h5>\(H(S)=-\sum p_k\log_2 p_k\) · \(IG=H(S)-\sum_v\frac{|S_v|}{|S|}H(S_v)\)",
@@ -40,7 +64,7 @@ ENRICHMENTS = [
     (["min-max", "z-score", "normaliz", "feature scaling", "scaling"],
      r"<h5>Scaling</h5>\(x'=\frac{x-x_{min}}{x_{max}-x_{min}}\) · \(x'=\frac{x-\mu}{\sigma}\)",
      "min-max-scaling.svg"),
-    (["bias", "variance", "overfit", "underfit", "rmse", "r²", "r2"],
+    (["high bias", "high variance", "overfit", "underfit", "bias–variance", "train≈test", "rmse", "r²", "r2"],
      r"<h5>Bias–Variance</h5>Train≈Test high→bias · Train low, Test high→variance · \(R^2=1-SS_{res}/SS_{tot}\)",
      "bias-variance.svg"),
     (["tom mitchell", "experience e", "task t", "performance measure"],
@@ -88,7 +112,21 @@ JUNE2026_BLOCKS = [
 def esc(s):
     if not s:
         return ""
-    return format_content(H.escape(s).replace("\n", "<br>"))
+    return format_stem(H.escape(s).replace("\n", "<br>"))
+
+
+def esc_sol(s):
+    if not s:
+        return ""
+    s = prepare_solution_raw(s)
+    html = format_content(H.escape(s).replace("\n", "<br>"))
+    html = enrich_jan2026_q6_solution(html)
+    html = enrich_mar2026_endsem_q6_solution(html)
+    html = enrich_knn_gower_solution(html)
+    html = format_solution(html)
+    html = enrich_gbm_solution(html)
+    html = enrich_lwlr_solution(html)
+    return format_math_in_html(html)
 
 
 def badge(exam, session, year):
@@ -102,7 +140,7 @@ def badge(exam, session, year):
 def enrich(qtext, sol):
     blob = (qtext + " " + sol).lower()
     extra = ""
-    for keys, formula, diagram in ENRICHMENTS:
+    for keys, formula, diagram in PRIORITY_ENRICHMENTS + ENRICHMENTS:
         if any(k in blob for k in keys):
             extra += f'<div class="formula">{formula}</div>'
             if diagram:
@@ -118,7 +156,7 @@ def clean(text):
 def split_questions(text):
     text = clean(text)
     # Main questions only (Q1. [5M] ...), not sub-parts like Q1. a)
-    parts = re.split(r"\n(?=Q\.?\s*\d+[\.\)]\s*(?:\[|[A-Z(]))", text)
+    parts = re.split(r"\n(?=Q\.?\s*\d+[\.\)]\s*(?:\[|[A-Za-z(]))", text)
     blocks = []
     markers = [
         "Solution:", "Solution", "Answers:", "Answer Keys", "Evaluation:",
@@ -127,7 +165,7 @@ def split_questions(text):
     answer_re = re.compile(r"\n(?:Answer|Ans)\s*:", re.I)
     for p in parts:
         p = p.strip()
-        if len(p) < 40:
+        if len(p) < 25:
             continue
         m = re.match(r"(Q\.?\s*\d+[\.\)]?)", p, re.I)
         if not m:
@@ -144,8 +182,16 @@ def split_questions(text):
             best = am.start()
         if best < len(body):
             qtext, sol = body[:best].strip(), body[best:].strip()
-        if len(qtext) >= 20:
-            blocks.append((qid, qtext, sol))
+        if len(qtext) < 20 or re.match(r"^\[[^\]]+\]\s*Solution:?\s*$", qtext.strip(), re.I):
+            marks_m = re.search(r"\[[^\]]+\]", body)
+            marks = marks_m.group(0) if marks_m else ""
+            qtext = (
+                f"<em>Question text missing from PDF extract (may be image-only). "
+                f"{marks} — refer to the official PDF.</em>"
+            )
+            if len(sol) <= 30:
+                sol = ""
+        blocks.append((qid, qtext, sol))
     return blocks
 
 
@@ -158,6 +204,22 @@ def june_section():
         <div class="sol"><strong>Solution:</strong>{body}</div></div>'''
     sec += "</section>"
     return sec
+
+
+def validate_html(html: str) -> list:
+    """Return list of structural HTML issues that break layout."""
+    issues = []
+    if html.count("<aside") != html.count("</aside>"):
+        issues.append("aside tag mismatch")
+    if html.count("<main") != html.count("</main>"):
+        issues.append("main tag mismatch")
+    if re.search(r"</(?:ul|table|div|section|p|li)(?![\s>/])", html):
+        issues.append("malformed closing tags (missing >)")
+    if re.search(r"</ul[^>]", html) and not re.search(r"</ul>", html):
+        pass
+    for m in re.finditer(r"</(?:ul|table|tbody|thead|section)(?![\s>/])", html):
+        issues.append(f"broken tag near: ...{html[max(0,m.start()-30):m.end()+20]!r}...")
+    return issues
 
 
 def build():
@@ -175,22 +237,24 @@ def build():
         sec = f'<section id="{sid}"><h2>{H.escape(label)}</h2><p class="src">Sem 1/ML/Question papers · {H.escape(fname)}</p>'
         for qid, qtext, sol in split_questions(text):
             extra = enrich(qtext, sol)
-            sol_html = esc(sol) if sol else "<em>See official answer key in PDF.</em>"
+            sol_html = esc_sol(sol) if sol else "<em>See official answer key in PDF.</em>"
             sec += f'''<div class="q"><div class="badges">{badge(exam,session,year)}</div>
             <h4>{H.escape(qid)}</h4>
             <div class="stem"><strong>Question:</strong><br>{esc(qtext)}</div>
             {extra}
-            <div class="sol"><strong>Solution:</strong><br>{sol_html}</div></div>'''
+            <div class="sol"><strong>Solution</strong>{sol_html}</div></div>'''
         sec += "</section>"
         sections.append(sec)
 
-    css_extra = """
-.formula{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.65rem 1rem;margin:.6rem 0;font-size:.92rem}
-.formula h5{margin:0 0 .35rem;font-size:.72rem;text-transform:uppercase;color:#2563eb;letter-spacing:.04em}
-.diagram{margin:.75rem 0;text-align:center}
-.diagram img{max-width:100%;height:auto;border:1px solid var(--border);border-radius:8px;background:#fff}
+    css_extra = f"""
+.formula{{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:1rem 1.15rem;margin:.85rem 0;font-size:1rem;overflow-x:auto;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.04)}}
+.formula h5{{margin:0 0 .55rem;font-size:.72rem;text-transform:uppercase;color:#64748b;letter-spacing:.05em;text-align:left}}
+.formula mjx-container{{margin:.35rem 0!important}}
+.diagram{{margin:1rem 0;text-align:center}}
+.diagram img{{max-width:100%;height:auto;border:1px solid var(--border);border-radius:8px;background:#fff}}
 {TABLE_CSS}
 {SVG_WRAP_CSS}
+{SOL_CSS}
 """
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -198,29 +262,37 @@ def build():
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ML Past Papers 2023–2026 — Full Solutions</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<script>
+window.MathJax = {{
+  tex: {{ inlineMath: [['\\\\(','\\\\)']], displayMath: [['\\\\[','\\\\]']], processEscapes: true }},
+  options: {{ skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }}
+}};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
 <style>
 :root{{--navy:#1e3a5f;--blue:#2563eb;--green:#059669;--red:#dc2626;--purple:#7c3aed;--amber:#d97706;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}}
 *{{box-sizing:border-box;margin:0;padding:0}}
 body{{font-family:Georgia,"Segoe UI",serif;background:var(--bg);color:var(--text);line-height:1.65}}
 header{{background:var(--navy);color:#fff;padding:1.5rem;text-align:center}}
 header a{{color:#93c5fd}}
-.shell{{display:flex;max-width:1280px;margin:0 auto}}
-aside{{width:260px;background:var(--card);border-right:1px solid var(--border);padding:.8rem;position:sticky;top:0;height:100vh;overflow-y:auto;font-size:.75rem}}
+.shell{{display:flex;max-width:1280px;margin:0 auto;width:100%}}
+aside{{width:260px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);padding:.8rem;position:sticky;top:0;height:100vh;overflow-y:auto;font-size:.75rem}}
 aside a{{display:block;padding:.3rem .5rem;color:var(--navy);text-decoration:none;border-radius:4px}}
 aside a:hover{{background:#eff6ff}}
 aside .grp{{font-weight:700;color:var(--amber);font-size:.65rem;text-transform:uppercase;margin:.8rem 0 .2rem}}
-main{{flex:1;padding:1.5rem 2rem;max-width:920px}}
+main{{flex:1;min-width:0;max-width:920px;padding:1.5rem 2rem}}
 section{{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:2px solid var(--border)}}
-h2{{color:var(--navy);font-size:1.2rem;margin-bottom:.5rem}}
-.q{{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--purple);border-radius:8px;padding:1rem;margin:.8rem 0}}
-.badges{{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.5rem}}
-.b{{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.03em}}
+h2{{color:var(--navy);font-size:1.2rem;margin-bottom:.75rem}}
+.q h4{{color:var(--navy);font-size:1rem;margin:.25rem 0 .5rem}}
+.q{{background:var(--card);border:1px solid var(--border);border-left:3px solid #a78bfa;border-radius:10px;padding:1.25rem 1.35rem;margin:1.35rem 0;box-shadow:0 1px 3px rgba(0,0,0,.05);min-width:0;width:100%;box-sizing:border-box}}
+.badges{{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.65rem}}
+.b{{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.03em}}
 .b.mid{{background:#dbeafe;color:#1d4ed8}} .b.end{{background:#fce7f3;color:#be185d}}
 .b.reg{{background:#d1fae5;color:#047857}} .b.makeup{{background:#fef3c7;color:#b45309}}
 .b.yr{{background:#f3e8ff;color:#7c3aed}}
-.stem{{font-size:.9rem;margin:.5rem 0;padding:.75rem 1rem;background:#f8fafc;border:1px solid var(--border);border-radius:6px;word-wrap:break-word}}
-.sol{{font-size:.9rem;margin-top:.6rem;padding:.75rem 1rem;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:6px;word-wrap:break-word}}
+.stem{{font-size:.92rem;margin:.75rem 0 1rem;padding:.9rem 1.1rem;background:#f8fafc;border:1px solid var(--border);border-radius:8px;line-height:1.7;min-width:0;width:100%;box-sizing:border-box;overflow-wrap:break-word;word-wrap:break-word;word-break:normal;hyphens:auto}}
+.sol{{font-size:.92rem;margin-top:1rem;padding:1.1rem 1.25rem;background:#fff;border:1px solid #e2e8f0;border-left:3px solid #059669;border-radius:8px;line-height:1.65;min-width:0;width:100%;box-sizing:border-box;overflow-wrap:break-word;word-wrap:break-word}}
+.sol > strong{{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:#047857;margin-bottom:.75rem;padding-bottom:.35rem;border-bottom:1px solid #ecfdf5}}
 .src{{font-size:.78rem;color:var(--muted);margin-bottom:.6rem}}
 .exam-img{{max-width:100%;border:1px solid var(--border);border-radius:6px;margin:.5rem 0}}
 .legend{{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;margin-bottom:1.5rem;font-size:.85rem}}
@@ -252,6 +324,11 @@ Diagrams are inlined SVG (no broken images when opened locally). MathJax renders
 </body>
 </html>"""
     OUT.write_text(html, encoding="utf-8")
+    issues = validate_html(html)
+    if issues:
+        print("WARNING: HTML validation issues:")
+        for issue in issues[:10]:
+            print(" -", issue)
     print("Wrote", OUT, "with", html.count('class="q"'), "questions")
 
 
