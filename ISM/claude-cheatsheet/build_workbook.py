@@ -3,10 +3,21 @@
 import html as H
 from pathlib import Path
 
-from svg_inline import SVG_WRAP_CSS, reset_uid, svg_figure
+from svg_inline import SVG_WRAP_CSS, reset_uid, svg_figure, asset_figure
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "ISM_PYQ_Workbook.html"
+
+PNG_DIAGRAMS = {
+    "type1": (
+        "Skewness — mean, median, mode order",
+        "Left skew (Mean < Median < Mode), symmetric (all equal), right skew (Mode < Median < Mean).",
+    ),
+    "type9": (
+        "Normal distribution — bell curve & empirical rule",
+        "68% within ±1σ, 95% within ±2σ, 99.7% within ±3σ. Z = (X−μ)/σ standardises any normal.",
+    ),
+}
 
 SHARED_HEAD = """
 <script>
@@ -176,7 +187,13 @@ def build():
 
     for tid, title, exam, svg, formula, solution in TYPES:
         nav.append(f'<a href="#{tid}">{title.split("—")[0].strip()}</a>')
-        diag = svg_figure(svg, title) if svg else ""
+        if tid in PNG_DIAGRAMS:
+            alt, cap = PNG_DIAGRAMS[tid]
+            diag = asset_figure(alt, cap, png="bell-curve-skewness.png")
+        elif svg:
+            diag = svg_figure(svg, title)
+        else:
+            diag = ""
         body += f"""<section id="{tid}"><h2>{H.escape(title)}</h2>
 <span class="tag">{H.escape(exam)}</span>
 <div class="formula"><h5>Core formula</h5>\\[{formula}\\]</div>

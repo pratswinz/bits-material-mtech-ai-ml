@@ -36,8 +36,11 @@ h2{color:var(--navy);font-size:1.15rem;margin-bottom:.6rem}
 .diagram{margin:.75rem 0;text-align:center}
 .tag{display:inline-block;font-size:.68rem;background:#f3e8ff;color:var(--purple);padding:2px 8px;border-radius:99px;margin-right:4px}
 
-.svg-wrap{display:inline-block;max-width:100%;vertical-align:top}
-.svg-wrap svg{max-width:100%;height:auto;border:1px solid var(--border);border-radius:8px;background:#fff;display:block}
+.diagram{margin:1.2rem 0;text-align:center}
+.diagram-img,.diagram .img-fallback{width:100%;max-width:640px;height:auto;display:block;margin:0 auto;border:1px solid var(--border);border-radius:8px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.svg-wrap{display:block;width:100%;max-width:640px;margin:0 auto}
+.svg-wrap svg{width:100%;height:auto;min-height:140px;border:1px solid var(--border);border-radius:8px;background:#fff;display:block;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.fig-cap{font-size:.82rem;color:var(--muted);margin-top:.55rem;line-height:1.5;max-width:640px;margin-left:auto;margin-right:auto;text-align:left;padding:0 .5rem}
 </style></head><body>
 <header><h1>ISM PYQ Workbook</h1><p><a href="index.html">← Hub</a> · 18 question types · AIMLCZC418</p></header>
 <div class="shell"><aside><div class="grp">Types</div><a href="#overview">Overview</a><a href="#type1">TYPE 1</a><a href="#type2">TYPE 2</a><a href="#type3">TYPE 3</a><a href="#type4">TYPE 4</a><a href="#type5">TYPE 5</a><a href="#type6">TYPE 6</a><a href="#type7">TYPE 7</a><a href="#type8">TYPE 8</a><a href="#type9">TYPE 9</a><a href="#type10">TYPE 10</a><a href="#type11">TYPE 11</a><a href="#type12">TYPE 12</a><a href="#type13">TYPE 13</a><a href="#type14">TYPE 14</a><a href="#type15">TYPE 15</a><a href="#type16">TYPE 16</a><a href="#type17">TYPE 17</a><a href="#type18">TYPE 18</a>
@@ -54,25 +57,7 @@ h2{color:var(--navy);font-size:1.15rem;margin-bottom:.6rem}
 </tbody></table></section><section id="type1"><h2>TYPE 1 — Descriptive Statistics</h2>
 <span class="tag">Mid EC-2</span>
 <div class="formula"><h5>Core formula</h5>\[\bar{x}=\frac{1}{n}\sum x_i \quad \text{Median = middle sorted value} \quad s=\sqrt{\frac{\sum(x_i-\bar{x})^2}{n-1}} \quad \text{IQR}=Q_3-Q_1\]</div>
-<figure class="diagram"><div class="svg-wrap" role="img" aria-label="TYPE 1 — Descriptive Statistics"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200" font-family="system-ui,sans-serif">
-  <rect width="420" height="200" fill="#f8fafc" rx="8"/>
-  <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Five-Number Summary &amp; Box Plot</text>
-  <line x1="60" y1="120" x2="360" y2="120" stroke="#64748b" stroke-width="2"/>
-  <line x1="100" y1="100" x2="100" y2="140" stroke="#2563eb" stroke-width="2"/>
-  <line x1="140" y1="85" x2="140" y2="155" stroke="#2563eb" stroke-width="3"/>
-  <rect x="140" y="95" width="120" height="50" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <line x1="200" y1="85" x2="200" y2="155" stroke="#059669" stroke-width="3"/>
-  <line x1="260" y1="85" x2="260" y2="155" stroke="#2563eb" stroke-width="3"/>
-  <line x1="300" y1="100" x2="300" y2="140" stroke="#2563eb" stroke-width="2"/>
-  <circle cx="340" cy="120" r="6" fill="#dc2626"/>
-  <text x="100" y="170" text-anchor="middle" font-size="9" fill="#64748b">Min</text>
-  <text x="140" y="170" text-anchor="middle" font-size="9" fill="#64748b">Q1</text>
-  <text x="200" y="170" text-anchor="middle" font-size="9" fill="#059669" font-weight="600">Med</text>
-  <text x="260" y="170" text-anchor="middle" font-size="9" fill="#64748b">Q3</text>
-  <text x="300" y="170" text-anchor="middle" font-size="9" fill="#64748b">Max</text>
-  <text x="340" y="170" text-anchor="middle" font-size="9" fill="#dc2626">Outlier</text>
-  <text x="210" y="188" text-anchor="middle" font-size="9" fill="#64748b">Outlier if &gt; Q3 + 1.5&#215;IQR or &lt; Q1 - 1.5&#215;IQR</text>
-</svg></div></figure>
+<figure class="diagram"><img class="diagram-img" src="assets/bell-curve-skewness.png" alt="Skewness — mean, median, mode order"/><figcaption class="fig-cap">Left skew (Mean < Median < Mode), symmetric (all equal), right skew (Mode < Median < Mean).</figcaption></figure>
 <div class="q"><p><strong>PYQ:</strong> Dec 2025 Q1 — chicken sandwich fat (7,4,20,23,25,19,30,30,40,56)</p>
 <div class="step"><strong>Step 1 — Sort &amp; centre:</strong> Sorted: 4,7,19,20,23,25,30,30,40,56 → \(ar{x}=25.4\), Median = (23+25)/2 = <strong>22</strong></div>
 <div class="step"><strong>Step 2 — Spread:</strong> Sample SD ≈ <strong>14.6 g</strong>, Q1=19, Q3=30, IQR=11</div>
@@ -82,7 +67,7 @@ h2{color:var(--navy);font-size:1.15rem;margin-bottom:.6rem}
 <span class="tag">Mid EC-2</span>
 <div class="formula"><h5>Core formula</h5>\[\text{Min, Q1, Median, Q3, Max} \quad \text{Outlier if } x>Q_3+1.5\cdot\text{IQR}\]</div>
 <figure class="diagram"><div class="svg-wrap" role="img" aria-label="TYPE 2 — Five-Number Summary"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200" font-family="system-ui,sans-serif">
-  <rect width="420" height="200" fill="#f8fafc" rx="8"/>
+  <rect width="420" height="200" fill="#ffffff" rx="8"/>
   <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Five-Number Summary &amp; Box Plot</text>
   <line x1="60" y1="120" x2="360" y2="120" stroke="#64748b" stroke-width="2"/>
   <line x1="100" y1="100" x2="100" y2="140" stroke="#2563eb" stroke-width="2"/>
@@ -231,18 +216,7 @@ h2{color:var(--navy);font-size:1.15rem;margin-bottom:.6rem}
 <div class="ans">Use Binomial exact; Poisson when n large, p small</div></div></section><section id="type9"><h2>TYPE 9 — Normal Distribution</h2>
 <span class="tag">Mid EC-2</span>
 <div class="formula"><h5>Core formula</h5>\[Z=\frac{X-\mu}{\sigma} \quad P(a<X<b)=P\left(\frac{a-\mu}{\sigma}<Z<\frac{b-\mu}{\sigma}\right)\]</div>
-<figure class="diagram"><div class="svg-wrap" role="img" aria-label="TYPE 9 — Normal Distribution"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 180" font-family="system-ui,sans-serif">
-  <rect width="420" height="180" fill="#f8fafc" rx="8"/>
-  <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Normal Distribution &amp; Z-Score</text>
-  <path d="M 40 140 Q 110 140 150 60 Q 210 20 270 60 Q 310 140 380 140 L 380 150 L 40 150 Z" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
-  <line x1="210" y1="30" x2="210" y2="150" stroke="#059669" stroke-width="2" stroke-dasharray="4"/>
-  <text x="210" y="168" text-anchor="middle" font-size="9" fill="#059669">mu</text>
-  <line x1="150" y1="140" x2="150" y2="150" stroke="#64748b"/>
-  <line x1="270" y1="140" x2="270" y2="150" stroke="#64748b"/>
-  <text x="150" y="168" text-anchor="middle" font-size="8" fill="#64748b">mu - sigma</text>
-  <text x="270" y="168" text-anchor="middle" font-size="8" fill="#64748b">mu + sigma</text>
-  <text x="210" y="175" text-anchor="middle" font-size="9" fill="#64748b">Z = (X - mu) / sigma</text>
-</svg></div></figure>
+<figure class="diagram"><img class="diagram-img" src="assets/bell-curve-skewness.png" alt="Normal distribution — bell curve & empirical rule"/><figcaption class="fig-cap">68% within ±1σ, 95% within ±2σ, 99.7% within ±3σ. Z = (X−μ)/σ standardises any normal.</figcaption></figure>
 <div class="q"><p><strong>PYQ:</strong> Jan 2026 Makeup Q3 — scores N(73,8²)</p>
 <div class="step">(i) \(P(X<91)=P(Z<2.25)pprox0.988\) → yes, "most" below 91</div>
 <div class="step">(ii) \(P(65<X<89)pprox0.818\)</div>

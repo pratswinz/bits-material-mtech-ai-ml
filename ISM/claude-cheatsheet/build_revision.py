@@ -61,11 +61,28 @@ SECTIONS = [
     ]),
 ]
 
+SECTION_FIGURES = {
+    "descriptive": (
+        "Skewness — mean, median, mode",
+        "Left skew, symmetric, and right skew with mean/median/mode order.",
+    ),
+    "continuous": (
+        "Normal distribution — bell curve & empirical rule",
+        "68% within ±1σ, 95% within ±2σ, 99.7% within ±3σ.",
+    ),
+}
+
 
 def build():
+    from svg_inline import asset_figure
+
     cards = ""
     for sid, title, items in SECTIONS:
-        cards += f'<div class="part" id="{sid}"><h2>{H.escape(title)}</h2><div class="grid">'
+        fig = ""
+        if sid in SECTION_FIGURES:
+            alt, cap = SECTION_FIGURES[sid]
+            fig = asset_figure(alt, cap, png="bell-curve-skewness.png")
+        cards += f'<div class="part" id="{sid}"><h2>{H.escape(title)}</h2>{fig}<div class="grid">'
         for label, formula in items:
             tex = formula if "\\" in formula or "{" in formula else H.escape(formula)
             wrap = f"\\({tex}\\)" if "\\" in str(tex) or "=" in str(formula) else tex
@@ -102,6 +119,9 @@ header a{{color:#a7f3d0}}
 .card{{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.65rem .85rem}}
 .label{{font-size:.72rem;font-weight:700;color:var(--navy);margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.04em}}
 .formula{{font-size:.95rem;overflow-x:auto}}
+.diagram{{margin:.75rem 0;text-align:center}}
+.diagram-img{{width:100%;max-width:640px;height:auto;display:block;margin:0 auto;border:1px solid var(--border);border-radius:8px;background:#fff}}
+.fig-cap{{font-size:.78rem;color:var(--muted);margin-top:.4rem;max-width:640px;margin-left:auto;margin-right:auto;text-align:left}}
 .note{{font-size:.78rem;color:var(--muted);margin-top:1rem;padding:.8rem;background:#fffbeb;border-radius:8px;border:1px solid #fcd34d}}
 @media print{{header{{background:#1e3a5f;-webkit-print-color-adjust:exact}}}}
 </style>

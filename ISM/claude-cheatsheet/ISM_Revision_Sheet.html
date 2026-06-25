@@ -25,6 +25,9 @@ header a{color:#a7f3d0}
 .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.65rem .85rem}
 .label{font-size:.72rem;font-weight:700;color:var(--navy);margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.04em}
 .formula{font-size:.95rem;overflow-x:auto}
+.diagram{margin:.75rem 0;text-align:center}
+.diagram-img{width:100%;max-width:640px;height:auto;display:block;margin:0 auto;border:1px solid var(--border);border-radius:8px;background:#fff}
+.fig-cap{font-size:.78rem;color:var(--muted);margin-top:.4rem;max-width:640px;margin-left:auto;margin-right:auto;text-align:left}
 .note{font-size:.78rem;color:var(--muted);margin-top:1rem;padding:.8rem;background:#fffbeb;border-radius:8px;border:1px solid #fcd34d}
 @media print{header{background:#1e3a5f;-webkit-print-color-adjust:exact}}
 </style>
@@ -35,7 +38,7 @@ header a{color:#a7f3d0}
 <a href="index.html">← Hub</a>
 </header>
 <div class="container">
-<div class="part" id="descriptive"><h2>1. Descriptive Statistics</h2><div class="grid"><div class="card">
+<div class="part" id="descriptive"><h2>1. Descriptive Statistics</h2><figure class="diagram"><img class="diagram-img" src="assets/bell-curve-skewness.png" alt="Skewness — mean, median, mode"/><figcaption class="fig-cap">Left skew, symmetric, and right skew with mean/median/mode order.</figcaption></figure><div class="grid"><div class="card">
             <div class="label">Mean</div>
             <div class="formula">\(\bar{x} = \frac{1}{n}\sum x_i\)</div>
             </div><div class="card">
@@ -107,7 +110,7 @@ header a{color:#a7f3d0}
             </div><div class="card">
             <div class="label">Poisson approx</div>
             <div class="formula">\(Use when n large, p small, np = λ\)</div>
-            </div></div></div><div class="part" id="continuous"><h2>5. Continuous Distributions</h2><div class="grid"><div class="card">
+            </div></div></div><div class="part" id="continuous"><h2>5. Continuous Distributions</h2><figure class="diagram"><img class="diagram-img" src="assets/bell-curve-skewness.png" alt="Normal distribution — bell curve & empirical rule"/><figcaption class="fig-cap">68% within ±1σ, 95% within ±2σ, 99.7% within ±3σ.</figcaption></figure><div class="grid"><div class="card">
             <div class="label">Normal</div>
             <div class="formula">\(X \sim N(\mu,\sigma^2),\; Z=\frac{X-\mu}{\sigma}\)</div>
             </div><div class="card">

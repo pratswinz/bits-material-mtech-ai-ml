@@ -22,6 +22,15 @@ SECTION_ENRICH = {
         ],
         "workbook_types": [1],
     },
+    "session1-step3": {
+        "formulas": [
+            (r"Symmetric", r"\text{Mean} = \text{Median} = \text{Mode}"),
+            (r"Right skew", r"\text{Mode} < \text{Median} < \text{Mean}"),
+            (r"Left skew", r"\text{Mean} < \text{Median} < \text{Mode}"),
+        ],
+        "workbook_types": [1],
+        "image": "bell-curve-skewness.png",
+    },
     "session1-step4": {
         "diagram": "box-plot.svg",
         "formulas": [
@@ -113,9 +122,10 @@ SECTION_ENRICH = {
         "diagram": "normal-curve.svg",
         "formulas": [
             (r"Normal PDF", r"f(x)=\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}"),
+            (r"Empirical rule", r"68\%\ \text{within } \pm1\sigma,\ 95\%\ \pm2\sigma,\ 99.7\%\ \pm3\sigma"),
         ],
         "workbook_types": [9],
-        "image": "distribution-shapes.png",
+        "image": "bell-curve-skewness.png",
     },
     "session6-zscore": {
         "formulas": [
@@ -204,6 +214,7 @@ SESSION_HERO = {
 
 DIAGRAM_CAPTIONS = {
     "box-plot.svg": "Box plot anatomy: whiskers to min/max (within fences), box = middle 50%, line = median, dots = outliers.",
+    "bell-curve-skewness.png": "Bell curve (μ, σ) with 68-95-99.7 rule; skewness types with mean/median/mode order.",
     "venn-ops.svg": "Set operations on events A and B: union (either), intersection (both), complement (not A).",
     "bayes-tree.svg": "Probability tree: multiply along branches, add across disjoint paths.",
     "naive-bayes.svg": "Naive Bayes: multiply prior P(class) by word likelihoods; pick highest score.",
@@ -284,7 +295,8 @@ def render_enrichment(anchor: str) -> str:
 
     if enrich.get("image"):
         png = enrich["image"]
-        out += asset_figure(anchor, f"Concept visual for {anchor.replace('-', ' ')}", png=png)
+        cap = DIAGRAM_CAPTIONS.get(png, f"Concept visual for {anchor.replace('-', ' ')}")
+        out += asset_figure(anchor, cap, png=png)
 
     formulas = enrich.get("formulas")
     if formulas:
