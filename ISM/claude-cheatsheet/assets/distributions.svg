@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 200" font-family="system-ui,sans-serif">
+  <rect width="440" height="200" fill="#f8fafc" rx="8"/>
+  <text x="220" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Discrete Distributions - When to Use</text>
+  <rect x="20" y="35" width="125" height="55" rx="6" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="82" y="55" text-anchor="middle" font-size="10" font-weight="600" fill="#2563eb">Bernoulli</text>
+  <text x="82" y="72" text-anchor="middle" font-size="8" fill="#64748b">1 trial, 2 outcomes</text>
+  <rect x="157" y="35" width="125" height="55" rx="6" fill="#ecfdf5" stroke="#059669"/>
+  <text x="220" y="55" text-anchor="middle" font-size="10" font-weight="600" fill="#059669">Binomial</text>
+  <text x="220" y="72" text-anchor="middle" font-size="8" fill="#64748b">n trials, fixed p</text>
+  <rect x="294" y="35" width="125" height="55" rx="6" fill="#f5f3ff" stroke="#7c3aed"/>
+  <text x="357" y="55" text-anchor="middle" font-size="10" font-weight="600" fill="#7c3aed">Poisson</text>
+  <text x="357" y="72" text-anchor="middle" font-size="8" fill="#64748b">rate lambda, rare events</text>
+  <rect x="88" y="110" width="125" height="55" rx="6" fill="#fffbeb" stroke="#d97706"/>
+  <text x="150" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">Normal</text>
+  <text x="150" y="147" text-anchor="middle" font-size="8" fill="#64748b">continuous, bell curve</text>
+  <rect x="226" y="110" width="125" height="55" rx="6" fill="#fef2f2" stroke="#dc2626"/>
+  <text x="289" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#dc2626">Poisson ~ Binomial</text>
+  <text x="289" y="147" text-anchor="middle" font-size="8" fill="#64748b">n large, p small, lambda=np</text>
+  <text x="220" y="188" text-anchor="middle" font-size="9" fill="#64748b">"out of n" = Binomial; "rate per hour" = Poisson</text>
+</svg>

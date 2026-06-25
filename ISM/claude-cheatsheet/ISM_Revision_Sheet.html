@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ISM Revision Sheet — AIMLCZC418</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['\\[','\\]']], processEscapes: true },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+<style>
+:root{--navy:#1e3a5f;--green:#059669;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.5;font-size:13px}
+header{background:linear-gradient(135deg,#1e3a5f,#059669);color:#fff;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}
+header h1{font-size:1.3rem}
+header a{color:#a7f3d0}
+.container{max-width:1200px;margin:0 auto;padding:1rem}
+.part{margin:1.2rem 0}
+.part h2{font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--green);background:#ecfdf5;padding:.4rem .8rem;border-radius:6px;margin-bottom:.6rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.6rem}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:.65rem .85rem}
+.label{font-size:.72rem;font-weight:700;color:var(--navy);margin-bottom:.25rem;text-transform:uppercase;letter-spacing:.04em}
+.formula{font-size:.95rem;overflow-x:auto}
+.note{font-size:.78rem;color:var(--muted);margin-top:1rem;padding:.8rem;background:#fffbeb;border-radius:8px;border:1px solid #fcd34d}
+@media print{header{background:#1e3a5f;-webkit-print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header>
+<div><h1>ISM Exam Cheat Sheet</h1><p>From <code>ISM/Cheat_Sheet/Cheat_Sheet_ISM.pdf</code></p></div>
+<a href="index.html">← Hub</a>
+</header>
+<div class="container">
+<div class="part" id="descriptive"><h2>1. Descriptive Statistics</h2><div class="grid"><div class="card">
+            <div class="label">Mean</div>
+            <div class="formula">\(\bar{x} = \frac{1}{n}\sum x_i\)</div>
+            </div><div class="card">
+            <div class="label">Median</div>
+            <div class="formula">\[Middle value (sorted); average of two middles if n even\]</div>
+            </div><div class="card">
+            <div class="label">Mode</div>
+            <div class="formula">\[Most frequent value\]</div>
+            </div><div class="card">
+            <div class="label">Variance.*?Sample</div>
+            <div class="formula">\(s^2 = \frac{\sum(x_i-\bar{x})^2}{n-1} \quad \text{(sample — divide by } n-1\text{)}\)</div>
+            </div><div class="card">
+            <div class="label">Std Dev</div>
+            <div class="formula">\(\sigma \text{ or } s = \sqrt{\text{variance}}\)</div>
+            </div><div class="card">
+            <div class="label">Coef. of Variation</div>
+            <div class="formula">\(CV = \frac{s}{\bar{x}} \times 100\%\)</div>
+            </div></div></div><div class="part" id="probability"><h2>2. Probability Theory</h2><div class="grid"><div class="card">
+            <div class="label">Axioms</div>
+            <div class="formula">\(0 \le P(A) \le 1,\; P(S)=1\)</div>
+            </div><div class="card">
+            <div class="label">Addition Rule</div>
+            <div class="formula">\(P(A \cup B) = P(A)+P(B)-P(A \cap B)\)</div>
+            </div><div class="card">
+            <div class="label">Mutually Exclusive</div>
+            <div class="formula">\(P(A \cap B)=0\)</div>
+            </div><div class="card">
+            <div class="label">Independence</div>
+            <div class="formula">\(P(A \cap B)=P(A)P(B)\)</div>
+            </div><div class="card">
+            <div class="label">Conditional</div>
+            <div class="formula">\(P(A|B)=\frac{P(A \cap B)}{P(B)}\)</div>
+            </div><div class="card">
+            <div class="label">Total Probability</div>
+            <div class="formula">\(P(B)=\sum P(B|A_i)P(A_i)\)</div>
+            </div><div class="card">
+            <div class="label">Bayes</div>
+            <div class="formula">\(P(A_k|B)=\frac{P(B|A_k)P(A_k)}{\sum_i P(B|A_i)P(A_i)}\)</div>
+            </div><div class="card">
+            <div class="label">Naïve Bayes</div>
+            <div class="formula">\(P(Y|X_1,\ldots,X_n) \propto P(Y)\prod_i P(X_i|Y)\)</div>
+            </div></div></div><div class="part" id="rv"><h2>3. Random Variables</h2><div class="grid"><div class="card">
+            <div class="label">E[X] discrete</div>
+            <div class="formula">\(E[X]=\sum x\,p(x)\)</div>
+            </div><div class="card">
+            <div class="label">Variance</div>
+            <div class="formula">\(\mathrm{Var}(X)=E[X^2]-(E[X])^2\)</div>
+            </div><div class="card">
+            <div class="label">E[aX+b]</div>
+            <div class="formula">\[aE[X] + b\]</div>
+            </div><div class="card">
+            <div class="label">Var(aX+b)</div>
+            <div class="formula">\(a^2\mathrm{Var}(X)\)</div>
+            </div><div class="card">
+            <div class="label">Covariance</div>
+            <div class="formula">\(\mathrm{Cov}(X,Y)=E[XY]-E[X]E[Y]\)</div>
+            </div><div class="card">
+            <div class="label">Independence check</div>
+            <div class="formula">\(p(x,y)=p_X(x)p_Y(y) \;\forall x,y\)</div>
+            </div></div></div><div class="part" id="discrete"><h2>4. Discrete Distributions</h2><div class="grid"><div class="card">
+            <div class="label">Bernoulli</div>
+            <div class="formula">\(P(X=x)=p^x(1-p)^{1-x},\; x\in\{0,1\};\; E=p,\; \mathrm{Var}=p(1-p)\)</div>
+            </div><div class="card">
+            <div class="label">Binomial</div>
+            <div class="formula">\(P(X=k)=\binom{n}{k}p^k(1-p)^{n-k};\; E=np,\; \mathrm{Var}=np(1-p)\)</div>
+            </div><div class="card">
+            <div class="label">Poisson</div>
+            <div class="formula">\(P(X=k)=\frac{e^{-\lambda}\lambda^k}{k!};\; E=\lambda,\; \mathrm{Var}=\lambda\)</div>
+            </div><div class="card">
+            <div class="label">Poisson approx</div>
+            <div class="formula">\(Use when n large, p small, np = λ\)</div>
+            </div></div></div><div class="part" id="continuous"><h2>5. Continuous Distributions</h2><div class="grid"><div class="card">
+            <div class="label">Normal</div>
+            <div class="formula">\(X \sim N(\mu,\sigma^2),\; Z=\frac{X-\mu}{\sigma}\)</div>
+            </div><div class="card">
+            <div class="label">Z-table</div>
+            <div class="formula">\(P(Z&gt;a)=1-P(Z&lt;a)\)</div>
+            </div><div class="card">
+            <div class="label">t-distribution</div>
+            <div class="formula">\[Fatter tails; n &lt; 30, \sigma unknown\]</div>
+            </div><div class="card">
+            <div class="label">Chi-square</div>
+            <div class="formula">\[Sum of squared Z — variance tests\]</div>
+            </div><div class="card">
+            <div class="label">F-distribution</div>
+            <div class="formula">\[Ratio of χ² — ANOVA\]</div>
+            </div></div></div><div class="part" id="strategy"><h2>6. Smart Student Strategy</h2><div class="grid"><div class="card">
+            <div class="label">Keywords → Binomial</div>
+            <div class="formula">\[&quot;out of n&quot;, success/failure \to Binomial(n,p)\]</div>
+            </div><div class="card">
+            <div class="label">Keywords → Poisson</div>
+            <div class="formula">\[&quot;rate per hour&quot; \to Poisson(\lambda)\]</div>
+            </div><div class="card">
+            <div class="label">Keywords → Normal</div>
+            <div class="formula">\[&quot;normally distributed&quot; \to Z-score\]</div>
+            </div><div class="card">
+            <div class="label">Bayes hack</div>
+            <div class="formula">\[Tree diagram \to total prob denominator \to pick branch\]</div>
+            </div><div class="card">
+            <div class="label">At least one</div>
+            <div class="formula">\(P(X \ge 1)=1-P(X=0)\)</div>
+            </div><div class="card">
+            <div class="label">Sample variance</div>
+            <div class="formula">\[Always n-1 in denominator for sample data\]</div>
+            </div></div></div>
+<p class="note">Print this page before a closed-book exam. For worked PYQs see <a href="ISM_Past_Papers.html">Past Papers</a>.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 180" font-family="system-ui,sans-serif">
+  <rect width="420" height="180" fill="#f8fafc" rx="8"/>
+  <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Normal Distribution &amp; Z-Score</text>
+  <path d="M 40 140 Q 110 140 150 60 Q 210 20 270 60 Q 310 140 380 140 L 380 150 L 40 150 Z" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <line x1="210" y1="30" x2="210" y2="150" stroke="#059669" stroke-width="2" stroke-dasharray="4"/>
+  <text x="210" y="168" text-anchor="middle" font-size="9" fill="#059669">mu</text>
+  <line x1="150" y1="140" x2="150" y2="150" stroke="#64748b"/>
+  <line x1="270" y1="140" x2="270" y2="150" stroke="#64748b"/>
+  <text x="150" y="168" text-anchor="middle" font-size="8" fill="#64748b">mu - sigma</text>
+  <text x="270" y="168" text-anchor="middle" font-size="8" fill="#64748b">mu + sigma</text>
+  <text x="210" y="175" text-anchor="middle" font-size="9" fill="#64748b">Z = (X - mu) / sigma</text>
+</svg>

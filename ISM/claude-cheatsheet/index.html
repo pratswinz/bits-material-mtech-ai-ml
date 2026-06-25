@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ISM — Study Hub</title>
+<style>
+:root{--navy:#1e3a5f;--blue:#2563eb;--green:#059669;--purple:#7c3aed;--amber:#d97706;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.hero{background:linear-gradient(135deg,#1e3a5f,#059669);color:#fff;padding:2.5rem 1.5rem;text-align:center}
+.hero h1{font-size:1.75rem;margin-bottom:.4rem}
+.hero p{opacity:.9;max-width:620px;margin:0 auto;font-size:.95rem}
+.plan-banner{max-width:900px;margin:1.5rem auto 0;padding:0 1rem}
+.plan-banner a{display:block;background:linear-gradient(135deg,#059669,#2563eb);color:#fff;text-decoration:none;padding:1rem 1.4rem;border-radius:12px;text-align:center;font-weight:600}
+.plan-banner span{display:block;font-size:.82rem;font-weight:400;opacity:.9;margin-top:.25rem}
+.grid{max-width:900px;margin:1.5rem auto 2rem;padding:0 1rem;display:grid;gap:1.2rem}
+@media(min-width:700px){.grid{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.4rem;text-decoration:none;color:inherit;transition:box-shadow .2s,transform .2s;display:block}
+.card:hover{box-shadow:0 8px 24px rgba(0,0,0,.08);transform:translateY(-2px)}
+.card h2{font-size:1.1rem;margin-bottom:.5rem;color:var(--navy)}
+.card p{font-size:.88rem;color:var(--muted);margin-bottom:.8rem}
+.card .tag{display:inline-block;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:99px}
+.tag.theory{background:#eff6ff;color:var(--blue)}
+.tag.pyq{background:#f3e8ff;color:var(--purple)}
+.tag.rev{background:#ecfdf5;color:var(--green)}
+.tag.plan{background:#fffbeb;color:var(--amber)}
+.sources{max-width:900px;margin:0 auto 3rem;padding:0 1rem}
+.sources h3{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem}
+.sources ul{font-size:.82rem;color:var(--muted);padding-left:1.2rem}
+.sources li{margin:.25rem 0}
+.sources code{background:#f1f5f9;padding:1px 5px;border-radius:3px;font-size:.78rem}
+.topics-wrap{max-width:900px;margin:1.5rem auto 0;padding:0 1rem}
+.topics-wrap h2{font-size:1rem;color:var(--navy);margin-bottom:.35rem}
+.topics-wrap .topics-note{font-size:.8rem;color:var(--muted);margin-bottom:1rem}
+.topics-grid{display:grid;gap:.75rem}
+@media(min-width:640px){.topics-grid{grid-template-columns:repeat(2,1fr)}}
+.topic-card{border-radius:10px;padding:.85rem 1rem;border:1px solid var(--border);background:var(--card)}
+.topic-card h3{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin:0 0 .5rem;padding-bottom:.35rem;border-bottom:2px solid}
+.topic-card ul{list-style:none;padding:0;margin:0}
+.topic-card li{font-size:.8rem;color:var(--text);padding:.22rem 0 .22rem .85rem;position:relative;line-height:1.35}
+.topic-card li::before{content:"";position:absolute;left:0;top:.55rem;width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.5}
+.t1 h3{color:#059669;border-color:#6ee7b7}.t1 li::before{color:#059669}
+.t2 h3{color:#2563eb;border-color:#93c5fd}.t2 li::before{color:#2563eb}
+.t3 h3{color:#7c3aed;border-color:#c4b5fd}.t3 li::before{color:#7c3aed}
+.t4 h3{color:#db2777;border-color:#f9a8d4}.t4 li::before{color:#db2777}
+.t5 h3{color:#d97706;border-color:#fcd34d}.t5 li::before{color:#d97706}
+.t6 h3{color:#dc2626;border-color:#fca5a5}.t6 li::before{color:#dc2626}
+.t7 h3{color:#0891b2;border-color:#67e8f9}.t7 li::before{color:#0891b2}
+</style>
+</head>
+<body>
+<div class="hero">
+<h1>Introduction to Statistical Methods — Study Hub</h1>
+<p>AIMLCZC418 · Sessions 1–7 · Mid &amp; End sem · All files in <code>ISM/claude-cheatsheet/</code></p>
+</div>
+<div class="plan-banner">
+<a href="ISM_Study_Plan.html">📅 Start with the 5-Day Study Plan<span>Sessions 1–7 → Workbook TYPEs → Past papers → Revision</span></a>
+</div>
+
+<div class="topics-wrap">
+<h2>Mid-sem syllabus — topics &amp; subtopics</h2>
+<p class="topics-note">From mid-sem PYQs (Dec 2025, Jan 2026, June 2026, 2025 papers) · Companion Sessions 1–7 up to <strong>sampling distribution of sample proportion</strong></p>
+<div class="topics-grid">
+
+<div class="topic-card t1">
+<h3>1 · Descriptive statistics</h3>
+<ul>
+<li>Data types — nominal, ordinal, interval, ratio</li>
+<li>Mean, median, mode</li>
+<li>Range, variance, standard deviation</li>
+<li>Quartiles and IQR</li>
+<li>Skew and symmetry</li>
+<li>Five-number summary</li>
+<li>Box plot</li>
+<li>Outlier rule (1.5 × IQR)</li>
+</ul>
+</div>
+
+<div class="topic-card t2">
+<h3>2 · Probability basics</h3>
+<ul>
+<li>Sample space, outcome, event</li>
+<li>Union, intersection, complement</li>
+<li>Mutually exclusive events</li>
+<li>Independent events</li>
+<li>Probability axioms</li>
+<li>Addition rule</li>
+<li>Inclusion–exclusion (two &amp; three sets)</li>
+<li>Counting / equally likely outcomes</li>
+</ul>
+</div>
+
+<div class="topic-card t3">
+<h3>3 · Conditional probability</h3>
+<ul>
+<li>Conditional probability P(A|B)</li>
+<li>Multiplication rule</li>
+<li>Independence test</li>
+<li>Total probability theorem</li>
+<li>Probability tree diagrams</li>
+</ul>
+</div>
+
+<div class="topic-card t4">
+<h3>4 · Bayes &amp; Naïve Bayes</h3>
+<ul>
+<li>Bayes theorem</li>
+<li>Prior, likelihood, posterior</li>
+<li>Total probability in Bayes denominator</li>
+<li>Naïve Bayes classifier</li>
+<li>Word likelihood tables</li>
+<li>Laplace smoothing</li>
+</ul>
+</div>
+
+<div class="topic-card t5">
+<h3>5 · Random variables</h3>
+<ul>
+<li>Discrete vs continuous RV</li>
+<li>PMF and validity rules</li>
+<li>CDF</li>
+<li>Expectation E[X]</li>
+<li>Variance and standard deviation</li>
+<li>Joint PMF / joint PDF</li>
+<li>Marginal distributions</li>
+<li>Independence of random variables</li>
+</ul>
+</div>
+
+<div class="topic-card t6">
+<h3>6 · Probability distributions</h3>
+<ul>
+<li>Bernoulli distribution</li>
+<li>Binomial distribution</li>
+<li>Poisson distribution</li>
+<li>Normal distribution</li>
+<li>Z-scores and standard normal table</li>
+<li>68–95–99.7 rule</li>
+<li>Binomial → Poisson approximation</li>
+<li>Binomial → Normal approximation</li>
+<li>Continuity correction</li>
+</ul>
+</div>
+
+<div class="topic-card t7" style="grid-column:1/-1">
+<h3>7 · Sampling (up to sample proportion)</h3>
+<ul>
+<li>Population vs sample</li>
+<li>Probability vs non-probability sampling</li>
+<li>Simple random sampling</li>
+<li>Stratified sampling</li>
+<li>Systematic &amp; cluster sampling</li>
+<li>Sampling variation</li>
+<li>Sampling distribution of sample mean (x̄)</li>
+<li>Central Limit Theorem</li>
+<li>Standard error σ/√n</li>
+<li>CLT applications for sample mean</li>
+<li>Finite population correction</li>
+<li>Sample proportion p̂</li>
+<li>Sampling distribution of sample proportion</li>
+<li>CLT for proportions (np, nq conditions)</li>
+</ul>
+</div>
+
+</div>
+</div>
+
+<div class="grid">
+<a class="card" href="ISM_Study_Plan.html" style="grid-column:1/-1;border-color:#059669">
+<h2>📅 5-Day Study Plan</h2>
+<p>Day-by-day schedule with diagrams linking theory → workbook → past papers.</p>
+<span class="tag plan">Start here</span>
+</a>
+<a class="card" href="ISM_Theory_Guide.html">
+<h2>📘 Theory Guide</h2>
+<p>Sessions 1–7 from <code>companion docs/</code> — including new S6 Distributions &amp; S7 Sampling.</p>
+<span class="tag theory">7 sessions</span>
+</a>
+<a class="card" href="ISM_PYQ_Workbook.html">
+<h2>📝 PYQ Workbook — 18 Types</h2>
+<p>Every question pattern with formulas, SVG diagrams &amp; detailed solutions from official keys.</p>
+<span class="tag pyq">By type</span>
+</a>
+<a class="card" href="ISM_Past_Papers.html">
+<h2>📋 Past Papers 2025–2026</h2>
+<p>Mid/end sem + June 2026 · answer keys from <code>previous question papers/</code>.</p>
+<span class="tag pyq">All papers</span>
+</a>
+<a class="card" href="ISM_Revision_Sheet.html">
+<h2>⚡ Revision Sheet</h2>
+<p>Print-ready formulas from <code>Cheat_Sheet/Cheat_Sheet_ISM.pdf</code>.</p>
+<span class="tag rev">Print</span>
+</a>
+<a class="card" href="ISM_3Day_Plan.html">
+<h2>📅 3-Day Mid-Sem Crash</h2>
+<p>Compressed plan if exam is soon — Sessions 1–5 focus only.</p>
+<span class="tag plan">Mid-sem only</span>
+</a>
+</div>
+<div class="sources">
+<h3>Source folders (rescanned)</h3>
+<ul>
+<li><code>ISM/companion docs/</code> — Sessions 1–7 (incl. S6 Probability Distributions, S7 Sampling &amp; Estimation)</li>
+<li><code>ISM/Cheat_Sheet/</code> — ISM exam cheat sheet</li>
+<li><code>ISM/previous question papers/</code> — 2023–2026 papers + Dec/Jan/Feb 2026 answer keys + June 2026 screenshots</li>
+<li>Rebuild: <code>python3 build_all.py</code> in <code>ISM/claude-cheatsheet/</code></li>
+</ul>
+</div>
+</body>
+</html>
