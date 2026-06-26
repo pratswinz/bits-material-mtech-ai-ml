@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear Models for Regression — Module 3 Interactive Lecture</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-svg.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:  #2C5AA0;
+      --green: #2E7D52;
+      --red:   #B23A48;
+      --amber: #8A5A1E;
+      --purple:#6A4C93;
+    }
+
+    html[data-theme="light"] {
+      --bg:     #ffffff;
+      --bg2:    #f5f7fb;
+      --text:   #1a202c;
+      --border: #dde3ed;
+      --muted:  #6b7280;
+    }
+    html[data-theme="dark"] {
+      --bg:     #111827;
+      --bg2:    #1f2937;
+      --text:   #f3f4f6;
+      --border: #374151;
+      --muted:  #9ca3af;
+    }
+    html:not([data-theme]) {
+      --bg:#fff; --bg2:#f5f7fb; --text:#1a202c; --border:#dde3ed; --muted:#6b7280;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      transition: background .25s, color .25s;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    /* ---- progress bar ---- */
+    #prog-track { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--border); z-index: 200; }
+    #prog-fill  { height: 100%; background: var(--navy); width: 0%; transition: width .2s; }
+
+    /* ---- header ---- */
+    header {
+      background: linear-gradient(135deg, #21355E 0%, #2C5AA0 100%);
+      color: #fff;
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      border-bottom: 4px solid var(--green);
+    }
+    header h1 { font-size: 2.2rem; margin-bottom: .4rem; }
+    header p  { font-size: 1rem; opacity: .9; }
+
+    /* ---- layout ---- */
+    .shell { display: flex; max-width: 1380px; margin: 0 auto; }
+
+    /* ---- sidebar ---- */
+    aside {
+      width: 270px;
+      flex-shrink: 0;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      height: 100vh;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+    }
+    .band-label {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 1.2rem 0 .4rem .4rem;
+    }
+    .nav-link {
+      display: block;
+      padding: .4rem .7rem;
+      border-radius: 5px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: .88rem;
+      margin-bottom: 2px;
+      transition: background .15s, color .15s;
+    }
+    .nav-link:hover { background: var(--navy); color: #fff; }
+    .nav-link.active { background: var(--navy); color: #fff; font-weight: 600; }
+    .sidebar-tools { margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+    .tool-btn {
+      display: block; width: 100%; text-align: left;
+      padding: .5rem .7rem; border-radius: 5px; border: none;
+      background: var(--bg); color: var(--text);
+      font-size: .88rem; cursor: pointer; margin-bottom: 6px;
+      transition: background .15s;
+    }
+    .tool-btn:hover { background: var(--navy); color: #fff; }
+
+    /* ---- main ---- */
+    main { flex: 1; padding: 2rem 2.5rem; min-width: 0; }
+
+    .chapter { display: none; }
+    .chapter.active { display: block; }
+
+    h2 {
+      font-size: 1.9rem;
+      color: var(--navy);
+      border-bottom: 3px solid var(--green);
+      padding-bottom: .4rem;
+      margin-bottom: 1.2rem;
+    }
+    h3 { font-size: 1.15rem; color: var(--navy); margin: 1.4rem 0 .5rem; }
+    p  { margin-bottom: .9rem; font-size: 1rem; overflow-wrap: break-word; }
+    ol, ul { margin: 0 0 .9rem 1.8rem; }
+    li { margin-bottom: .3rem; }
+
+    /* ---- callout boxes ---- */
+    .note, .everyday, .watch {
+      padding: 1rem 1.2rem;
+      border-left: 4px solid;
+      border-radius: 0 5px 5px 0;
+      margin: 1.2rem 0;
+      background: var(--bg2);
+      overflow-wrap: break-word;
+    }
+    .note     { border-color: var(--navy); }
+    .everyday { border-color: var(--amber); }
+    .watch    { border-color: var(--red); }
+    .note strong::before     { content: "☞ "; }
+    .everyday strong::before { content: "★ "; }
+    .watch strong::before    { content: "✗ "; }
+
+    /* ---- eqbox ---- */
+    .eqbox {
+      overflow-x: auto;
+      background: var(--bg2);
+      border-radius: 6px;
+      padding: .9rem 1rem;
+      margin: 1rem 0;
+      font-size: 1.05rem;
+    }
+
+    /* ---- lab ---- */
+    .lab {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .lab h3 { margin-top: 0; }
+    canvas  {
+      display: block;
+      max-width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin: .8rem 0;
+      background: var(--bg);
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-top: .8rem;
+      align-items: center;
+    }
+    .controls label { font-size: .9rem; display: flex; align-items: center; gap: .4rem; }
+    .btn {
+      padding: .42rem .9rem;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: .88rem;
+      transition: background .15s;
+    }
+    .btn:hover { background: var(--green); }
+    input[type="range"] { width: 130px; accent-color: var(--navy); }
+    #distDisplay, #alphaDisplay, #lambdaDisplay { font-weight: 600; color: var(--navy); min-width: 50px; }
+
+    /* ---- key (worked example) ---- */
+    .key {
+      background: #f1f8f3;
+      border: 1px solid var(--green);
+      border-radius: 6px;
+      padding: 1rem 1.2rem;
+      margin: 1rem 0;
+      overflow-wrap: break-word;
+    }
+    html[data-theme="dark"] .key { background: #1a2d22; }
+    .key ol { margin-left: 1.5rem; }
+    .key strong { color: var(--green); }
+
+    /* ---- comparison table ---- */
+    .cmp-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: .9rem;
+      overflow-wrap: break-word;
+    }
+    .cmp-table th, .cmp-table td {
+      border: 1px solid var(--border);
+      padding: .5rem .7rem;
+      text-align: left;
+    }
+    .cmp-table th { background: var(--navy); color: #fff; }
+    .cmp-table tr:nth-child(even) td { background: var(--bg2); }
+
+    /* ---- bottom nav ---- */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .bottom-nav span { color: var(--muted); font-size: .9rem; }
+
+    /* ---- storycard ---- */
+    #storycard {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg2);
+      border: 2px solid var(--navy);
+      border-radius: 10px;
+      padding: 1.2rem 1.4rem;
+      max-width: 420px;
+      width: calc(100% - 2rem);
+      box-shadow: 0 6px 24px rgba(0,0,0,.25);
+      z-index: 150;
+    }
+    #storycard.active { display: block; }
+    #storycard #sc-step { font-size: .8rem; color: var(--muted); margin-bottom: .4rem; }
+    #storycard #sc-title { font-weight: 700; color: var(--navy); font-size: 1rem; margin-bottom: .4rem; }
+    #storycard #sc-text  { font-size: .9rem; margin-bottom: .8rem; }
+    .sc-btns { display: flex; gap: .5rem; justify-content: center; }
+
+    @media (max-width: 768px) {
+      aside { display: none; }
+      main  { padding: 1rem; }
+      header h1 { font-size: 1.5rem; }
+      h2 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+<div id="prog-track"><div id="prog-fill"></div></div>
+
+<!-- Guided tour storycard -->
+<div id="storycard">
+  <div id="sc-step">Step 1 / 11</div>
+  <div id="sc-title"></div>
+  <div id="sc-text"></div>
+  <div class="sc-btns">
+    <button class="btn" id="sc-prev">← Back</button>
+    <button class="btn" id="sc-next">Next →</button>
+    <button class="btn" style="background:var(--red)" id="sc-exit">Exit</button>
+  </div>
+</div>
+
+<header>
+  <h1>📐 Linear Models for Regression</h1>
+  <p>Module 3 — AIML CZG565 · BITS Pilani WILP</p>
+</header>
+
+<div class="shell">
+  <!-- Sidebar -->
+  <aside>
+    <div class="band-label">Foundations</div>
+    <a href="#" class="nav-link active" data-ch="0">What Is Regression?</a>
+    <a href="#" class="nav-link" data-ch="1">Simple Linear Regression</a>
+    <a href="#" class="nav-link" data-ch="2">The MSE Loss Function</a>
+
+    <div class="band-label">Optimisation</div>
+    <a href="#" class="nav-link" data-ch="3">Gradient Descent</a>
+    <a href="#" class="nav-link" data-ch="4">Multiple Linear Regression</a>
+    <a href="#" class="nav-link" data-ch="5">The Normal Equation</a>
+
+    <div class="band-label">Evaluation</div>
+    <a href="#" class="nav-link" data-ch="6">Model Evaluation</a>
+    <a href="#" class="nav-link" data-ch="7">Bias, Variance & Overfitting</a>
+
+    <div class="band-label">Regularisation</div>
+    <a href="#" class="nav-link" data-ch="8">Why Regularise?</a>
+    <a href="#" class="nav-link" data-ch="9">Ridge Regression (L2)</a>
+    <a href="#" class="nav-link" data-ch="10">Lasso Regression (L1)</a>
+
+    <div class="sidebar-tools">
+      <button class="tool-btn" id="tourBtn">🎯 Guided Tour</button>
+      <button class="tool-btn" id="themeBtn">🌙 Dark Mode</button>
+    </div>
+  </aside>
+
+  <main>
+    <!-- ===================== Chapter 0 ===================== -->
+    <div class="chapter active" id="ch0">
+      <h2>What Is Regression?</h2>
+      <p>Sometimes we want to predict a number, not a category. We want to know the price of a flat, a patient's blood pressure, or how long a battery lasts. That task is <strong>regression</strong>.</p>
+
+      <div class="note">
+        <strong>The intuition:</strong> Regression finds the rule that maps input features to a real number. Linear regression finds that rule as a weighted sum — a straight line, or a flat plane, or a hyperplane in higher dimensions.
+      </div>
+
+      <div class="everyday">
+        <strong>Everyday picture:</strong> A property agent knows that larger flats cost more. She draws a line through past sales data. Given a new flat's area, she reads the price off the line. That is linear regression.
+      </div>
+
+      <p>Formally, we have \(n\) training examples. Each example has input features \(\mathbf{x}^{(i)}\) and a real-valued target \(y^{(i)}\). We want a function \(h(\mathbf{x})\) so that \(h(\mathbf{x}^{(i)}) \approx y^{(i)}\).</p>
+
+      <div class="lab">
+        <h3>Lab: Scatter Plot Explorer</h3>
+        <canvas id="ch0Canvas" width="620" height="280"></canvas>
+        <p style="font-size:.85rem;color:var(--muted)">Click "New Data" to regenerate random scatter data. Can you see a linear trend? The regression line will appear when you click "Fit Line".</p>
+        <div class="controls">
+          <button class="btn" id="ch0New">New Data</button>
+          <button class="btn" id="ch0Fit">Fit Line</button>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>1 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ===================== Chapter 1 ===================== -->
+    <div class="chapter" id="ch1">
+      <h2>Simple Linear Regression</h2>
+      <p><strong>Simple linear regression</strong> (SLR) uses one input feature \(x\) to predict \(y\). The model is a straight line:</p>
+
+      <div class="eqbox">\[ h(x) = w_0 + w_1 x. \]</div>
+
+      <p>\(w_0\) is the <strong>intercept</strong> — where the line crosses the \(y\)-axis. \(w_1\) is the <strong>slope</strong> — how much \(y\) changes per unit of \(x\). Both are <strong>weights</strong> (or parameters). We learn them from data.</p>
+
+      <div class="note">
+        <strong>The intuition:</strong> Picture a scatter plot of points. We want the line that sits "as close as possible" to all of them. Close means: the vertical gap between a point and the line (the <strong>residual</strong>) is small.
+      </div>
+
+      <div class="everyday">
+        <strong>Everyday picture:</strong> Imagine pinning a rubber band flat across a scatter of pins on a board. The band balances the pull from all the pins. That is what the least-squares line does.
+      </div>
+
+      <h3>The residual</h3>
+      <p>The residual for example \(i\) is the gap between prediction and truth:</p>
+      <div class="eqbox">\[ e^{(i)} = h(x^{(i)}) - y^{(i)}. \]</div>
+      <p>Positive residual → predicted too high. Negative → too low. We square each residual so positives and negatives do not cancel.</p>
+
+      <div class="key">
+        <strong>Worked example: residuals for three points</strong><br>
+        Line: \(h(x) = 1 + 2x\). Points: \((1,3),\,(2,5),\,(3,6)\).
+        <ol>
+          <li>Predictions: \(h(1)=3,\quad h(2)=5,\quad h(3)=7\)</li>
+          <li>Residuals: \(e_1 = 3-3 = 0,\quad e_2 = 5-5 = 0,\quad e_3 = 7-6 = 1\)</li>
+          <li>Squared: \(0,\;0,\;1\). Sum \(= 1\).</li>
+        </ol>
+        Perfect for two points; off by one for the third.
+      </div>
+
+      <div class="lab">
+        <h3>Lab: Slope &amp; Intercept Playground</h3>
+        <canvas id="ch1Canvas" width="620" height="280"></canvas>
+        <p style="font-size:.85rem;color:var(--muted)">Drag the sliders to change \(w_0\) and \(w_1\). Watch the line move and see the residuals (red dashes) change.</p>
+        <div class="controls">
+          <label>Intercept \(w_0\): <input type="range" id="w0Slider" min="-5" max="15" value="5" step="0.1"></label>
+          <label>Slope \(w_1\): <input type="range" id="w1Slider" min="-3" max="5" value="1.5" step="0.1"></label>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>2 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ===================== Chapter 2 ===================== -->
+    <div class="chapter" id="ch2">
+      <h2>The MSE Loss Function</h2>
+      <p>We need a single score that tells us how bad our weights are. That score is the <strong>loss function</strong>. The most common choice is <strong>mean squared error</strong> (MSE):</p>
+      <div class="eqbox">\[ J(\mathbf{w}) = \frac{1}{n} \sum_{i=1}^{n} \bigl(h(\mathbf{x}^{(i)}) - y^{(i)}\bigr)^2. \]</div>
+
+      <p>We divide by \(n\) to get an average, so the loss does not grow just because we have more data.</p>
+
+      <div class="note">
+        <strong>The intuition:</strong> MSE is the "average squared miss distance". A loss of zero means perfect predictions. Training finds the weights that make \(J(\mathbf{w})\) as small as possible.
+      </div>
+
+      <div class="everyday">
+        <strong>Everyday picture:</strong> Think of throwing darts at a target. MSE measures the average squared distance from the bullseye. The aim is to lower that number.
+      </div>
+
+      <div class="key">
+        <strong>Worked example: computing MSE</strong><br>
+        Data: \((1,2),\,(2,4),\,(3,5)\). Model: \(h(x)=0.5+1.5x\).
+        <ol>
+          <li>Predictions: \(h(1)=2.0,\quad h(2)=3.5,\quad h(3)=5.0\)</li>
+          <li>Errors: \(e_1=0,\quad e_2=-0.5,\quad e_3=0\)</li>
+          <li>Squared: \(0,\;0.25,\;0\)</li>
+          <li>\(\text{MSE} = (0+0.25+0)/3 = \mathbf{0.083}\)</li>
+        </ol>
+      </div>
+
+      <div class="lab">
+        <h3>Lab: Loss Bowl</h3>
+        <canvas id="ch2Canvas" width="620" height="300"></canvas>
+        <p style="font-size:.85rem;color:var(--muted)">The contour plot shows MSE as a function of \(w_0\) and \(w_1\). Click anywhere on the plot to place your weights. The star is the minimum. Watch how your MSE changes.</p>
+        <div class="controls">
+          <span id="ch2Loss" style="font-size:.9rem; color:var(--navy); font-weight:600;"></span>
+        </div>
+      </div>
+
+      <div class="watch">
+        <strong>Watch out:</strong> MSE penalises large errors heavily due to the square. One badly wrong prediction can dominate the loss. For datasets with outliers, try mean absolute error (MAE) instead.
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>3 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ===================== Chapter 3 ===================== -->
+    <div class="chapter" id="ch3">
+      <h2>Gradient Descent</h2>
+      <p><strong>Gradient descent</strong> (GD) is the most common way to find the best weights. The gradient of \(J\) at the current weights points uphill. We subtract a fraction of it to step downhill. We repeat until the loss stops improving.</p>
+
+      <div class="note">
+        <strong>The intuition:</strong> Imagine standing on a hilly surface in fog. You cannot see far, so you feel the slope under your feet and take one small step downhill. You keep stepping until the ground feels flat. That is gradient descent.
+      </div>
+
+      <div class="everyday">
+        <strong>Everyday picture:</strong> The learning rate \(\alpha\) is how much you trust the slope reading under your feet. A rate of 0.01 means tiny, careful steps. A rate of 10 means giant leaps — you might jump over the valley.
+      </div>
+
+      <p>The update rule for each weight is:</p>
+      <div class="eqbox">\[ w_j \leftarrow w_j - \frac{\alpha}{n} \sum_{i=1}^{n} \bigl(h(\mathbf{x}^{(i)}) - y^{(i)}\bigr)\, x_j^{(i)}. \]</div>
+
+      <p>For the intercept \(w_0\), set \(x_0^{(i)} = 1\) for every example.</p>
+
+      <div class="key">
+        <strong>Worked example: one GD step on the CHD dataset</strong><br>
+        3 patients: \(x_1\) = diastolic pressure, \(x_2\) = BMI, \(y\) = RR-CHD.<br>
+        Initial: \(w_0=5,\; w_1=w_2=-0.03\). Learning rate \(\alpha=0.02\).
+        <ol>
+          <li>Predictions: \(h_1=1.55,\quad h_2=1.85,\quad h_3=1.10\)</li>
+          <li>Errors: \(e_1=-0.26,\quad e_2=+0.63,\quad e_3=-0.61\)</li>
+          <li>Sums: \(\sum e_i = -0.24,\quad \sum e_i x_{1i} = -31.4,\quad \sum e_i x_{2i} = -11.65\)</li>
+          <li>Updates:
+            \(w_0 = 5 - \tfrac{0.02}{3}(-0.24) = \mathbf{5.0016}\),<br>
+            \(w_1 = -0.03 - \tfrac{0.02}{3}(-31.4) = \mathbf{0.1793}\),<br>
+            \(w_2 = -0.03 - \tfrac{0.02}{3}(-11.65) = \mathbf{0.0477}\)
+          </li>
+        </ol>
+      </div>
+
+      <div class="lab">
+        <h3>Lab: Gradient Descent Stepper</h3>
+        <canvas id="ch3Canvas" width="620" height="300"></canvas>
+        <p style="font-size:.85rem;color:var(--muted)">Click "Step" to run one GD iteration. Watch the dot walk downhill. Try different learning rates.</p>
+        <div class="controls">
+          <label>α: <input type="range" id="alphaSlider" min="0.01" max="0.45" value="0.10" step="0.01">
+            <span id="alphaDisplay">0.10</span></label>
+          <button class="btn" id="gdStep">Step</button>
+          <button class="btn" id="gdRun">Run 20</button>
+          <button class="btn" id="gdReset">Reset</button>
+        </div>
+      </div>
+
+      <div class="watch">
+        <strong>Watch out:</strong> If \(\alpha\) is too large, the weights oscillate or diverge. If too small, training takes thousands of steps. Always plot the loss per iteration to check convergence.
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>4 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ===================== Chapter 4 ===================== -->
+    <div class="chapter" id="ch4">
+      <h2>Multiple Linear Regression</h2>
+      <p>When we have more than one feature, we extend the line to a <strong>hyperplane</strong>:</p>
+      <div class="eqbox">\[ h(\mathbf{x}) = w_0 + w_1 x_1 + w_2 x_2 + \cdots + w_d x_d = \mathbf{w}^\top \tilde{\mathbf{x}}. \]</div>
+
+      <p>Here \(\tilde{\mathbf{x}} = (1, x_1, \ldots, x_d)\) prepends a~\(1\) for the intercept. The model is still <strong>linear in the weights</strong>, even if we use squared or log features.</p>
+
+      <div class="note">
+        <strong>The intuition:</strong> SLR is a line in 2-D. MLR with two features is a flat plane in 3-D. With ten features it is a hyperplane in 11-D. We cannot draw it, but the algebra is the same.
+      </div>
+
+      <div class="everyday">
+        <strong>Everyday picture:</strong> A doctor predicts heart-disease risk from diastolic pressure <em>and</em> BMI. Each feature pulls the prediction up or down by its weight. That is multiple linear regression.
+      </div>
+
+      <div class="lab">
+        <h3>Lab: Feature Weight Sliders</h3>
+        <canvas id="ch4Canvas" width="620" height="300"></canvas>
+        <p style="font-size:.85rem;color:var(--muted)">Move the sliders to change each weight. See how the predicted output for a fixed input changes. MSE on three training points updates in real time.</p>
+        <div class="controls">
+          <label>\(w_0\): <input type="range" id="mlrW0" min="0" max="10" value="5" step="0.1"></label>
+          <label>\(w_1\): <input type="range" id="mlrW1" min="-1" max="1" value="0.05" step="0.01"></label>
+          <label>\(w_2\): <input type="range" id="mlrW2" min="-1" max="1" value="0.02" step="0.01"></label>
+          <span id="mlrMSE" style="font-size:.9rem;color:var(--navy);font-weight:600;"></span>
+        </div>
+      </div>
+
+      <div class="watch">
+        <strong>Watch out:</strong> Adding more features always reduces training error. But it can raise test error if those features are just noise. Use cross-validation to pick the best set of features.
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>5 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ===================== Chapter 5 ===================== -->
+    <div class="chapter" id="ch5">
+      <h2>The Normal Equation</h2>
+      <p>Gradient descent is iterative. There is also a <strong>closed-form solution</strong> — the <strong>normal equation</strong>:</p>
+      <div class="eqbox">\[ \hat{\mathbf{w}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{y}. \]</div>
+
+      <p>Here \(\mathbf{X}\) is the <strong>design matrix</strong> (each row is one example, each column is one feature plus a bias column of ones). \(\mathbf{y}\) is the target vector.</p>
+
+      <div class="note">
+        <strong>The intuition:</strong> The normal equation gives the exact answer in one shot — no iterations. It is like solving \(ax = b\) by writing \(x = b/a\) directly, instead of guessing and checking.
+      </div>
+
+      <div class="everyday">
+        <strong>Everyday picture:</strong> Gradient descent is like finding the lowest point in a valley by walking downhill. The normal equation is like looking at a map and reading the coordinates of the lowest point directly.
+      </div>
+
+      <div class="key">
+        <strong>Worked example: normal equation on the CHD data</strong><br>
+        Design matrix (3 rows × 3 cols including bias):
+        <div class="eqbox">\[ \mathbf{X} = \begin{pmatrix} 1 & 80 & 35 \\ 1 & 80 & 25 \\ 1 & 100 & 30 \end{pmatrix}, \quad \mathbf{y} = \begin{pmatrix} 1.81 \\ 1.22 \\ 1.71 \end{pmatrix}. \]</div>
+        Computing \((\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}\) gives the least-squares weights in one matrix operation.
+      </div>
+
+      <div class="watch">
+        <strong>Watch out:</strong> Inverting \(\mathbf{X}^\top\mathbf{X}\) costs \(O(d^3)\). With thousands of features it is slow. If \(\mathbf{X}^\top\mathbf{X}\) is singular (non-invertible), the normal equation fails. Use regularisation to fix this.
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>6 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ===================== Chapter 6 ===================== -->
+    <div class="chapter" id="ch6">
+      <h2>Model Evaluation</h2>
+      <p>After training, measure how good the model is on <strong>held-out test data</strong>. Three standard metrics:</p>
+      <ul>
+        <li><strong>MAE</strong> — mean absolute error: \(\frac{1}{n}\sum|h(\mathbf{x}^{(i)}) - y^{(i)}|\). Easy to interpret: "we are off by this many units on average."</li>
+        <li><strong>RMSE</strong> — root MSE: \(\sqrt{\frac{1}{n}\sum(h-y)^2}\). Same units as the target. Penalises large errors more than MAE.</li>
+        <li><strong>\(R^2\)</strong> — coefficient of determination: how much of the target's variance does the model explain? \(R^2=1\) is perfect; \(R^2=0\) means no better than guessing the mean.</li>
+      </ul>
+
+      <div class="eqbox">\[ R^2 = 1 - \frac{\sum(h(\mathbf{x}^{(i)})-y^{(i)})^2}{\sum(\bar{y}-y^{(i)})^2}. \]</div>
+
+      <div class="everyday">
+        <strong>Everyday picture:</strong> \(R^2 = 0.85\) means the model explains 85% of the spread in the data. The other 15% is noise it could not capture.
+      </div>
+
+      <div class="lab">
+        <h3>Lab: Metric Calculator</h3>
+        <canvas id="ch6Canvas" width="620" height="280"></canvas>
+        <p style="font-size:.85rem;color:var(--muted)">Drag the slope slider. Watch MAE, RMSE, and R² update live. Notice how RMSE punishes outlier predictions more than MAE does.</p>
+        <div class="controls">
+          <label>Slope \(w_1\): <input type="range" id="evalSlope" min="-0.5" max="3" value="1.5" step="0.05"></label>
+          <span id="evalMetrics" style="font-size:.85rem; color:var(--navy); font-weight:600;"></span>
+        </div>
+      </div>
+
+      <div class="watch">
+        <strong>Watch out:</strong> Never pick your model or tune hyperparameters by looking at the test set. That leaks test information into the model and gives an overly optimistic score.
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>7 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ===================== Chapter 7 ===================== -->
+    <div class="chapter" id="ch7">
+      <h2>Bias, Variance &amp; Overfitting</h2>
+      <p>Every model has two sources of error. <strong>Bias</strong> is the error from wrong assumptions — for example, fitting a straight line to curved data. <strong>Variance</strong> is the error from being too sensitive to the training data.</p>
+
+      <div class="note">
+        <strong>The intuition:</strong> High bias = too simple → underfits (misses the pattern). High variance = too complex → overfits (memorises the training noise). The goal is to balance both.
+      </div>
+
+      <div class="everyday">
+        <strong>Everyday picture:</strong> A biased ruler reads 2 cm short every time — always wrong in the same direction. A high-variance ruler gives a different answer each time — noisy and inconsistent. A good ruler is both accurate and repeatable.
+      </div>
+
+      <div class="lab">
+        <h3>Lab: Bias–Variance Tradeoff</h3>
+        <canvas id="ch7Canvas" width="620" height="300"></canvas>
+        <p style="font-size:.85rem;color:var(--muted)">Move the complexity slider. See how bias² (blue), variance (red), and total error (black dashed) change. Find the sweet spot where total error is smallest.</p>
+        <div class="controls">
+          <label>Complexity: <input type="range" id="bvSlider" min="1" max="10" value="3" step="1">
+            <span id="bvDisplay">3</span></label>
+        </div>
+      </div>
+
+      <div class="watch">
+        <strong>Watch out:</strong> Adding features always reduces training error. Test error first falls then rises. Use cross-validation to find the right complexity. Regularisation is the main tool to control variance.
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>8 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ===================== Chapter 8 ===================== -->
+    <div class="chapter" id="ch8">
+      <h2>Why Regularise?</h2>
+      <p>A model with large weights fits training data closely, but is fragile. A tiny change in input causes a large change in prediction. <strong>Regularisation</strong> adds a penalty for large weights to the loss function.</p>
+
+      <div class="eqbox">\[ J_{\text{reg}}(\mathbf{w}) = \underbrace{\frac{1}{n}\sum_{i=1}^n (h(\mathbf{x}^{(i)})-y^{(i)})^2}_{\text{data fit}} + \underbrace{\lambda \cdot \Omega(\mathbf{w})}_{\text{penalty}}. \]</div>
+
+      <p>\(\lambda\) (lambda) is the <strong>regularisation constant</strong>. Large \(\lambda\) → strong penalty → simpler model. Small \(\lambda\) → trust the data more.</p>
+
+      <div class="note">
+        <strong>The intuition:</strong> Two forces fight each other. The data-fit term says "match the data". The penalty says "keep the weights small". \(\lambda\) is the dial between them.
+      </div>
+
+      <div class="everyday">
+        <strong>Everyday picture:</strong> Think of packing a bag for a trip. The data says "pack everything you might need". The weight limit (regulariser) says "only the essentials". \(\lambda\) is how strict the weight limit is.
+      </div>
+
+      <div class="lab">
+        <h3>Lab: Lambda Dial</h3>
+        <canvas id="ch8Canvas" width="620" height="300"></canvas>
+        <p style="font-size:.85rem;color:var(--muted)">Drag the λ slider. Watch how the Ridge weights (bars) shrink as λ grows. At λ=0 the model overfits; at large λ all weights are near zero.</p>
+        <div class="controls">
+          <label>λ: <input type="range" id="lambdaSlider" min="0" max="5" value="0.1" step="0.05">
+            <span id="lambdaDisplay">0.10</span></label>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>9 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ===================== Chapter 9 ===================== -->
+    <div class="chapter" id="ch9">
+      <h2>Ridge Regression (L2)</h2>
+      <p><strong>Ridge regression</strong> uses the sum of squared weights as the penalty:</p>
+      <div class="eqbox">\[ J_{\text{Ridge}} = \frac{1}{n}\sum(h-y)^2 + \lambda\sum_{j=1}^d w_j^2. \]</div>
+
+      <p>The gradient descent update becomes:</p>
+      <div class="eqbox">\[ w_j \leftarrow w_j(1 - \alpha\lambda) - \frac{\alpha}{n}\sum_{i=1}^n e^{(i)} x_j^{(i)}, \quad j \geq 1. \]</div>
+
+      <p>The factor \((1-\alpha\lambda)\) shrinks every weight by a fixed proportion at every step. Weights rarely reach exactly zero.</p>
+
+      <div class="note">
+        <strong>The intuition:</strong> Ridge pulls every weight toward zero with a spring. The stronger λ is, the stiffer the spring. All features stay in the model, but none dominates.
+      </div>
+
+      <div class="key">
+        <strong>Worked example: Ridge, 2 iterations (CHD data)</strong><br>
+        Setup: \(w_0=5,\;w_1=w_2=-0.03\), \(\alpha=0.02\), \(\lambda=5\). Note \(\alpha\lambda=0.1\), shrinkage \(= 0.9\).
+        <ol>
+          <li>Initial errors (same as GD): \(e_1=-0.26,\;e_2=+0.63,\;e_3=-0.61\)</li>
+          <li>Iteration 1 sums: \(\sum e_i=-0.24,\;\sum e_i x_{1i}=-31.4,\;\sum e_i x_{2i}=-11.65\)</li>
+          <li>After Iter 1: \(w_0=5.0016,\quad w_1=0.1823,\quad w_2=0.0507\)</li>
+          <li>After Iter 2 predictions are much larger (weights grew fast because λ=5 is large relative to the data scale): \(w_0=4.59,\;w_1=-36.09,\;w_2=-12.40\)</li>
+        </ol>
+        In practice, scale features and tune λ via cross-validation to avoid divergence.
+      </div>
+
+      <div class="watch">
+        <strong>Watch out:</strong> Ridge shrinks weights but never sets them to zero. All features stay in the model. If you need sparse solutions (some weights exactly zero), use Lasso.
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>10 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ===================== Chapter 10 ===================== -->
+    <div class="chapter" id="ch10">
+      <h2>Lasso Regression (L1)</h2>
+      <p><strong>Lasso</strong> (Least Absolute Shrinkage and Selection Operator) uses the sum of absolute values as the penalty:</p>
+      <div class="eqbox">\[ J_{\text{Lasso}} = \frac{1}{n}\sum(h-y)^2 + \lambda\sum_{j=1}^d |w_j|. \]</div>
+
+      <p>The gradient of \(|w_j|\) is \(\text{sign}(w_j)\). The update rule is:</p>
+      <div class="eqbox">\[ w_j \leftarrow w_j - \frac{\alpha}{n}\sum_{i=1}^n e^{(i)} x_j^{(i)} - \alpha\lambda\,\text{sign}(w_j). \]</div>
+
+      <div class="note">
+        <strong>The intuition:</strong> Ridge pulls weights with a spring (force grows with weight size). Lasso nudges weights with a constant push in the direction of zero. A constant push can drive small weights all the way to zero — automatic feature selection.
+      </div>
+
+      <div class="key">
+        <strong>Worked example: Lasso, 2 iterations (CHD data)</strong><br>
+        Same setup as Ridge. Since \(w_1=w_2=-0.03 &lt; 0\): \(\text{sign}(w_1)=\text{sign}(w_2)=-1\).
+        <ol>
+          <li>Iteration 1: \(w_0=5.0016,\quad w_1=0.2793,\quad w_2=0.1477\)</li>
+          <li>Now both weights are positive, so \(\text{sign}(w_1)=\text{sign}(w_2)=+1\).</li>
+          <li>After Iter 2: \(w_0=4.36,\quad w_1=-55.87,\quad w_2=-19.22\)</li>
+        </ol>
+        Both methods diverge at λ=5 on this small unscaled dataset. Always scale features first.
+      </div>
+
+      <h3>Ridge vs. Lasso</h3>
+      <div style="overflow-x:auto;">
+      <table class="cmp-table">
+        <thead>
+          <tr><th>Property</th><th>Ridge (L2)</th><th>Lasso (L1)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Penalty</td><td>\(\lambda\sum w_j^2\)</td><td>\(\lambda\sum|w_j|\)</td></tr>
+          <tr><td>GD update</td><td>Multiply by \((1-\alpha\lambda)\)</td><td>Subtract \(\alpha\lambda\,\text{sign}(w_j)\)</td></tr>
+          <tr><td>Weights to zero?</td><td>Rarely</td><td>Yes — feature selection</td></tr>
+          <tr><td>Best when</td><td>All features relevant</td><td>Many features irrelevant</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="lab">
+        <h3>Lab: Ridge vs. Lasso Geometry</h3>
+        <canvas id="ch10Canvas" width="620" height="300"></canvas>
+        <p style="font-size:.85rem;color:var(--muted)">Left: Ridge constraint (circle). Right: Lasso constraint (diamond). The red ellipses are loss contours. The solution point (green dot) sits where the first contour touches the constraint. Notice the Lasso solution lands at a corner — one weight is zero.</p>
+        <div class="controls">
+          <label>λ scale: <input type="range" id="geomSlider" min="0.3" max="2.5" value="1.5" step="0.05"></label>
+        </div>
+      </div>
+
+      <div class="watch">
+        <strong>Watch out:</strong> With many correlated features, Lasso picks one and zeros the rest (arbitrary). Ridge keeps all of them shrunk. Elastic Net combines both penalties and handles correlated features better.
+      </div>
+
+      <div class="bottom-nav">
+        <button class="btn" onclick="goPrev()">← Prev</button>
+        <span>11 / 11</span>
+        <button class="btn" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+  </main>
+</div><!-- .shell -->
+
+<script>
+// ============================================================
+//  Navigation
+// ============================================================
+let currentCh = 0;
+const TOTAL = 11;
+
+function showChapter(n) {
+  document.querySelectorAll('.chapter').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('ch' + n).classList.add('active');
+  document.querySelector('[data-ch="' + n + '"]').classList.add('active');
+  document.getElementById('prog-fill').style.width = (n / (TOTAL - 1) * 100) + '%';
+  currentCh = n;
+  window.scrollTo(0, 0);
+  setTimeout(() => redrawAll(), 80);
+}
+
+function goNext() { if (currentCh < TOTAL - 1) showChapter(currentCh + 1); }
+function goPrev() { if (currentCh > 0)         showChapter(currentCh - 1); }
+
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    showChapter(+link.dataset.ch);
+  });
+});
+
+// ============================================================
+//  Theme toggle
+// ============================================================
+const themeBtn = document.getElementById('themeBtn');
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  themeBtn.textContent = t === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode';
+  localStorage.setItem('lr-theme', t);
+}
+themeBtn.addEventListener('click', () =>
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light'));
+applyTheme(localStorage.getItem('lr-theme') || 'light');
+
+// ============================================================
+//  Colour helpers
+// ============================================================
+const C = { navy:'#2C5AA0', green:'#2E7D52', red:'#B23A48', amber:'#D97706', purple:'#6A4C93', grey:'#9CA3AF' };
+
+function bgColour() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? '#111827' : '#ffffff';
+}
+function textColour() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? '#f3f4f6' : '#1a202c';
+}
+
+// ============================================================
+//  CH0 — Scatter + regression line
+// ============================================================
+let ch0Data = [];
+let ch0Fitted = false;
+
+function ch0GenData() {
+  const rng = lcg(42);
+  ch0Data = [];
+  ch0Fitted = false;
+  for (let i = 0; i < 25; i++) {
+    const x = rng() * 8 + 1;
+    const y = 1.5 * x + 2 + (rng() - 0.5) * 4;
+    ch0Data.push([x, y]);
+  }
+  drawCh0();
+}
+
+function drawCh0() {
+  const cv = document.getElementById('ch0Canvas');
+  if (!cv) return;
+  const cx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = bgColour();
+  cx.fillRect(0, 0, W, H);
+
+  if (ch0Data.length === 0) ch0GenData();
+
+  const pad = 40;
+  const xs = ch0Data.map(d => d[0]), ys = ch0Data.map(d => d[1]);
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+  const yMin = Math.min(...ys), yMax = Math.max(...ys);
+
+  function toScreen(x, y) {
+    return [
+      pad + (x - xMin) / (xMax - xMin + 1) * (W - 2 * pad),
+      H - pad - (y - yMin) / (yMax - yMin + 1) * (H - 2 * pad)
+    ];
+  }
+
+  // axes
+  cx.strokeStyle = C.grey;
+  cx.lineWidth = 1;
+  cx.beginPath();
+  cx.moveTo(pad, H - pad); cx.lineTo(W - pad, H - pad);
+  cx.moveTo(pad, pad);     cx.lineTo(pad, H - pad);
+  cx.stroke();
+
+  cx.fillStyle = textColour();
+  cx.font = '11px sans-serif';
+  cx.fillText('Feature x', W / 2 - 25, H - 8);
+  cx.save(); cx.translate(14, H / 2); cx.rotate(-Math.PI / 2);
+  cx.fillText('Target y', -20, 0); cx.restore();
+
+  // data points
+  cx.fillStyle = C.navy;
+  ch0Data.forEach(([x, y]) => {
+    const [sx, sy] = toScreen(x, y);
+    cx.beginPath(); cx.arc(sx, sy, 5, 0, 2 * Math.PI); cx.fill();
+  });
+
+  // fitted line
+  if (ch0Fitted) {
+    const n = xs.length;
+    const xMean = xs.reduce((a, b) => a + b) / n;
+    const yMean = ys.reduce((a, b) => a + b) / n;
+    const num = xs.reduce((s, x, i) => s + (x - xMean) * (ys[i] - yMean), 0);
+    const den = xs.reduce((s, x) => s + (x - xMean) ** 2, 0);
+    const m = num / den, b = yMean - m * xMean;
+    const [x1s, y1s] = toScreen(xMin, m * xMin + b);
+    const [x2s, y2s] = toScreen(xMax, m * xMax + b);
+    cx.strokeStyle = C.green; cx.lineWidth = 2.5;
+    cx.beginPath(); cx.moveTo(x1s, y1s); cx.lineTo(x2s, y2s); cx.stroke();
+
+    // residuals
+    cx.strokeStyle = C.red; cx.lineWidth = 1; cx.setLineDash([3, 3]);
+    ch0Data.forEach(([x, y]) => {
+      const [sx, sy] = toScreen(x, y);
+      const [, sy2] = toScreen(x, m * x + b);
+      cx.beginPath(); cx.moveTo(sx, sy); cx.lineTo(sx, sy2); cx.stroke();
+    });
+    cx.setLineDash([]);
+  }
+}
+
+document.getElementById('ch0New').addEventListener('click', () => { ch0GenData(); });
+document.getElementById('ch0Fit').addEventListener('click', () => { ch0Fitted = true; drawCh0(); });
+
+// ============================================================
+//  CH1 — Slope & Intercept Playground
+// ============================================================
+const ch1Pts = [[1,3.2],[2,5.1],[3,7.8],[4,9.4],[5,11.1],[6,13.5],[7,15.2],[8,16.8]];
+
+function drawCh1() {
+  const cv = document.getElementById('ch1Canvas');
+  if (!cv) return;
+  const cx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = bgColour(); cx.fillRect(0, 0, W, H);
+
+  const w0 = +document.getElementById('w0Slider').value;
+  const w1 = +document.getElementById('w1Slider').value;
+  const pad = 50;
+
+  function toS(x, y) {
+    return [pad + (x - 0) / 10 * (W - 2 * pad),
+            H - pad - (y - 0) / 22 * (H - 2 * pad)];
+  }
+
+  cx.strokeStyle = C.grey; cx.lineWidth = 1;
+  cx.beginPath();
+  cx.moveTo(pad, H - pad); cx.lineTo(W - pad, H - pad);
+  cx.moveTo(pad, pad);     cx.lineTo(pad, H - pad);
+  cx.stroke();
+
+  // fitted line
+  cx.strokeStyle = C.green; cx.lineWidth = 2;
+  cx.beginPath();
+  const [x1s, y1s] = toS(0, w0 + w1 * 0);
+  const [x2s, y2s] = toS(10, w0 + w1 * 10);
+  cx.moveTo(x1s, y1s); cx.lineTo(x2s, y2s); cx.stroke();
+
+  // residuals & points
+  let mse = 0;
+  ch1Pts.forEach(([x, y]) => {
+    const yhat = w0 + w1 * x;
+    const [sx, sy] = toS(x, y);
+    const [, shy] = toS(x, yhat);
+    cx.strokeStyle = C.red; cx.lineWidth = 1; cx.setLineDash([4, 3]);
+    cx.beginPath(); cx.moveTo(sx, sy); cx.lineTo(sx, shy); cx.stroke();
+    cx.setLineDash([]);
+    cx.fillStyle = C.navy;
+    cx.beginPath(); cx.arc(sx, sy, 5, 0, 2 * Math.PI); cx.fill();
+    mse += (yhat - y) ** 2;
+  });
+  mse /= ch1Pts.length;
+
+  cx.fillStyle = textColour(); cx.font = '12px sans-serif';
+  cx.fillText(`h(x) = ${w0.toFixed(1)} + ${w1.toFixed(2)}x    MSE = ${mse.toFixed(2)}`, pad, H - 8);
+}
+
+['w0Slider','w1Slider'].forEach(id => document.getElementById(id).addEventListener('input', drawCh1));
+
+// ============================================================
+//  CH2 — Loss Bowl (contour)
+// ============================================================
+const ch2Pts = [[1,2],[2,4],[3,5],[4,8],[5,9]];
+let ch2W = [0, 0];
+
+function mse2(w0, w1) {
+  return ch2Pts.reduce((s, [x, y]) => s + (w0 + w1 * x - y) ** 2, 0) / ch2Pts.length;
+}
+
+function drawCh2() {
+  const cv = document.getElementById('ch2Canvas');
+  if (!cv) return;
+  const cx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = bgColour(); cx.fillRect(0, 0, W, H);
+
+  const pad = 45, w0Range = [-2, 5], w1Range = [0, 3];
+  const cols = 80, rows = 80;
+  const cellW = (W - 2 * pad) / cols, cellH = (H - 2 * pad) / rows;
+
+  const losses = [];
+  let maxL = 0, minL = Infinity;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const w0 = w0Range[0] + (c / cols) * (w0Range[1] - w0Range[0]);
+      const w1 = w1Range[0] + (r / rows) * (w1Range[1] - w1Range[0]);
+      const l = mse2(w0, w1);
+      losses.push(l);
+      if (l > maxL) maxL = l;
+      if (l < minL) { minL = l; }
+    }
+  }
+
+  const idx = losses.indexOf(Math.min(...losses));
+  const optC = idx % cols, optR = Math.floor(idx / cols);
+
+  // draw heatmap
+  losses.forEach((l, i) => {
+    const c = i % cols, r = Math.floor(i / cols);
+    const t = Math.sqrt((l - minL) / (maxL - minL));
+    const blue = Math.round(255 * (1 - t));
+    const alpha = 0.4 + t * 0.5;
+    cx.fillStyle = `rgba(44,90,160,${alpha})`;
+    cx.fillRect(pad + c * cellW, pad + r * cellH, cellW + 1, cellH + 1);
+  });
+
+  // axes labels
+  cx.fillStyle = textColour(); cx.font = '11px sans-serif';
+  cx.fillText('w₀', W / 2, H - 5);
+  cx.save(); cx.translate(12, H / 2); cx.rotate(-Math.PI / 2);
+  cx.fillText('w₁', 0, 0); cx.restore();
+
+  // optimum star
+  cx.fillStyle = 'lime'; cx.font = '18px sans-serif';
+  cx.fillText('★', pad + optC * cellW - 9, pad + optR * cellH + 6);
+
+  // user dot
+  const ux = pad + (ch2W[0] - w0Range[0]) / (w0Range[1] - w0Range[0]) * (W - 2 * pad);
+  const uy = pad + (ch2W[1] - w1Range[0]) / (w1Range[1] - w1Range[0]) * (H - 2 * pad);
+  cx.fillStyle = C.red;
+  cx.beginPath(); cx.arc(ux, uy, 7, 0, 2 * Math.PI); cx.fill();
+
+  document.getElementById('ch2Loss').textContent =
+    `MSE at your point: ${mse2(...ch2W).toFixed(3)}`;
+}
+
+document.getElementById('ch2Canvas').addEventListener('click', e => {
+  const cv = e.currentTarget;
+  const rect = cv.getBoundingClientRect();
+  const px = e.clientX - rect.left, py = e.clientY - rect.top;
+  const pad = 45, W = cv.width, H = cv.height;
+  ch2W[0] = -2 + (px - pad) / (W - 2 * pad) * 7;
+  ch2W[1] =  0 + (py - pad) / (H - 2 * pad) * 3;
+  drawCh2();
+});
+
+// ============================================================
+//  CH3 — Gradient Descent Stepper
+// ============================================================
+const ch3Pts = [[1,2],[2,4],[3,5],[4,8],[5,9]];
+let gdPos = [4, 0.5], gdPath = [[4, 0.5]];
+
+function gdMseGrad(w0, w1) {
+  let g0 = 0, g1 = 0;
+  ch3Pts.forEach(([x, y]) => { const e = w0 + w1 * x - y; g0 += 2 * e; g1 += 2 * e * x; });
+  return [g0 / ch3Pts.length, g1 / ch3Pts.length];
+}
+
+function drawCh3() {
+  const cv = document.getElementById('ch3Canvas');
+  if (!cv) return;
+  const cx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = bgColour(); cx.fillRect(0, 0, W, H);
+
+  const pad = 45, w0R = [-2, 6], w1R = [0, 3];
+
+  // heatmap
+  const cols = 80, rows = 80;
+  const cellW = (W - 2 * pad) / cols, cellH = (H - 2 * pad) / rows;
+  let maxL = 0, minL = Infinity, allL = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const w0 = w0R[0] + (c / cols) * (w0R[1] - w0R[0]);
+      const w1 = w1R[0] + (r / rows) * (w1R[1] - w1R[0]);
+      const l = mse2(w0, w1);
+      allL.push(l);
+      if (l > maxL) maxL = l;
+      if (l < minL) minL = l;
+    }
+  }
+  allL.forEach((l, i) => {
+    const c = i % cols, r = Math.floor(i / cols);
+    const t = Math.sqrt((l - minL) / (maxL - minL + 1e-9));
+    cx.fillStyle = `rgba(44,90,160,${0.4 + t * 0.5})`;
+    cx.fillRect(pad + c * cellW, pad + r * cellH, cellW + 1, cellH + 1);
+  });
+
+  function toScreen([w0, w1]) {
+    return [pad + (w0 - w0R[0]) / (w0R[1] - w0R[0]) * (W - 2 * pad),
+            pad + (w1 - w1R[0]) / (w1R[1] - w1R[0]) * (H - 2 * pad)];
+  }
+
+  // path
+  cx.strokeStyle = C.amber; cx.lineWidth = 2;
+  cx.beginPath();
+  gdPath.forEach((pt, i) => {
+    const [sx, sy] = toScreen(pt);
+    if (i === 0) cx.moveTo(sx, sy); else cx.lineTo(sx, sy);
+  });
+  cx.stroke();
+
+  // current point
+  const [cx2, cy2] = toScreen(gdPos);
+  cx.fillStyle = C.red;
+  cx.beginPath(); cx.arc(cx2, cy2, 7, 0, 2 * Math.PI); cx.fill();
+
+  const curMse = mse2(...gdPos);
+  cx.fillStyle = textColour(); cx.font = '11px sans-serif';
+  cx.fillText(`w₀=${gdPos[0].toFixed(3)}, w₁=${gdPos[1].toFixed(3)}, MSE=${curMse.toFixed(3)}`, pad, H - 5);
+}
+
+function gdStepOnce() {
+  const alpha = +document.getElementById('alphaSlider').value;
+  const [g0, g1] = gdMseGrad(...gdPos);
+  gdPos[0] -= alpha * g0;
+  gdPos[1] -= alpha * g1;
+  gdPos[0] = Math.max(-2, Math.min(6, gdPos[0]));
+  gdPos[1] = Math.max(0,  Math.min(3, gdPos[1]));
+  gdPath.push([...gdPos]);
+  drawCh3();
+}
+
+document.getElementById('gdStep').addEventListener('click', gdStepOnce);
+document.getElementById('gdRun').addEventListener('click', () => { for (let i = 0; i < 20; i++) gdStepOnce(); });
+document.getElementById('gdReset').addEventListener('click', () => {
+  gdPos = [4, 0.5]; gdPath = [[4, 0.5]]; drawCh3();
+});
+document.getElementById('alphaSlider').addEventListener('input', e => {
+  document.getElementById('alphaDisplay').textContent = (+e.target.value).toFixed(2);
+});
+
+// ============================================================
+//  CH4 — MLR slider
+// ============================================================
+const ch4Pts = [[80, 35, 1.81], [80, 25, 1.22], [100, 30, 1.71]];
+
+function drawCh4() {
+  const cv = document.getElementById('ch4Canvas');
+  if (!cv) return;
+  const cx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = bgColour(); cx.fillRect(0, 0, W, H);
+
+  const w0 = +document.getElementById('mlrW0').value;
+  const w1 = +document.getElementById('mlrW1').value;
+  const w2 = +document.getElementById('mlrW2').value;
+
+  let mse = 0;
+  const preds = ch4Pts.map(([x1, x2, y]) => {
+    const h = w0 + w1 * x1 + w2 * x2;
+    mse += (h - y) ** 2;
+    return h;
+  });
+  mse /= ch4Pts.length;
+
+  const labels = ['Patient 1', 'Patient 2', 'Patient 3'];
+  const barW = 60, gap = 80, startX = 80;
+
+  ch4Pts.forEach(([,,y], i) => {
+    const pred = preds[i];
+    const x = startX + i * (barW * 2 + gap);
+    const scale = 80;
+    const baseY = H - 60;
+
+    // actual bar
+    cx.fillStyle = C.navy;
+    cx.fillRect(x, baseY - y * scale, barW, y * scale);
+    cx.fillStyle = textColour(); cx.font = '10px sans-serif';
+    cx.fillText(`y=${y.toFixed(2)}`, x, baseY - y * scale - 4);
+
+    // prediction bar
+    const ph = Math.max(0, Math.min(pred, 3));
+    cx.fillStyle = pred > 0 ? C.green : C.red;
+    cx.fillRect(x + barW + 4, baseY - ph * scale, barW, ph * scale);
+    cx.fillStyle = textColour(); cx.font = '10px sans-serif';
+    cx.fillText(`ĥ=${pred.toFixed(2)}`, x + barW + 4, baseY - ph * scale - 4);
+
+    cx.fillStyle = textColour(); cx.font = '11px sans-serif';
+    cx.fillText(labels[i], x, baseY + 14);
+  });
+
+  cx.fillStyle = textColour(); cx.font = '12px sans-serif';
+  cx.fillText(`w₀=${w0.toFixed(2)}, w₁=${w1.toFixed(3)}, w₂=${w2.toFixed(3)}`, 10, 20);
+  cx.fillText(`Training MSE = ${mse.toFixed(4)}`, 10, 38);
+  document.getElementById('mlrMSE').textContent = `MSE: ${mse.toFixed(4)}`;
+}
+
+['mlrW0','mlrW1','mlrW2'].forEach(id => document.getElementById(id).addEventListener('input', drawCh4));
+
+// ============================================================
+//  CH6 — Metric calculator
+// ============================================================
+const ch6Pts = [[1,2],[2,4.5],[3,5.5],[4,8],[5,10.5],[6,12],[7,14.5],[8,16]];
+
+function drawCh6() {
+  const cv = document.getElementById('ch6Canvas');
+  if (!cv) return;
+  const cx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = bgColour(); cx.fillRect(0, 0, W, H);
+
+  const w1 = +document.getElementById('evalSlope').value;
+  const w0 = 0.5;
+  const pad = 50;
+  const xs = ch6Pts.map(d => d[0]), ys = ch6Pts.map(d => d[1]);
+  const xMin = 0, xMax = 9, yMin = 0, yMax = 20;
+
+  function toS(x, y) {
+    return [pad + (x - xMin) / (xMax - xMin) * (W - 2 * pad),
+            H - pad - (y - yMin) / (yMax - yMin) * (H - 2 * pad)];
+  }
+
+  // axes
+  cx.strokeStyle = C.grey; cx.lineWidth = 1;
+  cx.beginPath();
+  cx.moveTo(pad, H - pad); cx.lineTo(W - pad, H - pad);
+  cx.moveTo(pad, pad); cx.lineTo(pad, H - pad);
+  cx.stroke();
+
+  // line
+  const [xs1, ys1] = toS(0, w0); const [xs2, ys2] = toS(9, w0 + w1 * 9);
+  cx.strokeStyle = C.green; cx.lineWidth = 2;
+  cx.beginPath(); cx.moveTo(xs1, ys1); cx.lineTo(xs2, ys2); cx.stroke();
+
+  let mae = 0, mse = 0;
+  const yMean = ys.reduce((a, b) => a + b) / ys.length;
+  let ssTot = 0, ssRes = 0;
+
+  ch6Pts.forEach(([x, y]) => {
+    const yhat = w0 + w1 * x;
+    const [sx, sy] = toS(x, y), [, shy] = toS(x, yhat);
+    cx.strokeStyle = C.red; cx.lineWidth = 1; cx.setLineDash([4, 3]);
+    cx.beginPath(); cx.moveTo(sx, sy); cx.lineTo(sx, shy); cx.stroke();
+    cx.setLineDash([]);
+    cx.fillStyle = C.navy;
+    cx.beginPath(); cx.arc(sx, sy, 5, 0, 2 * Math.PI); cx.fill();
+    mae += Math.abs(yhat - y);
+    mse += (yhat - y) ** 2;
+    ssTot += (y - yMean) ** 2;
+    ssRes += (yhat - y) ** 2;
+  });
+  mae /= ch6Pts.length; mse /= ch6Pts.length;
+  const rmse = Math.sqrt(mse);
+  const r2 = 1 - ssRes / ssTot;
+
+  document.getElementById('evalMetrics').textContent =
+    `MAE = ${mae.toFixed(3)}  |  RMSE = ${rmse.toFixed(3)}  |  R² = ${r2.toFixed(3)}`;
+}
+
+document.getElementById('evalSlope').addEventListener('input', drawCh6);
+
+// ============================================================
+//  CH7 — Bias-Variance
+// ============================================================
+function drawCh7() {
+  const cv = document.getElementById('ch7Canvas');
+  if (!cv) return;
+  const cx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = bgColour(); cx.fillRect(0, 0, W, H);
+
+  const d = +document.getElementById('bvSlider').value;
+  document.getElementById('bvDisplay').textContent = d;
+
+  const degrees = [1,2,3,4,5,6,7,8,9,10];
+  const bias2 = degrees.map(k => 5.0 / k);
+  const variance = degrees.map(k => 0.2 * k ** 1.8);
+  const total = degrees.map((k, i) => bias2[i] + variance[i]);
+
+  const pad = 55, maxVal = 12;
+
+  function toS(k, v) {
+    return [pad + (k - 1) / 9 * (W - 2 * pad),
+            H - pad - v / maxVal * (H - 2 * pad)];
+  }
+
+  // axes
+  cx.strokeStyle = C.grey; cx.lineWidth = 1;
+  cx.beginPath();
+  cx.moveTo(pad, H - pad); cx.lineTo(W - pad, H - pad);
+  cx.moveTo(pad, pad); cx.lineTo(pad, H - pad);
+  cx.stroke();
+
+  cx.fillStyle = textColour(); cx.font = '11px sans-serif';
+  cx.fillText('Model Complexity', W / 2 - 40, H - 8);
+
+  [[bias2, C.navy, 'Bias²'], [variance, C.red, 'Variance'], [total, textColour(), 'Total']].forEach(([vals, col, label], li) => {
+    cx.strokeStyle = col;
+    cx.lineWidth = li === 2 ? 2.5 : 2;
+    cx.setLineDash(li === 2 ? [6, 4] : []);
+    cx.beginPath();
+    degrees.forEach((k, i) => {
+      const [sx, sy] = toS(k, vals[i]);
+      if (i === 0) cx.moveTo(sx, sy); else cx.lineTo(sx, sy);
+    });
+    cx.stroke();
+    cx.setLineDash([]);
+    const [lx, ly] = toS(10, vals[9]);
+    cx.fillStyle = col; cx.font = '11px sans-serif';
+    cx.fillText(label, lx - 35, ly - 6);
+  });
+
+  // vertical cursor
+  const [cx2, cy2] = toS(d, total[d - 1]);
+  cx.strokeStyle = C.green; cx.lineWidth = 1.5; cx.setLineDash([5, 3]);
+  cx.beginPath(); cx.moveTo(cx2, H - pad); cx.lineTo(cx2, 10); cx.stroke();
+  cx.setLineDash([]);
+  cx.fillStyle = C.green;
+  cx.beginPath(); cx.arc(cx2, cy2, 6, 0, 2 * Math.PI); cx.fill();
+
+  cx.fillStyle = textColour(); cx.font = '11px sans-serif';
+  cx.fillText(`d=${d}: Bias²=${bias2[d-1].toFixed(2)}, Var=${variance[d-1].toFixed(2)}, Total=${total[d-1].toFixed(2)}`, pad, 16);
+}
+
+document.getElementById('bvSlider').addEventListener('input', drawCh7);
+
+// ============================================================
+//  CH8 — Lambda Dial (bar chart of weights)
+// ============================================================
+const ch8TrueW = [1.5, -0.8, 0.4, -0.2, 0.1];
+
+function ridgeWeights(lam) {
+  const n = 30, d = 5;
+  const rng = lcg(5);
+  const X = [], y = [];
+  for (let i = 0; i < n; i++) {
+    const row = Array.from({length: d}, () => rng() * 4 - 2);
+    X.push(row);
+    y.push(row.reduce((s, x, j) => s + ch8TrueW[j] * x, 0) + (rng() - 0.5) * 0.3);
+  }
+  // Ridge closed form in JS (small scale)
+  const XtX = Array.from({length:d}, (_, i) => Array.from({length:d}, (__, j) =>
+    X.reduce((s, row) => s + row[i] * row[j], 0)));
+  const XtY = Array.from({length:d}, (_, i) => X.reduce((s, row, r) => s + row[i] * y[r], 0));
+  for (let i = 0; i < d; i++) XtX[i][i] += lam * n;
+  return solveLinear(XtX, XtY);
+}
+
+function drawCh8() {
+  const cv = document.getElementById('ch8Canvas');
+  if (!cv) return;
+  const cx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = bgColour(); cx.fillRect(0, 0, W, H);
+
+  const lam = +document.getElementById('lambdaSlider').value;
+  document.getElementById('lambdaDisplay').textContent = lam.toFixed(2);
+  const wVals = ridgeWeights(lam);
+
+  const barW = 60, gap = 30;
+  const startX = (W - (wVals.length * (barW + gap) - gap)) / 2;
+  const scaleY = 80, baseY = H / 2;
+
+  cx.strokeStyle = C.grey; cx.lineWidth = 1;
+  cx.beginPath(); cx.moveTo(30, baseY); cx.lineTo(W - 30, baseY); cx.stroke();
+
+  wVals.forEach((w, i) => {
+    const x = startX + i * (barW + gap);
+    const h = w * scaleY;
+    cx.fillStyle = w >= 0 ? C.navy : C.red;
+    cx.fillRect(x, h < 0 ? baseY : baseY - h, barW, Math.abs(h));
+    cx.fillStyle = textColour(); cx.font = '11px sans-serif';
+    cx.fillText(`w${i+1}`, x + 18, baseY + (h < 0 ? -Math.abs(h) - 4 : Math.abs(h) + 14));
+    cx.fillText(w.toFixed(3), x + 4, h < 0 ? baseY + 18 : baseY - Math.abs(h) - 6);
+  });
+
+  cx.fillStyle = textColour(); cx.font = '12px sans-serif';
+  cx.fillText(`λ = ${lam.toFixed(2)} — weights shrink toward zero as λ grows`, 20, 20);
+}
+
+document.getElementById('lambdaSlider').addEventListener('input', drawCh8);
+
+// ============================================================
+//  CH10 — Ridge vs Lasso Geometry
+// ============================================================
+function drawCh10() {
+  const cv = document.getElementById('ch10Canvas');
+  if (!cv) return;
+  const cx = cv.getContext('2d'), W = cv.width, H = cv.height;
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = bgColour(); cx.fillRect(0, 0, W, H);
+
+  const halfW = W / 2, radius = +document.getElementById('geomSlider').value * 50;
+  const optX = 0.65 * halfW, optY = 0.35 * H;  // loss minimum (right of centre in each panel)
+
+  function drawPanel(offX, kind) {
+    const cx0 = offX + halfW / 2, cy0 = H / 2;
+
+    // loss contours
+    for (let s = 1; s <= 5; s++) {
+      cx.strokeStyle = C.red; cx.lineWidth = 1; cx.globalAlpha = 0.5;
+      cx.beginPath();
+      const rx2 = s * 40, ry2 = s * 24;
+      cx.ellipse(cx0 + (optX - halfW / 2), cy0 - (H / 2 - optY),
+                 rx2, ry2, 0.3, 0, 2 * Math.PI);
+      cx.stroke();
+    }
+    cx.globalAlpha = 1;
+
+    // constraint
+    cx.fillStyle = C.navy; cx.globalAlpha = 0.18;
+    if (kind === 'circle') {
+      cx.beginPath(); cx.arc(cx0, cy0, radius, 0, 2 * Math.PI); cx.fill();
+      cx.globalAlpha = 1; cx.strokeStyle = C.navy; cx.lineWidth = 2;
+      cx.beginPath(); cx.arc(cx0, cy0, radius, 0, 2 * Math.PI); cx.stroke();
+    } else {
+      cx.beginPath();
+      cx.moveTo(cx0, cy0 - radius); cx.lineTo(cx0 + radius, cy0);
+      cx.lineTo(cx0, cy0 + radius); cx.lineTo(cx0 - radius, cy0); cx.closePath();
+      cx.fill();
+      cx.globalAlpha = 1; cx.strokeStyle = C.navy; cx.lineWidth = 2;
+      cx.beginPath();
+      cx.moveTo(cx0, cy0 - radius); cx.lineTo(cx0 + radius, cy0);
+      cx.lineTo(cx0, cy0 + radius); cx.lineTo(cx0 - radius, cy0); cx.closePath();
+      cx.stroke();
+    }
+
+    // solution dot
+    const solX = kind === 'circle' ? cx0 : cx0;
+    const solY = kind === 'circle' ? cy0 - radius : cy0 - radius;
+    cx.fillStyle = C.green;
+    cx.beginPath(); cx.arc(solX, solY, 8, 0, 2 * Math.PI); cx.fill();
+
+    // axes
+    cx.strokeStyle = C.grey; cx.lineWidth = 0.8;
+    cx.beginPath(); cx.moveTo(offX + 10, cy0); cx.lineTo(offX + halfW - 10, cy0); cx.stroke();
+    cx.beginPath(); cx.moveTo(cx0, 15); cx.lineTo(cx0, H - 15); cx.stroke();
+
+    cx.fillStyle = textColour(); cx.font = '11px sans-serif';
+    cx.fillText('w₁', offX + halfW - 20, cy0 + 14);
+    cx.fillText('w₂', cx0 + 6, 24);
+
+    const title = kind === 'circle' ? 'Ridge (L2 ball)' : 'Lasso (L1 diamond)';
+    cx.fillStyle = var_navy(); cx.font = 'bold 13px sans-serif';
+    cx.fillText(title, offX + 10, 20);
+
+    if (kind === 'diamond') {
+      cx.fillStyle = C.green; cx.font = '11px sans-serif';
+      cx.fillText('← Corner = sparse solution!', cx0 + 10, solY);
+    }
+  }
+
+  function var_navy() { return C.navy; }
+
+  drawPanel(0, 'circle');
+  cx.strokeStyle = C.grey; cx.lineWidth = 1;
+  cx.beginPath(); cx.moveTo(halfW, 0); cx.lineTo(halfW, H); cx.stroke();
+  drawPanel(halfW, 'diamond');
+}
+
+document.getElementById('geomSlider').addEventListener('input', drawCh10);
+
+// ============================================================
+//  Linear congruential generator (seeded random)
+// ============================================================
+function lcg(seed) {
+  let s = seed % 2147483647;
+  if (s <= 0) s += 2147483646;
+  return () => { s = s * 16807 % 2147483647; return (s - 1) / 2147483646; };
+}
+
+// ============================================================
+//  Small Gaussian elimination for CH8 Ridge
+// ============================================================
+function solveLinear(A, b) {
+  const n = A.length;
+  const M = A.map((row, i) => [...row, b[i]]);
+  for (let col = 0; col < n; col++) {
+    let maxRow = col;
+    for (let r = col + 1; r < n; r++)
+      if (Math.abs(M[r][col]) > Math.abs(M[maxRow][col])) maxRow = r;
+    [M[col], M[maxRow]] = [M[maxRow], M[col]];
+    for (let r = col + 1; r < n; r++) {
+      const factor = M[r][col] / M[col][col];
+      for (let c = col; c <= n; c++) M[r][c] -= factor * M[col][c];
+    }
+  }
+  const x = new Array(n).fill(0);
+  for (let i = n - 1; i >= 0; i--) {
+    x[i] = M[i][n];
+    for (let j = i + 1; j < n; j++) x[i] -= M[i][j] * x[j];
+    x[i] /= M[i][i];
+  }
+  return x;
+}
+
+// ============================================================
+//  Redraw on chapter change
+// ============================================================
+function redrawAll() {
+  const draws = [drawCh0, drawCh1, drawCh2, drawCh3, drawCh4,
+                 null, drawCh6, drawCh7, drawCh8, null, drawCh10];
+  if (draws[currentCh]) draws[currentCh]();
+}
+
+// ============================================================
+//  Guided Tour
+// ============================================================
+const tourSteps = [
+  { title: "What Is Regression?", text: "Regression predicts a number, not a category. The house price, the disease risk — all regression problems." },
+  { title: "Simple Linear Regression", text: "One feature, one line: h(x) = w₀ + w₁x. The weights w₀ and w₁ are learned from data." },
+  { title: "The MSE Loss", text: "MSE measures how bad the current weights are. Training finds the weights that make MSE as small as possible." },
+  { title: "Gradient Descent", text: "Step downhill on the loss surface by subtracting a fraction of the gradient. The learning rate α controls the step size." },
+  { title: "Multiple Regression", text: "More features → a hyperplane instead of a line. The math extends naturally." },
+  { title: "Normal Equation", text: "For small datasets, solve for the best weights in one shot: w = (X'X)⁻¹X'y." },
+  { title: "Evaluation Metrics", text: "MAE, RMSE, and R² tell you how good the model is on test data. Always evaluate on held-out data." },
+  { title: "Bias & Variance", text: "Too simple → underfits (high bias). Too complex → overfits (high variance). Find the sweet spot." },
+  { title: "Why Regularise?", text: "Large weights → fragile model. Add a penalty to the loss to keep weights small." },
+  { title: "Ridge vs. Lasso", text: "Ridge shrinks weights proportionally (never zero). Lasso can push weights to exactly zero — feature selection." },
+  { title: "You Are Done!", text: "You have covered all of Module 3: Linear Models for Regression. Good luck on the exam!" }
+];
+
+let tourStep = 0;
+function showTourStep(n) {
+  if (n < 0 || n >= tourSteps.length) { endTour(); return; }
+  tourStep = n;
+  document.getElementById('sc-step').textContent = `Step ${n + 1} / ${tourSteps.length}`;
+  document.getElementById('sc-title').textContent = tourSteps[n].title;
+  document.getElementById('sc-text').textContent = tourSteps[n].text;
+  showChapter(n);
+}
+function startTour() {
+  document.getElementById('storycard').classList.add('active');
+  showTourStep(0);
+}
+function endTour() {
+  document.getElementById('storycard').classList.remove('active');
+}
+document.getElementById('tourBtn').addEventListener('click', startTour);
+document.getElementById('sc-next').addEventListener('click', () => showTourStep(tourStep + 1));
+document.getElementById('sc-prev').addEventListener('click', () => showTourStep(tourStep - 1));
+document.getElementById('sc-exit').addEventListener('click', endTour);
+
+// ============================================================
+//  Init
+// ============================================================
+showChapter(0);
+</script>
+</body>
+</html>

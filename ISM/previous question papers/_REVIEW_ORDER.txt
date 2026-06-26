@@ -1,0 +1,28 @@
+ISM Past Papers — review order (oldest → newest)
+===============================================
+
+Open MidSem/ or EndSem/ in Finder — files sort chronologically by YYYY-MM prefix.
+
+MID-SEM (EC-2) — folder: MidSem/
+--------------------------------
+2024-07  Regular_Answers     (Jul 2024 — Sem II 2023-24)
+2024-07  Makeup_Answers      (Jul 2024 makeup)
+2025-01  Regular               (Jan 2025 — also _S2-24 and _batch2025 variants)
+2025-06  Makeup                (Jun 2025 — also _S2-24 and _answer-set2)
+2025-12  Regular_QP-AnswerKey  (Dec 2025 + answer key)
+2025-12  Regular_QP-only       (Dec 2025 QP only, S1 code)
+2026-01  Makeup_QP-AnswerKey   (Jan 2026 makeup + key)
+2026-01  Makeup_QP-only        (Jan 2026 QP only, S1 code)
+2026-06  Regular/              (Jun 2026 paper PDF + Q1–Q6 JPEGs)
+
+END-SEM (EC-3) — folder: EndSem/
+----------------------------------
+2024-09  Regular               (Sep 2024 — Sem II 2023-24 end)
+2024-10  Makeup                (Oct 2024 makeup)
+2025-09  Regular               (Sep 2025 — Sem II 2024-25 end)
+2026-02  Regular_QP-AnswerKey  (Feb 2026 end + key)
+2026-03  Makeup_QP-AnswerKey   (Mar 2026 end makeup + key)
+
+RESOURCES — folder: _Resources/
+-------------------------------
+Practice questions, webinars, compiled docx, class notes, older batch papers.

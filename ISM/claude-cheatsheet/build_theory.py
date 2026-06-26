@@ -4,6 +4,7 @@ import html as H
 import re
 from pathlib import Path
 
+from ism_theme import LIGHT_HERO, LIGHT_SIDEBAR
 from math_format import format_math_in_html
 from ism_theory_enrich import (
     SECTION_ENRICH,
@@ -368,26 +369,15 @@ def format_block(text: str) -> str:
 
 
 THEORY_CSS = """
-:root{--bg:#f1f5f9;--paper:#fff;--text:#1e293b;--muted:#64748b;--accent:#2563eb;--border:#e2e8f0;--sidebar-w:260px;--radius:12px}
+:root{--bg:#f1f5f9;--paper:#fff;--text:#1e293b;--muted:#64748b;--accent:#2563eb;--navy:#1e3a5f;--blue:#2563eb;--border:#e2e8f0;--sidebar-w:260px;--radius:12px}
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;font-size:15px}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.55;color:var(--text);background:var(--bg)}
 a{color:#2563eb;text-decoration:none;font-weight:500}a:hover{text-decoration:underline}
 .page{display:flex;min-height:100vh;max-width:1280px;margin:0 auto;background:var(--paper);box-shadow:0 4px 24px rgba(0,0,0,.06)}
-#sidebar{width:var(--sidebar-w);flex-shrink:0;background:#1e293b;color:#e2e8f0;border-right:none;padding:1rem .75rem 2rem;font-size:.74rem;position:sticky;top:0;height:100vh;overflow-y:auto}
-#sidebar .brand{font-weight:800;font-size:.9rem;color:#fff;margin-bottom:.15rem}
-#sidebar .brand-sub{font-size:.68rem;color:#94a3b8;margin-bottom:1rem}
-#sidebar .brand-sub a{color:#67e8f9}
-#sidebar nav h3{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin:1rem 0 .3rem;font-weight:700}
-#sidebar ol{list-style:none;padding:0;margin:0}
-#sidebar li a{display:block;padding:.3rem .55rem;border-radius:6px;color:#cbd5e1;line-height:1.3}
-#sidebar li a:hover{background:#334155;color:#fff;text-decoration:none}
-#sidebar li.sub a{padding-left:1.1rem;font-size:.68rem;color:#94a3b8}
-#sidebar li.guide-link a{color:#6ee7b7}
+""" + LIGHT_SIDEBAR + """
 #content{flex:1;min-width:0;padding:1.5rem 2rem 3rem;max-width:780px}
-.hero{background:linear-gradient(135deg,#1e3a8a 0%,#7c3aed 50%,#059669 100%);color:#fff;padding:1.6rem 1.8rem;border-radius:var(--radius);margin-bottom:1.5rem;box-shadow:0 8px 24px rgba(37,99,235,.25)}
-.hero h1{margin:0 0 .35rem;font-size:1.45rem;color:#fff}
-.hero .meta{font-size:.82rem;opacity:.92;margin:0}
+""" + LIGHT_HERO + """
 h2.session-header{font-size:1.2rem;margin:2rem 0 .5rem;padding:.85rem 1.1rem;border-radius:var(--radius);border:none;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
 h2#overview{margin-top:0;font-size:1.2rem;border-bottom:3px solid #2563eb;padding-bottom:.4rem;color:#1e3a8a}
 .src{font-size:.75rem;color:var(--muted);margin:0 0 1rem}

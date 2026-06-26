@@ -3,6 +3,7 @@
 import html as H
 from pathlib import Path
 
+from ism_theme import LIGHT_HEADER
 from svg_inline import SVG_WRAP_CSS, reset_uid, svg_figure, asset_figure
 
 ROOT = Path(__file__).resolve().parent
@@ -33,8 +34,7 @@ SHARED_CSS = """
 :root{--navy:#1e3a5f;--blue:#2563eb;--green:#059669;--purple:#7c3aed;--amber:#d97706;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Georgia,"Segoe UI",serif;background:var(--bg);color:var(--text);line-height:1.65}
-header{background:var(--navy);color:#fff;padding:1.5rem;text-align:center}
-header a{color:#93c5fd}
+""" + LIGHT_HEADER + """
 .shell{display:flex;max-width:1280px;margin:0 auto;width:100%}
 aside{width:260px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);padding:.8rem;position:sticky;top:0;height:100vh;overflow-y:auto;font-size:.72rem}
 aside a{display:block;padding:.28rem .45rem;color:var(--navy);text-decoration:none;border-radius:4px}

@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ML Practice Problems — AIMLCZG565</title>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+  <style>
+  :root {
+    --bg: #f8fafc;
+    --paper: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --accent: #2563eb;
+    --accent-soft: #eff6ff;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --green-bd: #86efac;
+    --amber: #b45309;
+    --amber-bg: #fffbeb;
+    --amber-bd: #fcd34d;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --purple: #7c3aed;
+    --purple-bg: #f5f3ff;
+    --purple-bd: #c4b5fd;
+    --border: #e2e8f0;
+    --radius: 10px;
+    --sidebar-w: 260px;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; font-size: 15px; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.7;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  /* ── Progress bar ── */
+  #progress-bar {
+    position: fixed; top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    width: 0%; z-index: 9999; transition: width 0.1s;
+  }
+
+  /* ── Layout ── */
+  .page { display: flex; min-height: 100vh; }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    background: var(--paper);
+    border-right: 1px solid var(--border);
+    position: sticky; top: 0; height: 100vh;
+    overflow-y: auto;
+    padding: 1rem 0.8rem 2.5rem;
+    font-size: 0.77rem;
+  }
+  #sidebar .brand { font-weight: 800; font-size: 0.88rem; color: var(--text); margin-bottom: 0.1rem; }
+  #sidebar .brand-sub { font-size: 0.7rem; color: var(--muted); margin-bottom: 1rem; }
+  #sidebar nav h3 {
+    font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--muted); margin: 1rem 0 0.2rem; font-weight: 700;
+  }
+  #sidebar ol { list-style: none; padding: 0; margin: 0; }
+  #sidebar li { margin: 0.06rem 0; }
+  #sidebar li a {
+    display: block; padding: 0.18rem 0.5rem; border-radius: 5px;
+    color: var(--text); line-height: 1.3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    transition: background 0.15s, color 0.15s; text-decoration: none;
+  }
+  #sidebar li a:hover, #sidebar li a.active {
+    background: var(--accent-soft); color: var(--accent);
+  }
+  .score-display {
+    background: linear-gradient(135deg, #1e40af, #7c3aed);
+    color: white; border-radius: var(--radius);
+    padding: 0.7rem 0.9rem; margin-bottom: 1rem; text-align: center;
+  }
+  .score-display .score-num { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+  .score-display .score-label { font-size: 0.68rem; opacity: 0.85; margin-top: 0.15rem; }
+  .reset-btn {
+    display: block; width: 100%; margin: 0.5rem 0;
+    padding: 0.4rem; border-radius: var(--radius);
+    background: #f1f5f9; border: 1px solid var(--border);
+    color: var(--text); font-size: 0.75rem; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .reset-btn:hover { background: #e2e8f0; }
+
+  /* ── Content ── */
+  #content { flex: 1; padding: 2rem 2.5rem 4rem; max-width: 880px; }
+
+  /* ── Hero ── */
+  .hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #4f46e5 60%, #7c3aed 100%);
+    color: white; border-radius: 14px;
+    padding: 1.8rem 2rem 1.5rem; margin-bottom: 2rem;
+  }
+  .hero h1 { margin: 0 0 0.4rem; font-size: 1.5rem; font-weight: 800; }
+  .hero p { margin: 0.2rem 0; font-size: 0.88rem; opacity: 0.9; }
+  .hero-stats {
+    display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;
+  }
+  .hero-stat {
+    background: rgba(255,255,255,0.15); border-radius: 8px;
+    padding: 0.4rem 0.8rem; font-size: 0.8rem; font-weight: 600;
+  }
+
+  /* ── Part header ── */
+  .part-header {
+    background: linear-gradient(90deg, #1e40af, #4f46e5);
+    color: white; padding: 0.6rem 1.2rem;
+    border-radius: var(--radius); margin: 2rem 0 1.2rem;
+    font-size: 1rem; font-weight: 700;
+  }
+  .part-sub { color: var(--muted); font-size: 0.82rem; margin: -0.8rem 0 1rem; }
+
+  /* ── Problem card ── */
+  .problem {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 1.2rem;
+    position: relative;
+  }
+  .problem:hover { border-color: #c7d2fe; box-shadow: 0 2px 8px rgba(99,102,241,0.07); }
+
+  .problem-num {
+    position: absolute; top: -12px; left: 1rem;
+    background: var(--accent); color: white;
+    font-size: 0.7rem; font-weight: 800;
+    padding: 0.15rem 0.6rem; border-radius: 20px;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .problem-num.green-tag  { background: var(--green); }
+  .problem-num.amber-tag  { background: #d97706; }
+  .problem-num.red-tag    { background: var(--red); }
+  .problem-num.purple-tag { background: var(--purple); }
+
+  .problem-q { font-weight: 600; font-size: 0.95rem; margin: 0 0 0.6rem; color: #1e293b; }
+  .problem-q .tag {
+    display: inline-block; font-size: 0.65rem; font-weight: 700;
+    padding: 0.1rem 0.5rem; border-radius: 20px; margin-right: 0.4rem;
+    vertical-align: middle; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .tag.numerical { background: #dbeafe; color: #1d4ed8; }
+  .tag.conceptual { background: #f3e8ff; color: #6d28d9; }
+  .tag.tf { background: #fef3c7; color: #92400e; }
+  .tag.scenario { background: #dcfce7; color: #15803d; }
+
+  /* ── Answer options (MCQ) ── */
+  .options { list-style: none; padding: 0; margin: 0.5rem 0; }
+  .options li {
+    padding: 0.35rem 0.7rem; border: 1px solid var(--border);
+    border-radius: 6px; margin: 0.3rem 0; font-size: 0.88rem;
+    cursor: pointer; transition: background 0.15s, border-color 0.15s;
+    display: flex; align-items: flex-start; gap: 0.5rem;
+  }
+  .options li:hover { background: var(--accent-soft); border-color: #93c5fd; }
+  .options li .opt-label { font-weight: 700; flex-shrink: 0; color: var(--accent); }
+  .options li.correct   { background: #f0fdf4 !important; border-color: #86efac !important; color: #14532d; }
+  .options li.incorrect { background: #fef2f2 !important; border-color: #fca5a5 !important; color: #7f1d1d; }
+  .options li.revealed  { background: #f0fdf4 !important; border-color: #86efac !important; color: #14532d; }
+
+  /* ── Dataset table ── */
+  table { border-collapse: collapse; width: 100%; font-size: 0.84rem; margin: 0.6rem 0; }
+  th { background: #f1f5f9; text-align: left; padding: 0.35rem 0.7rem; font-weight: 700; border: 1px solid var(--border); }
+  td { padding: 0.3rem 0.7rem; border: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .bad { color: var(--red); font-weight: 700; }
+  .ok  { color: var(--green); }
+
+  /* ── Reveal button ── */
+  .reveal-btn {
+    background: var(--accent); color: white;
+    border: none; border-radius: 6px;
+    padding: 0.4rem 1rem; font-size: 0.82rem; font-weight: 600;
+    cursor: pointer; margin-top: 0.6rem;
+    transition: background 0.15s;
+  }
+  .reveal-btn:hover { background: #1d4ed8; }
+  .reveal-btn.revealed { background: var(--green); }
+
+  /* ── Solution box ── */
+  .solution-box {
+    display: none; margin-top: 0.8rem;
+    border-top: 2px solid var(--green-bd);
+    padding-top: 0.8rem;
+  }
+  .solution-box.visible { display: block; }
+
+  .solution-step {
+    display: flex; gap: 0.7rem; margin: 0.5rem 0;
+    align-items: flex-start;
+  }
+  .step-num {
+    background: var(--accent); color: white;
+    border-radius: 50%; width: 1.5rem; height: 1.5rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 800; flex-shrink: 0; margin-top: 0.1rem;
+  }
+  .step-num.green  { background: var(--green); }
+  .step-num.amber  { background: #d97706; }
+  .step-num.check  { background: #15803d; font-size: 0.9rem; }
+  .step-content { font-size: 0.88rem; flex: 1; }
+  .step-content strong { color: #1e293b; }
+
+  /* ── Fill-in box ── */
+  .fill-in {
+    display: inline-block;
+    border-bottom: 2px solid var(--accent);
+    min-width: 80px;
+    color: var(--accent);
+    font-weight: 700;
+    padding: 0 0.3rem;
+  }
+
+  /* ── Note ── */
+  .callout {
+    border-radius: var(--radius); padding: 0.6rem 0.9rem;
+    font-size: 0.84rem; margin: 0.6rem 0;
+    border: 1px solid transparent;
+  }
+  .callout.tip  { background: #ecfdf5; border-color: #86efac; }
+  .callout.warn { background: #fffbeb; border-color: #fbbf24; }
+  .callout.info { background: var(--accent-soft); border-color: #93c5fd; }
+  .callout-label { font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+
+  /* ── Difficulty ── */
+  .diff { font-size: 0.68rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 20px; vertical-align: middle; margin-left: 0.3rem; }
+  .diff.easy   { background: #dcfce7; color: #15803d; }
+  .diff.medium { background: #fef3c7; color: #92400e; }
+  .diff.hard   { background: #fce7f3; color: #9d174d; }
+
+  /* ── Back to top ── */
+  .back-top { text-align: right; margin-top: 2rem; font-size: 0.8rem; }
+  .back-top a { color: var(--muted); text-decoration: none; }
+  .back-top a:hover { color: var(--accent); }
+  hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+  @media (max-width: 860px) {
+    .page { flex-direction: column; }
+    #sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); max-height: 45vh; }
+    #content { padding: 1.2rem 1rem 3rem; }
+  }
+  @media print {
+    #sidebar, #progress-bar { display: none; }
+    #content { max-width: none; padding: 0; }
+    .reveal-btn { display: none; }
+    .solution-box { display: block !important; }
+  }
+  </style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<div class="page">
+
+  <!-- ── Sidebar ── -->
+  <aside id="sidebar">
+    <div class="brand">ML Practice Problems</div>
+    <div class="brand-sub">AIMLCZG565 · BITS WILP · CS1–CS6</div>
+
+    <div class="score-display">
+      <div class="score-num" id="score-num">0</div>
+      <div class="score-label">problems revealed</div>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">↺ Reset All Answers</button>
+
+    <nav>
+      <h3>Part I — Intro to ML</h3>
+      <ol>
+        <li><a href="#p1">Q1. Mitchell's T/P/E — Spam</a></li>
+        <li><a href="#p2">Q2. Mitchell's T/P/E — Chess</a></li>
+        <li><a href="#p3">Q3. Learning type identification</a></li>
+        <li><a href="#p4">Q4. Discriminative vs Generative</a></li>
+      </ol>
+      <h3>Part II — Data &amp; Workflow</h3>
+      <ol>
+        <li><a href="#p5">Q5. Dataset — spot quality issues</a></li>
+        <li><a href="#p6">Q6. Feature scaling T/F</a></li>
+        <li><a href="#p7">Q7. Stratified split scenario</a></li>
+        <li><a href="#p8">Q8. Cross-validation</a></li>
+      </ol>
+      <h3>Part III — Linear Regression</h3>
+      <ol>
+        <li><a href="#p9">Q9. GD vs Normal Equation</a></li>
+        <li><a href="#p10">Q10. Learning rate diagnosis</a></li>
+        <li><a href="#p11">Q11. Bias-Variance diagnosis</a></li>
+        <li><a href="#p12">Q12. Ridge vs Lasso</a></li>
+        <li><a href="#p13">Q13. Gradient descent step</a></li>
+        <li><a href="#p14">Q14. Model RMSE ranking</a></li>
+      </ol>
+      <h3>Part IV — Logistic Regression</h3>
+      <ol>
+        <li><a href="#p15">Q15. Why LR fails for classification</a></li>
+        <li><a href="#p16">Q16. Sigmoid computation</a></li>
+        <li><a href="#p17">Q17. J(θ)=0 true/false</a></li>
+        <li><a href="#p18">Q18. Weight interpretation</a></li>
+        <li><a href="#p19">Q19. Large weights &amp; overfitting</a></li>
+      </ol>
+      <h3>Part V — Evaluation Metrics</h3>
+      <ol>
+        <li><a href="#p20">Q20. Confusion matrix — fraud</a></li>
+        <li><a href="#p21">Q21. Precision vs Recall choice</a></li>
+        <li><a href="#p22">Q22. Accuracy paradox</a></li>
+        <li><a href="#p23">Q23. ROC &amp; AUC</a></li>
+        <li><a href="#p24">Q24. Multi-class metrics</a></li>
+      </ol>
+      <h3>Part VI — Decision Trees</h3>
+      <ol>
+        <li><a href="#p25">Q25. Entropy calculation</a></li>
+        <li><a href="#p26">Q26. Information Gain — root node</a></li>
+        <li><a href="#p27">Q27. Full ID3 calculation</a></li>
+        <li><a href="#p28">Q28. Gain Ratio</a></li>
+        <li><a href="#p29">Q29. Overfitting &amp; pruning</a></li>
+        <li><a href="#p30">Q30. Mixed exam-style problem</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- ── Main content ── -->
+  <main id="content">
+    <div id="top"></div>
+    <div class="hero">
+      <h1>ML Practice Problems</h1>
+      <p><strong>BITS Pilani WILP · AIMLCZG565 Machine Learning</strong><br>
+      30 problems across all 6 parts · Compiled from 2023–2026 MidSem paper patterns</p>
+      <div class="hero-stats">
+        <span class="hero-stat">30 Problems</span>
+        <span class="hero-stat">6 Parts</span>
+        <span class="hero-stat">Numerical + Conceptual + T/F</span>
+        <span class="hero-stat">Reveal-on-Click Answers</span>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-label">How to use</div>
+      Read the question → attempt it on paper → click <strong>▶ Show Answer</strong>. For MCQ, click an option to check. The sidebar tracks how many you've revealed.
+    </div>
+
+    <!-- ════════════════════════════════════════
+         PART I — INTRO TO ML
+    ════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-i">Part I — Introduction to Machine Learning</h2>
+    <p class="part-sub">Q1–Q4 · Mitchell's T/P/E appears in every paper</p>
+
+    <!-- Q1 -->
+    <div class="problem" id="p1">
+      <span class="problem-num">Q1</span>
+      <p class="problem-q">
+        <span class="tag scenario">Scenario</span><span class="diff easy">Easy</span>
+        A spam filter learns to classify emails as Spam or Not-Spam from a dataset of 50,000 manually labelled emails. After training, it is evaluated on its classification accuracy. In the context of Tom Mitchell's definition, identify <strong>T, P, and E</strong>, and state the type of learning.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step">
+          <div class="step-num">T</div>
+          <div class="step-content"><strong>Task:</strong> Classify incoming emails as Spam or Not-Spam (binary classification task)</div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">P</div>
+          <div class="step-content"><strong>Performance:</strong> Classification accuracy — the fraction of emails correctly classified. Alternative measures: Precision, Recall, F1-score (especially important for imbalanced classes).</div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">E</div>
+          <div class="step-content"><strong>Experience:</strong> The 50,000 manually labelled emails (features: subject line, sender, body text; label: Spam/Not-Spam).</div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num class='check'">✅</div>
+          <div class="step-content"><strong>Type:</strong> Supervised Learning (labelled data) → Classification (predicting a category).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="problem" id="p2">
+      <span class="problem-num">Q2</span>
+      <p class="problem-q">
+        <span class="tag scenario">Scenario</span><span class="diff easy">Easy</span>
+        "A chess-playing program improves its performance at playing chess by playing thousands of games against itself and adjusting its strategy based on whether it wins or loses." Identify <strong>T, P, E</strong> and name the learning paradigm.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step">
+          <div class="step-num">T</div>
+          <div class="step-content"><strong>Task:</strong> Play chess (select optimal moves to win a game)</div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">P</div>
+          <div class="step-content"><strong>Performance:</strong> Percentage of games won (win rate against opponents of known strength)</div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">E</div>
+          <div class="step-content"><strong>Experience:</strong> Thousands of self-play games — each game outcome (win/loss) is the reward/feedback signal</div>
+        </div>
+        <div class="solution-step">
+          <div class="step-num">✅</div>
+          <div class="step-content"><strong>Type: Reinforcement Learning</strong> — the program receives a reward (win) or penalty (loss), not pre-labelled move data. No supervisor provides the correct move at each step.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="problem" id="p3">
+      <span class="problem-num green-tag">Q3</span>
+      <p class="problem-q">
+        <span class="tag tf">True/False MCQ</span><span class="diff easy">Easy</span>
+        For each scenario, select the correct <strong>learning type and sub-type</strong>:
+      </p>
+      <table>
+        <thead><tr><th>#</th><th>Scenario</th><th>Correct Answer</th></tr></thead>
+        <tbody>
+          <tr><td>a</td><td>Predict insurance claim amount from policyholder age and vehicle type</td><td><em>click reveal</em></td></tr>
+          <tr><td>b</td><td>Group news articles into topics without any labels</td><td><em>click reveal</em></td></tr>
+          <tr><td>c</td><td>Detect fraudulent credit card transactions (labelled historical data)</td><td><em>click reveal</em></td></tr>
+          <tr><td>d</td><td>Robot learns to walk by receiving a reward when it moves forward without falling</td><td><em>click reveal</em></td></tr>
+        </tbody>
+      </table>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answers</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">a</div><div class="step-content"><strong>Supervised → Regression.</strong> Output (claim amount) is a continuous number; labelled training data exists.</div></div>
+        <div class="solution-step"><div class="step-num">b</div><div class="step-content"><strong>Unsupervised → Clustering.</strong> No labels; finding hidden structure (topic groups) in unlabelled article data.</div></div>
+        <div class="solution-step"><div class="step-num">c</div><div class="step-content"><strong>Supervised → Classification.</strong> Binary output (fraud / not fraud); historical labelled transactions provided.</div></div>
+        <div class="solution-step"><div class="step-num">d</div><div class="step-content"><strong>Reinforcement Learning.</strong> Agent (robot) interacts with environment; receives reward signal; no pre-labelled "correct movements" dataset.</div></div>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="problem" id="p4">
+      <span class="problem-num">Q4</span>
+      <p class="problem-q">
+        <span class="tag conceptual">Conceptual</span><span class="diff medium">Medium</span>
+        A hospital wants to classify patient records as "disease present" or "disease absent" AND also flag records that are anomalous (unusual patterns not seen before). Should they choose a <strong>discriminative</strong> or <strong>generative</strong> classifier? Justify your answer.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step">
+          <div class="step-num">✅</div>
+          <div class="step-content">
+            <strong>Generative classifier</strong> (e.g., Naïve Bayes).
+            <br><br>
+            <strong>Reason:</strong> A discriminative model (e.g., Logistic Regression) directly learns P(y|x) — it tells you the probability of disease given features. However, it cannot estimate how likely a particular input x itself is (P(x)).
+            <br><br>
+            A <strong>generative model</strong> learns P(x|y) — how data is generated for each class. From this, you can compute P(x) = ΣP(x|y)P(y) and detect anomalies: if P(x) is very low, the record doesn't fit any class's typical pattern → flag as anomalous.
+            <br><br>
+            <strong>Rule:</strong> If you need density estimation or outlier detection in addition to classification → choose Generative.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ════════════════════════════════════════
+         PART II — DATA & WORKFLOW
+    ════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-ii">Part II — ML Workflow &amp; Data</h2>
+    <p class="part-sub">Q5–Q8 · The messy-dataset question appears in every single paper</p>
+
+    <!-- Q5 -->
+    <div class="problem" id="p5">
+      <span class="problem-num amber-tag">Q5</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff medium">Medium</span>
+        The table below is from a student examination dataset. Identify <strong>at least 6 data quality issues</strong> and suggest a resolution for each.
+      </p>
+      <table>
+        <thead><tr><th>STU-ID</th><th>NAME</th><th>AGE</th><th>CGPA</th><th>EXAM-DATE</th><th>RESULT</th></tr></thead>
+        <tbody>
+          <tr><td>S001</td><td>Ananya</td><td>21</td><td>8.7</td><td>15-Jan-2025</td><td>Pass</td></tr>
+          <tr><td>S002</td><td>Ravi123</td><td>19</td><td>7.2</td><td>2025-01-15</td><td>1</td></tr>
+          <tr><td>S003</td><td>Kiran</td><td class="bad">250</td><td class="bad">96.5</td><td>16-Jan-2025</td><td>Pass</td></tr>
+          <tr><td>S004</td><td>Meera</td><td>23</td><td>6.8</td><td>16-Jan-2025</td><td><em>(blank)</em></td></tr>
+          <tr><td>S005</td><td>Ananya</td><td>21</td><td>8.7</td><td>15-Jan-2025</td><td>Pass</td></tr>
+          <tr><td>S006</td><td>Dev</td><td>22</td><td class="bad">7.8kg</td><td>17-Jan-2025</td><td>Fail</td></tr>
+        </tbody>
+      </table>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show All Issues &amp; Solutions</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Outlier — Age=250 (S003):</strong> Biologically impossible. Resolution: Replace with mean/median age or flag for manual correction.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Outlier — CGPA=96.5 (S003):</strong> CGPA is typically out of 10. Resolution: Verify with source; likely a data entry error. Replace or flag.</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Inconsistent Encoding — RESULT column (S002=1):</strong> Most records use "Pass/Fail" but S002 uses "1". Resolution: Standardise all to "Pass/Fail" (or 0/1).</div></div>
+        <div class="solution-step"><div class="step-num">4</div><div class="step-content"><strong>Inconsistent Format — EXAM-DATE (S002):</strong> S001, S003+ use "dd-Mon-yyyy"; S002 uses "yyyy-mm-dd". Resolution: Transform all to a single format (e.g., ISO 8601: 2025-01-15).</div></div>
+        <div class="solution-step"><div class="step-num">5</div><div class="step-content"><strong>Missing Value — RESULT blank (S004):</strong> Resolution: Impute with mode ("Pass" if most students pass) or flag for manual lookup.</div></div>
+        <div class="solution-step"><div class="step-num">6</div><div class="step-content"><strong>Duplicate Row — S001 and S005 are identical:</strong> Same name, age, CGPA, date, result. Resolution: Remove one duplicate row (keep S001, delete S005).</div></div>
+        <div class="solution-step"><div class="step-num">7</div><div class="step-content"><strong>Wrong Data Type / Noise — NAME="Ravi123" (S002) and CGPA="7.8kg" (S006):</strong> "Ravi123" has digits in a name field (noise). "7.8kg" has a unit appended to a numeric field. Resolution: Strip non-alphabetic chars from NAME; strip "kg" from CGPA and cast to float.</div></div>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="problem" id="p6">
+      <span class="problem-num amber-tag">Q6</span>
+      <p class="problem-q">
+        <span class="tag tf">True/False</span><span class="diff medium">Medium</span>
+        Mark each statement as <strong>TRUE or FALSE</strong> and explain why. (This exact question appeared in the 2024 Makeup paper.)
+      </p>
+      <ol type="a" style="font-size:0.88rem;">
+        <li>Feature scaling ensures that gradient descent converges to the global minimum.</li>
+        <li>Feature scaling speeds up gradient descent convergence.</li>
+        <li>Without feature scaling, gradient descent may oscillate or take very long to converge.</li>
+        <li>Feature scaling prevents the matrix X<sup>T</sup>X from being singular.</li>
+        <li>Feature scaling prevents gradient descent from getting stuck in local optima for linear regression.</li>
+      </ol>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answers</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num class='amber'">a</div><div class="step-content"><strong>FALSE.</strong> Scaling does not change the topology of the cost surface. For linear regression, it's already convex (global min exists). For non-convex problems (neural nets), scaling doesn't eliminate local minima.</div></div>
+        <div class="solution-step"><div class="step-num class='green'">b</div><div class="step-content"><strong>TRUE.</strong> Scaling makes the cost function contours more circular. Without scaling, elongated elliptical contours force many more iterations to reach the minimum. Scaling significantly reduces the number of steps needed.</div></div>
+        <div class="solution-step"><div class="step-num class='green'">c</div><div class="step-content"><strong>TRUE.</strong> When feature scales differ greatly (e.g., income [0–100,000] vs age [0–100]), the gradient steps are dominated by the large-scale feature. The algorithm zigzags instead of moving directly towards the minimum.</div></div>
+        <div class="solution-step"><div class="step-num class='amber'">d</div><div class="step-content"><strong>FALSE.</strong> X<sup>T</sup>X becomes singular when features are linearly dependent (e.g., perfect multicollinearity), not because of scale differences. Scaling changes magnitudes, not linear independence.</div></div>
+        <div class="solution-step"><div class="step-num class='amber'">e</div><div class="step-content"><strong>FALSE.</strong> Linear regression's MSE cost function is convex — there are no local optima regardless of scaling. Scaling only affects convergence speed, not whether a local minimum exists.</div></div>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="problem" id="p7">
+      <span class="problem-num amber-tag">Q7</span>
+      <p class="problem-q">
+        <span class="tag scenario">Scenario</span><span class="diff medium">Medium</span>
+        You have a loan-approval dataset with <strong>10,000 records: 8,700 Rejected, 1,300 Approved</strong>. A colleague randomly splits the data 70/30. You argue this creates a risk. Explain the risk and propose a better approach.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Risk of random split:</strong> With 13% approvals, a random 70/30 split may put most or all approved cases into training (or test) by chance. For example, if all 1,300 approvals end up in the training set, the test set has no positives — the model's test performance is meaningless. Even if some end up in both, the proportions will likely not match the true 87/13 ratio.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Better approach: Stratified Split.</strong> A stratified split ensures that <em>each</em> split (train and test) has the same class ratio as the full dataset — approximately 87% Rejected and 13% Approved. This preserves the real-world distribution in both splits.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">With stratified 70/30 split: Training = 7,000 records (≈6,090 Rejected, ≈910 Approved); Test = 3,000 records (≈2,610 Rejected, ≈390 Approved). The model is trained and evaluated on representative samples.</div></div>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="problem" id="p8">
+      <span class="problem-num amber-tag">Q8</span>
+      <p class="problem-q">
+        <span class="tag conceptual">Conceptual</span><span class="diff medium">Medium</span>
+        You train a model on an 800-sample dataset. Model A (single 80/20 split) achieves <strong>91% accuracy</strong>. Model B (5-fold cross-validation) achieves <strong>83% ± 4%</strong>. Which estimate is more trustworthy, and why?
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Model B (5-fold CV) is more trustworthy.</strong> The single 80/20 split tests on only 160 samples — whether those 160 happen to be easy or hard examples is random. A lucky split gives inflated accuracy (91%).</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>5-fold CV</strong> tests on all 800 samples across 5 runs (each fold of 160 becomes the test set once). Every example contributes to the evaluation. The ±4% gives a confidence interval — much more stable.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">The 91% single-split estimate is likely inflated. The 83%±4% CV estimate better reflects real-world generalisation. Always prefer CV for small datasets.</div></div>
+      </div>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ════════════════════════════════════════
+         PART III — LINEAR REGRESSION
+    ════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-iii">Part III — Linear Regression</h2>
+    <p class="part-sub">Q9–Q14 · Gradient descent, bias-variance, regularisation, and model comparison are all high-yield</p>
+
+    <!-- Q9 -->
+    <div class="problem" id="p9">
+      <span class="problem-num red-tag">Q9</span>
+      <p class="problem-q">
+        <span class="tag conceptual">Conceptual</span><span class="diff easy">Easy</span>
+        You have a dataset with <strong>n = 500,000 features</strong> and <strong>m = 2,000,000 instances</strong>. Should you use Gradient Descent or the Normal Equation for linear regression? Justify with computational complexity.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">
+          <strong>Use Gradient Descent.</strong>
+          <br><br>
+          The Normal Equation requires computing \((X^TX)^{-1}\), which involves inverting an <strong>n×n matrix (500,000 × 500,000)</strong>. Matrix inversion is O(n³) — for n=500,000 this is \((5\times10^5)^3 = 1.25\times10^{17}\) operations. Completely infeasible even for modern hardware.
+          <br><br>
+          <strong>Gradient Descent</strong> scales to any n and m because it only computes the gradient (dot products), which is O(n·m) per iteration — manageable.
+          <br><br>
+          Additionally, with m=2,000,000, use <strong>Mini-batch GD</strong> (batch size 256) for GPU efficiency.
+        </div></div>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="problem" id="p10">
+      <span class="problem-num red-tag">Q10</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff easy">Easy</span>
+        You run gradient descent on a linear regression problem. After 50 iterations, the cost J(θ) is <strong>increasing</strong> instead of decreasing. What does this indicate and what should you do? Also, if J decreases very slowly over thousands of iterations, what does that suggest?
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>J increases → α (learning rate) is too large.</strong> The algorithm is overshooting the minimum: each step jumps past the bottom of the bowl and lands on the other side at a higher cost. Fix: <strong>decrease α</strong> (try dividing by 3: e.g., α=0.1 → α=0.03).</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>J decreases very slowly → α is too small.</strong> The steps are tiny, requiring thousands of iterations to converge. Fix: <strong>increase α</strong> (try multiplying by 3). Monitor that J doesn't start increasing.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">Recommended sweep: try α = 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1 and plot J vs iterations. Pick the largest α where J consistently decreases.</div></div>
+      </div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="problem" id="p11">
+      <span class="problem-num red-tag">Q11</span>
+      <p class="problem-q">
+        <span class="tag scenario">Scenario</span><span class="diff medium">Medium</span>
+        You use Ridge Regression. Your model shows: <strong>Training RMSE = 8.4, Validation RMSE = 8.6</strong> (both are high). Diagnose the problem and state what action to take with λ (increase or decrease). Explain the effect.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Diagnosis: High Bias (Underfitting).</strong> Training RMSE ≈ Validation RMSE and both are high → the model fails to capture the underlying pattern even on training data. The model is too simple or over-regularised.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Action: Decrease λ.</strong> High λ imposes a large penalty on coefficients → forces them towards zero → model becomes too simple (high bias). Reducing λ allows the model to fit the data more closely.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Rule:</strong> ↑λ → ↑Bias, ↓Variance (simpler model). ↓λ → ↓Bias, ↑Variance. In underfitting, reduce λ. Also consider: adding more features, using polynomial features, or removing the regularisation entirely.</div></div>
+      </div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="problem" id="p12">
+      <span class="problem-num red-tag">Q12</span>
+      <p class="problem-q">
+        <span class="tag conceptual">Conceptual</span><span class="diff medium">Medium</span>
+        You have a dataset with <strong>500 features, many of which are suspected to be irrelevant or redundant</strong>. Which regularisation method — Ridge (L2) or Lasso (L1) — is more appropriate? Explain what happens to the coefficients in each case.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">
+          <strong>Lasso (L1) is more appropriate.</strong>
+          <br><br>
+          <strong>Lasso</strong> adds a penalty of \(\lambda\sum|\theta_j|\) (absolute values). Due to the geometry of the L1 ball, Lasso tends to drive coefficients of irrelevant features <strong>exactly to zero</strong>. This performs automatic feature selection — the result is a sparse model using only the most relevant features.
+          <br><br>
+          <strong>Ridge (L2)</strong> adds \(\lambda\sum\theta_j^2\) (squares). It shrinks all coefficients towards zero but <strong>never exactly to zero</strong>. All 500 features remain in the model (small but nonzero weights).
+          <br><br>
+          With 500 features and many suspected irrelevant ones, Lasso simplifies the model, improves interpretability, and reduces overfitting more effectively.
+        </div></div>
+      </div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="problem" id="p13">
+      <span class="problem-num red-tag">Q13</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff hard">Hard</span>
+        A linear regression model has current parameters <strong>θ₀=1.0, θ₁=2.0</strong> and learning rate <strong>α=0.1</strong>. For a single training example (x₁=3, y=10), compute the <strong>prediction ŷ</strong>, the <strong>error</strong>, and the <strong>updated parameters</strong> after one gradient descent step.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content">
+          <strong>Prediction:</strong><br>
+          ŷ = θ₀ + θ₁·x₁ = 1.0 + 2.0×3 = <strong>7.0</strong>
+        </div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content">
+          <strong>Error:</strong> ŷ − y = 7.0 − 10 = <strong>−3.0</strong>
+        </div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content">
+          <strong>Gradients (m=1 example):</strong><br>
+          ∂J/∂θ₀ = (ŷ−y)·x₀ = (−3.0)·1 = −3.0 &nbsp;&nbsp;(x₀=1 for the bias term)<br>
+          ∂J/∂θ₁ = (ŷ−y)·x₁ = (−3.0)·3 = −9.0
+        </div></div>
+        <div class="solution-step"><div class="step-num">4</div><div class="step-content">
+          <strong>Updated parameters:</strong><br>
+          θ₀ ← 1.0 − 0.1×(−3.0) = 1.0 + 0.3 = <strong>1.3</strong><br>
+          θ₁ ← 2.0 − 0.1×(−9.0) = 2.0 + 0.9 = <strong>2.9</strong>
+        </div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">The parameters moved towards better fitting the example (y=10). The new prediction would be: 1.3 + 2.9×3 = 10.0 (perfect fit for this single example — consistent with GD direction).</div></div>
+      </div>
+    </div>
+
+    <!-- Q14 -->
+    <div class="problem" id="p14">
+      <span class="problem-num red-tag">Q14</span>
+      <p class="problem-q">
+        <span class="tag scenario">Scenario</span><span class="diff hard">Hard</span>
+        Four models are fitted to a dataset with non-linear (curved) patterns. Rank their <strong>Training RMSE</strong> and <strong>Test RMSE</strong> (lowest to highest) and identify which suffer from high bias and high variance.
+      </p>
+      <table>
+        <thead><tr><th>Model</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>A</strong></td><td>Linear regression (degree-1)</td></tr>
+          <tr><td><strong>B</strong></td><td>Polynomial degree-8, no regularisation</td></tr>
+          <tr><td><strong>C</strong></td><td>Polynomial degree-8 + Ridge (λ well-tuned)</td></tr>
+          <tr><td><strong>D</strong></td><td>Polynomial degree-8 + Lasso (λ well-tuned)</td></tr>
+        </tbody>
+      </table>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Training RMSE (lowest to highest): B &lt; C ≈ D &lt; A</strong><br>B (overfit) fits training data perfectly. C and D (regularised) are slightly penalised. A (underfit on curved data) has high training error because it can't capture the curve.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Test RMSE (lowest to highest): C ≈ D &lt; A &lt; B</strong><br>C and D generalise well. A has moderate test error (underfits consistently). B has the worst test error — memorised noise, fails completely on new data.</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Model A: High Bias (underfitting)</strong> — high train AND test RMSE. The linear model can't capture curved relationships.<br><strong>Model B: High Variance (overfitting)</strong> — very low train RMSE, very high test RMSE. The model memorised training noise.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>D (Lasso)</strong> additionally drives some degree-8 coefficients to exactly zero → effectively reduces the polynomial degree → automatic model simplification. Both C and D represent good trade-offs.</div></div>
+      </div>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ════════════════════════════════════════
+         PART IV — LOGISTIC REGRESSION
+    ════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-iv">Part IV — Classification &amp; Logistic Regression</h2>
+    <p class="part-sub">Q15–Q19 · J(θ)=0 question appears in nearly every paper</p>
+
+    <!-- Q15 -->
+    <div class="problem" id="p15">
+      <span class="problem-num purple-tag">Q15</span>
+      <p class="problem-q">
+        <span class="tag conceptual">Conceptual</span><span class="diff medium">Medium</span>
+        Explain <strong>three reasons</strong> why linear regression should not be used directly for binary classification. What does logistic regression fix about each?
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Unbounded output:</strong> Linear regression produces ŷ ∈ (−∞, +∞). For binary labels (0/1), we need a probability ∈ [0,1]. Values like −0.3 or 1.7 are meaningless. <br>Fix: Logistic regression uses the sigmoid function to squash the output to (0,1).</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Non-convex cost function:</strong> Applying MSE loss with a sigmoid (or directly on binary labels) produces a non-convex cost surface with multiple local minima. Gradient descent can get stuck. <br>Fix: Logistic regression uses log-loss (cross-entropy), which gives a convex cost → GD guaranteed to reach global minimum.</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Sensitivity to outliers:</strong> A single extreme example can shift the regression line significantly, moving the decision boundary in harmful ways. <br>Fix: The sigmoid's saturating nature makes logistic regression less sensitive to extreme outliers far from the decision boundary.</div></div>
+      </div>
+    </div>
+
+    <!-- Q16 -->
+    <div class="problem" id="p16">
+      <span class="problem-num purple-tag">Q16</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff easy">Easy</span>
+        A logistic regression model has parameters <strong>θ₀=−2, θ₁=1.5</strong>. For an input <strong>x₁=3</strong>, compute: (a) the linear score z, (b) the predicted probability P(y=1|x), and (c) the class prediction (threshold=0.5).
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">a</div><div class="step-content"><strong>Linear score z:</strong><br>z = θ₀ + θ₁·x₁ = −2 + 1.5×3 = −2 + 4.5 = <strong>2.5</strong></div></div>
+        <div class="solution-step"><div class="step-num">b</div><div class="step-content"><strong>Predicted probability:</strong><br>\(P(y=1|x) = \sigma(z) = \dfrac{1}{1+e^{-2.5}} = \dfrac{1}{1+0.082} \approx \dfrac{1}{1.082} \approx \mathbf{0.924}\)</div></div>
+        <div class="solution-step"><div class="step-num">c</div><div class="step-content"><strong>Class prediction:</strong> P(y=1|x) = 0.924 ≥ 0.5 → <strong>Predict class 1 (Positive)</strong>. The model is 92.4% confident this is a positive instance.</div></div>
+      </div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="problem" id="p17">
+      <span class="problem-num purple-tag">Q17</span>
+      <p class="problem-q">
+        <span class="tag tf">True/False</span><span class="diff medium">Medium</span>
+        You train a logistic regression model and find that <strong>J(θ) = 0</strong>. Mark each statement TRUE or FALSE:
+      </p>
+      <ol type="a" style="font-size:0.88rem;">
+        <li>The model will perform perfectly on any unseen test data.</li>
+        <li>h_θ(x⁽ⁱ⁾) = y⁽ⁱ⁾ for every training example i.</li>
+        <li>The model parameters θ₀ and θ₁ must both equal zero.</li>
+        <li>J(θ) cannot reach exactly 0 for logistic regression.</li>
+        <li>The model has overfit the training data.</li>
+      </ol>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answers</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">a</div><div class="step-content"><strong>FALSE.</strong> J=0 means perfect fit on training data → the model has memorised the training set. On unseen data it will almost certainly perform worse — this is overfitting.</div></div>
+        <div class="solution-step"><div class="step-num">b</div><div class="step-content"><strong>TRUE.</strong> Log-loss = 0 only when every term is 0. Each term is 0 when h_θ(x⁽ⁱ⁾) = y⁽ⁱ⁾ exactly (probability = 1 for the correct class).</div></div>
+        <div class="solution-step"><div class="step-num">c</div><div class="step-content"><strong>FALSE.</strong> If θ=0, then σ(0)=0.5 for all x — predicting 50% probability everywhere, which does NOT give J=0. Large weights (not zero) are needed to make σ(z) approach exactly 0 or 1.</div></div>
+        <div class="solution-step"><div class="step-num">d</div><div class="step-content"><strong>FALSE.</strong> J can reach exactly 0 if the training data is linearly separable AND sufficiently large weights are used. The sigmoid approaches 0 or 1 asymptotically, but with very large |w|, it effectively reaches those values.</div></div>
+        <div class="solution-step"><div class="step-num">e</div><div class="step-content"><strong>TRUE.</strong> J(θ)=0 → perfect training accuracy → the model has memorised the training data exactly → this is a classic sign of overfitting.</div></div>
+      </div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="problem" id="p18">
+      <span class="problem-num purple-tag">Q18</span>
+      <p class="problem-q">
+        <span class="tag conceptual">Conceptual</span><span class="diff medium">Medium</span>
+        A logistic regression model for loan default prediction has coefficients: <strong>θ_income = −0.8, θ_debt = 1.2, θ_age = 0.05</strong>. Interpret each coefficient in terms of the log-odds of default.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>θ_income = −0.8:</strong> For each unit increase in income (holding debt and age constant), the log-odds of default decrease by 0.8. Higher income → lower probability of defaulting. (Negative coefficient = protective factor.)</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>θ_debt = 1.2:</strong> For each unit increase in debt (others held constant), the log-odds of default increase by 1.2. Higher debt → higher probability of defaulting. This is the strongest predictor in the model. (Largest |θ|.)</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>θ_age = 0.05:</strong> For each one-year increase in age, the log-odds of default increase by 0.05. The effect is very small — age has minimal impact on default probability in this model.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">Log-odds = θ₀ + (−0.8)·income + 1.2·debt + 0.05·age. Convert to probability: P(default) = σ(log-odds). A large positive z → high default risk; negative z → low default risk.</div></div>
+      </div>
+    </div>
+
+    <!-- Q19 -->
+    <div class="problem" id="p19">
+      <span class="problem-num purple-tag">Q19</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff medium">Medium</span>
+        Plot (describe) the sigmoid function σ(wx) for <strong>w=1, w=10, w=100</strong>. How does increasing w lead to overfitting?
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>w=1:</strong> Smooth S-curve. σ transitions gradually from ~0 (x≪0) to ~1 (x≫0) over a wide range of x values. Uncertain near x=0 (σ=0.5).</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>w=10:</strong> Steeper S-curve. The transition from 0→1 happens much more rapidly near x=0. The model is more confident farther from the boundary.</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>w=100:</strong> Essentially a step function at x=0. For any x&lt;0 (even x=−0.01), σ≈0. For any x&gt;0 (even x=+0.01), σ≈1. The model is hyper-confident everywhere.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Why overfitting:</strong> Very large weights create an extremely sharp decision boundary. The model perfectly separates training data (J→0) but even a tiny perturbation of a test example near the boundary causes extreme misclassification. It memorises training labels rather than learning generalisable patterns. <strong>Fix: L2 regularisation</strong> penalises large weights → keeps the sigmoid smooth → better generalisation.</div></div>
+      </div>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ════════════════════════════════════════
+         PART V — EVALUATION METRICS
+    ════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-v">Part V — Evaluation Metrics</h2>
+    <p class="part-sub">Q20–Q24 · Guaranteed confusion matrix calculation in every paper</p>
+
+    <!-- Q20 -->
+    <div class="problem" id="p20">
+      <span class="problem-num green-tag">Q20</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff medium">Medium</span>
+        A cancer screening model is tested on 500 patients (50 have cancer, 450 do not). The confusion matrix is:
+      </p>
+      <table>
+        <thead><tr><th></th><th>Predicted Cancer</th><th>Predicted No Cancer</th></tr></thead>
+        <tbody>
+          <tr><th>Actual Cancer</th><td>42</td><td>8</td></tr>
+          <tr><th>Actual No Cancer</th><td>90</td><td>360</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.88rem;">Calculate <strong>Precision, Recall, Specificity, F1-score, and Accuracy</strong> for the Cancer class. Which metric is most important here and why?</p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Full Solution</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Label TP, FP, FN, TN:</strong><br>TP=42 (correctly predicted cancer), FN=8 (missed cancer cases), FP=90 (false alarms), TN=360 (correctly predicted no cancer)</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Precision:</strong> \(\frac{42}{42+90} = \frac{42}{132} \approx 31.8\%\) — Only 1 in 3 predicted cancer cases is real.</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Recall (Sensitivity):</strong> \(\frac{42}{42+8} = \frac{42}{50} = 84.0\%\) — Catches 84% of actual cancer patients. 8 patients were missed.</div></div>
+        <div class="solution-step"><div class="step-num">4</div><div class="step-content"><strong>Specificity:</strong> \(\frac{360}{360+90} = \frac{360}{450} = 80.0\%\)</div></div>
+        <div class="solution-step"><div class="step-num">5</div><div class="step-content"><strong>F1-score:</strong> \(\frac{2 \times 0.318 \times 0.840}{0.318+0.840} = \frac{0.534}{1.158} \approx 46.1\%\)</div></div>
+        <div class="solution-step"><div class="step-num">6</div><div class="step-content"><strong>Accuracy:</strong> \(\frac{42+360}{500} = \frac{402}{500} = 80.4\%\)</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Recall is the most important metric here.</strong> Missing a cancer patient (FN=missed) means delayed treatment and potentially death. 90 false alarms (FP) result in unnecessary follow-up tests — inconvenient but not life-threatening. In medicine, maximise Recall for serious disease screening.</div></div>
+      </div>
+    </div>
+
+    <!-- Q21 -->
+    <div class="problem" id="p21">
+      <span class="problem-num green-tag">Q21</span>
+      <p class="problem-q">
+        <span class="tag scenario">Scenario</span><span class="diff easy">Easy</span>
+        For each use case below, state whether you should <strong>maximise Precision or Recall</strong>, and explain why.
+      </p>
+      <ol type="a" style="font-size:0.88rem;">
+        <li>Email spam filter (incorrectly flagging an important business email as spam is costly)</li>
+        <li>COVID-19 test at an airport (missing an infected traveller could cause an outbreak)</li>
+        <li>Fraud detection for credit cards (investigating every false alarm costs the bank heavily)</li>
+        <li>Drug side-effect detection system (missing a dangerous side effect is unacceptable)</li>
+      </ol>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answers</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">a</div><div class="step-content"><strong>Maximise Precision.</strong> FP (flagging important email as spam) is costly — user misses important communication. A few spam emails in the inbox (FN) are acceptable. High precision = fewer false alarms.</div></div>
+        <div class="solution-step"><div class="step-num">b</div><div class="step-content"><strong>Maximise Recall.</strong> FN (missing an infected traveller) could cause community spread. The cost of a false alarm (FP = unnecessary quarantine for a healthy traveller) is far less harmful. High recall = catch all infected people.</div></div>
+        <div class="solution-step"><div class="step-num">c</div><div class="step-content"><strong>Context-dependent, but often Precision.</strong> If investigating each alert costs significant resources, many false alarms (FP) are expensive. Increase precision threshold so only high-confidence fraud triggers investigation. However, missing fraud (FN) also has costs — use F1 for balance.</div></div>
+        <div class="solution-step"><div class="step-num">d</div><div class="step-content"><strong>Maximise Recall.</strong> Missing a dangerous side effect (FN) puts patients at risk. False alarms (FP = flagging a safe drug interaction) result in extra monitoring, which is manageable. Patient safety → maximise recall.</div></div>
+      </div>
+    </div>
+
+    <!-- Q22 -->
+    <div class="problem" id="p22">
+      <span class="problem-num green-tag">Q22</span>
+      <p class="problem-q">
+        <span class="tag conceptual">Conceptual</span><span class="diff easy">Easy</span>
+        A model that predicts loan approval achieves <strong>96% accuracy</strong>. The dataset has 96% rejections and 4% approvals. Is this model good? Explain the accuracy paradox and suggest a better metric.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>No — the model is likely useless.</strong> A naive model that <em>always predicts "Reject"</em> would achieve 96% accuracy because 96% of examples are rejections. It never correctly identifies an approval.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Accuracy Paradox:</strong> On heavily imbalanced datasets, accuracy is dominated by the majority class. It rewards a model that ignores the minority class entirely.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Better metrics:</strong><br>
+          • <strong>Precision</strong> for Approved class: of all predicted approvals, how many are real?<br>
+          • <strong>Recall</strong> for Approved class: of all actual approvals, how many did we catch?<br>
+          • <strong>F1-score</strong>: harmonic mean — balanced view<br>
+          • <strong>AUC-ROC</strong>: threshold-independent measure<br>
+          Check the confusion matrix to expose that the model predicts 0 approvals.</div></div>
+      </div>
+    </div>
+
+    <!-- Q23 -->
+    <div class="problem" id="p23">
+      <span class="problem-num green-tag">Q23</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff hard">Hard</span>
+        True labels = [1, 0, 1, 0, 1, 0], Predicted probabilities = [0.95, 0.80, 0.70, 0.40, 0.30, 0.10]. Compute <strong>TPR and FPR</strong> at threshold &gt;0.75 and threshold &gt;0.35. What does this tell us about the ROC curve?
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>At threshold &gt;0.75:</strong> Predicted positive = [0.95, 0.80] → instances 1 and 2.<br>
+          Instance 1: true=1 (TP); Instance 2: true=0 (FP)<br>
+          Remaining: FN=2 (probs 0.70 and 0.30 with true=1), TN=2<br>
+          <strong>TPR = TP/(TP+FN) = 1/3 ≈ 0.33; FPR = FP/(FP+TN) = 1/3 ≈ 0.33</strong><br>
+          ROC point: (0.33, 0.33)</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>At threshold &gt;0.35:</strong> Predicted positive = [0.95, 0.80, 0.70, 0.40] → instances 1,2,3,4.<br>
+          TPs: instances 1 (true=1), 3 (true=1) → TP=2; FPs: instances 2 (true=0), 4 (true=0) → FP=2; FN=1; TN=1<br>
+          <strong>TPR = 2/3 ≈ 0.67; FPR = 2/3 ≈ 0.67</strong><br>
+          ROC point: (0.67, 0.67)</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Observation:</strong> Both points lie close to the diagonal (TPR ≈ FPR), suggesting this classifier performs near-randomly for these threshold values. As threshold decreases, TPR and FPR both increase. The closer the ROC curve bows towards the top-left corner, the better the classifier (higher AUC).</div></div>
+      </div>
+    </div>
+
+    <!-- Q24 -->
+    <div class="problem" id="p24">
+      <span class="problem-num green-tag">Q24</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff hard">Hard</span>
+        A 3-class classifier produces the following confusion matrix for classes A, B, C. Compute <strong>Precision and Recall for Class B</strong>.
+      </p>
+      <table>
+        <thead><tr><th>Actual \ Predicted</th><th>A</th><th>B</th><th>C</th></tr></thead>
+        <tbody>
+          <tr><th>A</th><td>30</td><td>5</td><td>2</td></tr>
+          <tr><th>B</th><td>3</td><td>20</td><td>7</td></tr>
+          <tr><th>C</th><td>1</td><td>4</td><td>28</td></tr>
+        </tbody>
+      </table>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Identify TP, FP, FN for Class B (treat B as Positive):</strong><br>
+          <strong>TP</strong> = diagonal cell for B = <strong>20</strong> (actual B, predicted B)<br>
+          <strong>FP</strong> = other classes predicted as B (B's predicted column, other rows) = 5 (from A) + 4 (from C) = <strong>9</strong><br>
+          <strong>FN</strong> = B instances predicted as other classes (B's actual row, other columns) = 3 (predicted A) + 7 (predicted C) = <strong>10</strong>
+        </div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Precision (Class B):</strong> \(\dfrac{TP}{TP+FP} = \dfrac{20}{20+9} = \dfrac{20}{29} \approx \mathbf{69.0\%}\)</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Recall (Class B):</strong> \(\dfrac{TP}{TP+FN} = \dfrac{20}{20+10} = \dfrac{20}{30} \approx \mathbf{66.7\%}\)</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">The model correctly identifies 69% of its B predictions, and catches 67% of actual B instances. Repeat this process for Classes A and C to get per-class metrics, then average for macro-F1.</div></div>
+      </div>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <!-- ════════════════════════════════════════
+         PART VI — DECISION TREES
+    ════════════════════════════════════════ -->
+    <h2 class="part-header" id="part-vi">Part VI — Decision Trees</h2>
+    <p class="part-sub">Q25–Q30 · Entropy + IG calculation is guaranteed 4–6 marks every year</p>
+
+    <!-- Q25 -->
+    <div class="problem" id="p25">
+      <span class="problem-num amber-tag">Q25</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff easy">Easy</span>
+        Compute the <strong>entropy</strong> for each node described below. Recall: \(H(S) = -\sum p_c \log_2 p_c\)
+      </p>
+      <ol type="a" style="font-size:0.88rem;">
+        <li>Node with 10 instances — all class A (pure node)</li>
+        <li>Node with 8 class-1, 8 class-2 instances (50-50)</li>
+        <li>Node with 9 Yes, 5 No (14 total)</li>
+        <li>Node with 4 equal classes (4 instances each, 16 total)</li>
+        <li>Node with 14 class-1, 2 class-2 (16 total)</li>
+      </ol>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answers</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">a</div><div class="step-content"><strong>H = 0.</strong> p(A) = 10/10 = 1. H = −1·log₂(1) = −1·0 = <strong>0 bits</strong>. Pure node — maximum information, no uncertainty.</div></div>
+        <div class="solution-step"><div class="step-num">b</div><div class="step-content"><strong>H = 1.0 bit.</strong> p₁ = p₂ = 0.5. H = −0.5·log₂(0.5) − 0.5·log₂(0.5) = −0.5·(−1) − 0.5·(−1) = 0.5 + 0.5 = <strong>1.0 bit</strong>. Maximum impurity for 2 classes.</div></div>
+        <div class="solution-step"><div class="step-num">c</div><div class="step-content"><strong>H ≈ 0.940 bits.</strong> p(Yes)=9/14≈0.643, p(No)=5/14≈0.357.<br>H = −0.643·log₂(0.643) − 0.357·log₂(0.357) = −0.643·(−0.638) − 0.357·(−1.485) = 0.410 + 0.530 ≈ <strong>0.940 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">d</div><div class="step-content"><strong>H = 2.0 bits.</strong> 4 equal classes → p_c = 1/4 each. H = −4·(1/4)·log₂(1/4) = −4·(1/4)·(−2) = <strong>2 bits</strong> = log₂(4). Equal probabilities = maximum entropy for k classes.</div></div>
+        <div class="solution-step"><div class="step-num">e</div><div class="step-content"><strong>H ≈ 0.544 bits.</strong> p₁=14/16=0.875, p₂=2/16=0.125.<br>H = −0.875·log₂(0.875) − 0.125·log₂(0.125) = −0.875·(−0.193) − 0.125·(−3) = 0.169 + 0.375 ≈ <strong>0.544 bits</strong>. Low entropy — mostly pure.</div></div>
+      </div>
+    </div>
+
+    <!-- Q26 -->
+    <div class="problem" id="p26">
+      <span class="problem-num amber-tag">Q26</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff medium">Medium</span>
+        A parent node has <strong>20 instances: 12 class-1, 8 class-2</strong>. After splitting on attribute B:<br>
+        — Left child: 10 instances (9 class-1, 1 class-2)<br>
+        — Right child: 10 instances (3 class-1, 7 class-2)<br>
+        Compute: (a) H(parent), (b) H(left), (c) H(right), (d) Weighted avg entropy, (e) IG(B).
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Full Solution</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">a</div><div class="step-content"><strong>H(parent):</strong> p₁=12/20=0.6, p₂=8/20=0.4<br>H = −0.6·log₂(0.6) − 0.4·log₂(0.4) = −0.6·(−0.737) − 0.4·(−1.322) = 0.442 + 0.529 = <strong>0.971 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">b</div><div class="step-content"><strong>H(left):</strong> p₁=9/10=0.9, p₂=1/10=0.1<br>H = −0.9·log₂(0.9) − 0.1·log₂(0.1) = −0.9·(−0.152) − 0.1·(−3.322) = 0.137 + 0.332 = <strong>0.469 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">c</div><div class="step-content"><strong>H(right):</strong> p₁=3/10=0.3, p₂=7/10=0.7<br>H = −0.3·log₂(0.3) − 0.7·log₂(0.7) = −0.3·(−1.737) − 0.7·(−0.515) = 0.521 + 0.360 = <strong>0.881 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">d</div><div class="step-content"><strong>Weighted average entropy:</strong><br>(10/20)·0.469 + (10/20)·0.881 = 0.5·0.469 + 0.5·0.881 = 0.235 + 0.441 = <strong>0.675 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">e</div><div class="step-content"><strong>IG(B) = H(parent) − Weighted avg = 0.971 − 0.675 = <span style="color:var(--green)">0.296 bits</span></strong><br>Significant reduction in impurity — this is a good split.</div></div>
+      </div>
+    </div>
+
+    <!-- Q27 -->
+    <div class="problem" id="p27">
+      <span class="problem-num amber-tag">Q27</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff hard">Hard</span>
+        <strong>Full ID3 Root-Node Selection.</strong> A dataset has 14 records: 9 Play=Yes, 5 Play=No. Two attributes are considered:
+      </p>
+      <table>
+        <thead><tr><th>Attribute</th><th>Value</th><th>Play=Yes</th><th>Play=No</th><th>Total</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="2"><strong>Outlook</strong></td><td>Sunny</td><td>2</td><td>3</td><td>5</td></tr>
+          <tr><td>Overcast</td><td>4</td><td>0</td><td>4</td></tr>
+          <tr><td></td><td>Rain</td><td>3</td><td>2</td><td>5</td></tr>
+          <tr><td rowspan="2"><strong>Wind</strong></td><td>Weak</td><td>6</td><td>2</td><td>8</td></tr>
+          <tr><td>Strong</td><td>3</td><td>3</td><td>6</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.88rem;">Compute IG for both attributes and select the root node.</p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Full Solution</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Parent entropy H(S):</strong> p(Yes)=9/14, p(No)=5/14<br>H(S) = −(9/14)log₂(9/14) − (5/14)log₂(5/14) = −0.643·(−0.638) − 0.357·(−1.485) = 0.410 + 0.530 = <strong>0.940 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>Outlook — entropy per branch:</strong><br>
+          H(Sunny, 5: 2Y 3N) = −0.4·log₂(0.4) − 0.6·log₂(0.6) = 0.529 + 0.442 = 0.971<br>
+          H(Overcast, 4: 4Y 0N) = 0 (pure! log₂(1)=0)<br>
+          H(Rain, 5: 3Y 2N) = −0.6·log₂(0.6) − 0.4·log₂(0.4) = 0.442 + 0.529 = 0.971<br>
+          Weighted avg = (5/14)·0.971 + (4/14)·0 + (5/14)·0.971 = 0.347 + 0 + 0.347 = 0.693<br>
+          <strong>IG(Outlook) = 0.940 − 0.693 = 0.247 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Wind — entropy per branch:</strong><br>
+          H(Weak, 8: 6Y 2N) = −(6/8)log₂(6/8) − (2/8)log₂(2/8) = −0.75·(−0.415) − 0.25·(−2) = 0.311 + 0.500 = 0.811<br>
+          H(Strong, 6: 3Y 3N) = −0.5·log₂(0.5) − 0.5·log₂(0.5) = 1.0<br>
+          Weighted avg = (8/14)·0.811 + (6/14)·1.0 = 0.463 + 0.429 = 0.892<br>
+          <strong>IG(Wind) = 0.940 − 0.892 = 0.048 bits</strong></div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content"><strong>Root Node: Outlook</strong><br>IG(Outlook) = 0.247 bits &gt; IG(Wind) = 0.048 bits<br>Outlook provides the greatest reduction in entropy → it becomes the root node. Note: Overcast branch is immediately a pure leaf (always Play=Yes).</div></div>
+      </div>
+    </div>
+
+    <!-- Q28 -->
+    <div class="problem" id="p28">
+      <span class="problem-num amber-tag">Q28</span>
+      <p class="problem-q">
+        <span class="tag conceptual">Conceptual</span><span class="diff medium">Medium</span>
+        A dataset has an attribute "Transaction-ID" that takes a unique value for every record. If you compute IG for Transaction-ID, it will be the highest of any attribute. Explain <strong>why this is a problem</strong> and how <strong>Gain Ratio</strong> addresses it.
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">1</div><div class="step-content"><strong>Why Transaction-ID gives maximum IG:</strong> Every unique ID creates a separate leaf with exactly 1 example. Each leaf is perfectly pure (H=0). The weighted average entropy = 0 → IG = H(parent) − 0 = H(parent) = maximum possible. But each leaf holds only 1 training record — completely useless for generalisation.</div></div>
+        <div class="solution-step"><div class="step-num">2</div><div class="step-content"><strong>The problem:</strong> ID3's IG metric systematically favours attributes with many distinct values — even when those attributes have no predictive value (like IDs, timestamps, names). This leads to overfitted, meaningless trees.</div></div>
+        <div class="solution-step"><div class="step-num">3</div><div class="step-content"><strong>Gain Ratio (C4.5 fix):</strong><br>SplitInfo measures the entropy of the attribute's own value distribution:<br>\(\text{SplitInfo}(S,A) = -\sum_v \frac{|S_v|}{|S|}\log_2\frac{|S_v|}{|S|}\)<br>For Transaction-ID with n unique values, SplitInfo = log₂(n) — very large.<br>GainRatio = IG / SplitInfo → large denominator → low GainRatio. The high-cardinality attribute is penalised.</div></div>
+        <div class="solution-step"><div class="step-num">✅</div><div class="step-content">Gain Ratio normalises Information Gain by the attribute's own complexity. High-cardinality attributes (IDs, dates) get penalised; attributes that create meaningful, useful splits retain high GainRatio.</div></div>
+      </div>
+    </div>
+
+    <!-- Q29 -->
+    <div class="problem" id="p29">
+      <span class="problem-num amber-tag">Q29</span>
+      <p class="problem-q">
+        <span class="tag tf">True/False</span><span class="diff medium">Medium</span>
+        Mark each statement about decision tree overfitting as <strong>TRUE or FALSE</strong>:
+      </p>
+      <ol type="a" style="font-size:0.88rem;">
+        <li>A fully grown decision tree achieves 100% accuracy on training data.</li>
+        <li>Evaluating a decision tree only on training data is a reliable estimate of real performance.</li>
+        <li>Post-pruning is generally more effective than pre-pruning.</li>
+        <li>Pre-pruning can miss XOR-like interactions because it stops growth myopically.</li>
+        <li>Adding more training data always increases decision tree training accuracy.</li>
+      </ol>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Answers</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">a</div><div class="step-content"><strong>TRUE.</strong> A fully grown tree creates a unique path for each training example, perfectly memorising all labels. Training accuracy = ~100%, but test accuracy is typically much lower.</div></div>
+        <div class="solution-step"><div class="step-num">b</div><div class="step-content"><strong>FALSE.</strong> Training accuracy is an optimistic (inflated) estimate — a fully grown tree achieves 100% on training data regardless of how good or bad the features are. Always evaluate on a held-out test/validation set.</div></div>
+        <div class="solution-step"><div class="step-num">c</div><div class="step-content"><strong>TRUE.</strong> Post-pruning grows the full tree first (capturing all complex interactions) then prunes based on validation performance. Pre-pruning stops early and may prevent the tree from discovering patterns that only become clear deeper in the tree.</div></div>
+        <div class="solution-step"><div class="step-num">d</div><div class="step-content"><strong>TRUE.</strong> XOR-like patterns (where no single feature predicts the outcome, but combinations of features do) require growing multiple levels before the interaction becomes apparent. Pre-pruning may stop before reaching this depth.</div></div>
+        <div class="solution-step"><div class="step-num">e</div><div class="step-content"><strong>FALSE.</strong> More training data may actually decrease training accuracy for a decision tree. With more data, the tree must generalise more — it may no longer perfectly memorise every example with the same number of leaves. However, test accuracy typically improves.</div></div>
+      </div>
+    </div>
+
+    <!-- Q30 -->
+    <div class="problem" id="p30">
+      <span class="problem-num amber-tag">Q30</span>
+      <p class="problem-q">
+        <span class="tag numerical">Numerical</span><span class="diff hard">Hard</span>
+        <strong>Mixed Exam-Style Problem.</strong> A road accident dataset (12 records: 8 Major, 4 Minor) has two attributes. After computing IG:
+        IG(Driver Condition) = 0.043, IG(Weather) = 0.010.
+        <br>(a) Which attribute becomes the root node?<br>
+        (b) The "Alcohol" branch has: {4 Major, 1 Minor}. Is this branch pure? If not, compute its entropy.<br>
+        (c) You train a decision tree and get Training Accuracy = 98%, Test Accuracy = 62%. Diagnose and suggest two fixes.<br>
+        (d) Your colleague suggests using Gain Ratio instead of IG. When is this especially important?
+      </p>
+      <button class="reveal-btn" onclick="reveal(this)">▶ Show Full Answer</button>
+      <div class="solution-box">
+        <div class="solution-step"><div class="step-num">a</div><div class="step-content"><strong>Root node: Driver Condition.</strong> IG(Driver Condition)=0.043 &gt; IG(Weather)=0.010. Always select the attribute with the highest Information Gain as the root (ID3 rule).</div></div>
+        <div class="solution-step"><div class="step-num">b</div><div class="step-content"><strong>Not pure</strong> — the branch has 2 classes (Major and Minor).<br>
+          p(Major) = 4/5 = 0.8; p(Minor) = 1/5 = 0.2<br>
+          H = −0.8·log₂(0.8) − 0.2·log₂(0.2) = −0.8·(−0.322) − 0.2·(−2.322) = 0.258 + 0.464 = <strong>0.722 bits</strong><br>
+          Since it's not pure, ID3 would continue splitting this branch using the remaining attribute (Weather).</div></div>
+        <div class="solution-step"><div class="step-num">c</div><div class="step-content"><strong>Diagnosis: High Variance (Overfitting).</strong> Training accuracy ~100% (the tree memorised training data) but test accuracy is only 62% — a huge 36% gap. The model fails to generalise.<br><br>
+          <strong>Fix 1: Post-Pruning</strong> — grow the full tree, then prune branches where removing them improves validation accuracy.<br>
+          <strong>Fix 2: Pre-Pruning</strong> — set max_depth (e.g., 4), min_samples_leaf (e.g., 5), or minimum IG threshold to prevent excessive growth.<br>
+          Additional fix: Get more training data, or use an ensemble method (Random Forest).</div></div>
+        <div class="solution-step"><div class="step-num">d</div><div class="step-content"><strong>Gain Ratio is especially important when:</strong><br>
+          1. Dataset has attributes with many unique values (IDs, names, timestamps)<br>
+          2. Some attributes are continuous (after discretisation into many bins)<br>
+          3. You want to avoid the bias towards high-cardinality attributes<br>
+          Gain Ratio = IG / SplitInfo. High cardinality → high SplitInfo → low GainRatio → penalised. This is the key improvement in C4.5 over ID3.</div></div>
+      </div>
+    </div>
+
+    <div class="back-top"><a href="#top">↑ Back to top</a></div>
+    <hr>
+
+    <div class="callout tip" style="margin-top:1.5rem;">
+      <div class="callout-label">You've completed all 30 problems!</div>
+      If you solved them without peeking, you are well-prepared. Focus extra time on the problems you found most difficult, especially the full entropy+IG calculation (Q27) and the confusion matrix metrics (Q20, Q24).
+    </div>
+
+    <p style="text-align:center; color: var(--muted); font-size:0.8rem; margin-top:2rem;">
+      ML Practice Problems · AIMLCZG565 · BITS Pilani WILP · Compiled Jun 2026
+    </p>
+
+  </main>
+</div>
+
+<script>
+// Progress bar
+window.addEventListener('scroll', () => {
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = total > 0 ? (window.scrollY / total) * 100 : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// Sidebar active link
+const links = document.querySelectorAll('#sidebar a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`#sidebar a[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+document.querySelectorAll('.problem').forEach(p => observer.observe(p));
+
+// Score tracking
+let revealed = 0;
+function updateScore() {
+  document.getElementById('score-num').textContent = revealed;
+}
+
+// Reveal button
+function reveal(btn) {
+  const box = btn.nextElementSibling;
+  if (!box.classList.contains('visible')) {
+    box.classList.add('visible');
+    btn.textContent = '✓ Answer Shown';
+    btn.classList.add('revealed');
+    btn.disabled = true;
+    revealed++;
+    updateScore();
+  }
+}
+
+// Reset all
+function resetAll() {
+  document.querySelectorAll('.solution-box').forEach(b => b.classList.remove('visible'));
+  document.querySelectorAll('.reveal-btn').forEach(b => {
+    b.textContent = '▶ Show Answer';
+    if (b.textContent.includes('Shown')) b.textContent = '▶ Show Answer';
+    b.classList.remove('revealed');
+    b.disabled = false;
+  });
+  // Reset reveal button labels properly
+  document.querySelectorAll('.reveal-btn').forEach(b => {
+    const original = b.getAttribute('data-original') || b.textContent;
+    b.setAttribute('data-original', original);
+    if (b.classList.contains('revealed')) {
+      b.classList.remove('revealed');
+      b.disabled = false;
+    }
+  });
+  revealed = 0;
+  updateScore();
+  // Reload to reset properly
+  location.reload();
+}
+
+// Store original button text
+document.querySelectorAll('.reveal-btn').forEach(b => {
+  b.setAttribute('data-original', b.textContent);
+});
+
+// MathJax config
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'],['$','$']],
+    displayMath: [['\\[','\\]'],['$$','$$']]
+  }
+};
+</script>
+</body>
+</html>

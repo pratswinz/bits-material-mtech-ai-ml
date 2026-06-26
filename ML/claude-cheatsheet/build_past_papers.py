@@ -3,6 +3,7 @@
 import fitz
 import html as H
 import re
+import shutil
 from pathlib import Path
 
 from svg_inline import SVG_WRAP_CSS, reset_uid, svg_div, svg_figure
@@ -19,9 +20,13 @@ from table_format import (
 )
 from math_format import format_math_in_html
 
+from ml_topics import TOPIC_BADGE_CSS, render_question_tags
+
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "ML_Past_Papers.html"
-BASE = Path("/Volumes/disc 2/bits pilani/Sem 1/ML/Question papers")
+BASE = Path("/Volumes/disc 2/bits pilani/ML/questions")
+JUNE_SRC = BASE / "june mid sem regular 2026"
+EXAM_IMG_DST = ROOT / "assets/exam-2026-06"
 
 PAPERS = [
     ("2023 MidSem Regular ML.pdf", "Mid Sem", "Regular", "2023", "2023 Mid-Sem EC-2 Regular"),
@@ -82,28 +87,28 @@ SKIP = re.compile(
 
 JUNE2026_BLOCKS = [
     ("Q1", "Electricity bill regression [5M]",
-     "../questions/june mid sem regular 2026/WhatsApp Image 2026-06-21 at 11.43.21.jpeg",
+     "assets/exam-2026-06/Q1.jpeg",
      r"""<div class="formula"><h5>Model</h5>\(\hat y = 120 + 7.5x_1 + 45x_2 - 4x_3 + 18x_4\)</div>
 {gd}
 <p>(a) Interpret coefs · (b) kWh→Wh: \(w_1' = 7.5/1000 = 0.0075\) · (c) \(\partial J/\partial\theta_3=-12 \Rightarrow \theta_3\leftarrow\theta_3+12\alpha\)</p>""".format(gd=svg_figure("gd-flow.svg", "GD"))),
     ("Q2", "Decision tree — entropy [2M+]",
-     "../questions/june mid sem regular 2026/WhatsApp Image 2026-06-21 at 11.43.22.jpeg",
+     "assets/exam-2026-06/Q2.jpeg",
      r"""<div class="formula"><h5>Entropy</h5>\(H=-0.6\log_2 0.6-0.4\log_2 0.4\approx 0.971\)</div>
 {ig}
 <p>Split Existing Loan=No → IG ≈ 0.610</p>""".format(ig=svg_figure("entropy-ig-tree.svg", "IG"))),
     ("Q3", "Logistic + min-max [4M+]",
-     "../questions/june mid sem regular 2026/WhatsApp Image 2026-06-21 at 11.43.23.jpeg",
+     "assets/exam-2026-06/Q3.jpeg",
      r"""<div class="formula"><h5>Min-max</h5>\(x'=(x-590)/120\) → S1=0.25, S2=0.75, S3=0, S4=1.0 · 650→0.50</div>
 <figure class="diagram">{scale}{sig}</figure>""".format(
          scale=svg_div("min-max-scaling.svg", "scale"),
          sig=svg_div("logistic-sigmoid.svg", "sigmoid", "margin-top:.5rem"),
      )),
     ("Q4", "Fraud confusion matrix [2.5M]",
-     "../questions/june mid sem regular 2026/WhatsApp Image 2026-06-21 at 11.43.24.jpeg",
+     "assets/exam-2026-06/Q4.jpeg",
      r"""{cm}
 <div class="formula"><h5>Model A</h5>Acc=98.55% · Prec=33.3% · Rec=45% · F1=38.3%</div>""".format(cm=svg_figure("confusion-matrix.svg", "CM"))),
     ("Q5", "Bias-variance spam [1M+]",
-     "../questions/june mid sem regular 2026/WhatsApp Image 2026-06-21 at 11.43.21 (1).jpeg",
+     "assets/exam-2026-06/Q5.jpeg",
      r"""{bv}
 <p>A: 61%/60% high bias · B: 99%/67% high variance</p>""".format(bv=svg_figure("bias-variance.svg", "BV"))),
 ]
@@ -195,10 +200,27 @@ def split_questions(text):
     return blocks
 
 
+def sync_exam_images():
+    """Copy June 2026 question photos into assets/ for reliable file:// viewing."""
+    EXAM_IMG_DST.mkdir(parents=True, exist_ok=True)
+    mapping = [
+        ("WhatsApp Image 2026-06-21 at 11.43.21.jpeg", "Q1.jpeg"),
+        ("WhatsApp Image 2026-06-21 at 11.43.22.jpeg", "Q2.jpeg"),
+        ("WhatsApp Image 2026-06-21 at 11.43.23.jpeg", "Q3.jpeg"),
+        ("WhatsApp Image 2026-06-21 at 11.43.24.jpeg", "Q4.jpeg"),
+        ("WhatsApp Image 2026-06-21 at 11.43.21 (1).jpeg", "Q5.jpeg"),
+    ]
+    for src_name, dst_name in mapping:
+        src = JUNE_SRC / src_name
+        if src.exists():
+            shutil.copy2(src, EXAM_IMG_DST / dst_name)
+
+
 def june_section():
     sec = '<section id="june2026"><h2>June 2026 EC-2 Regular</h2><p class="src">ML/questions/june mid sem regular 2026/</p>'
     for qid, title, img, body in JUNE2026_BLOCKS:
-        sec += f'''<div class="q"><div class="badges">{badge("Mid Sem","Regular","2026")}</div>
+        topic_badges = render_question_tags("june2026", qid)
+        sec += f'''<div class="q"><div class="badges">{badge("Mid Sem","Regular","2026")}{topic_badges}</div>
         <h4>{H.escape(qid)} — {H.escape(title)}</h4>
         <img class="exam-img" src="{img}" alt="{H.escape(qid)}">
         <div class="sol"><strong>Solution:</strong>{body}</div></div>'''
@@ -224,21 +246,25 @@ def validate_html(html: str) -> list:
 
 def build():
     reset_uid()
+    sync_exam_images()
     sections = [june_section()]
     nav = ['<a href="#june2026">June 2026 Mid Regular</a>']
     for fname, exam, session, year, label in PAPERS:
         path = BASE / fname
         text = "\n".join(p.get_text() for p in fitz.open(path))
-        sid = re.sub(r"[^a-z0-9]+", "-", label.lower()).strip("-")
+        sid = re.sub(r"[^a-z0-9]+", "-", Path(fname).stem.lower()).strip("-")
         short = f"{year} {exam.split()[0]} {session}"
         if "Set 2" in label:
             short += " (Set 2)"
         nav.append(f'<a href="#{sid}">{short}</a>')
-        sec = f'<section id="{sid}"><h2>{H.escape(label)}</h2><p class="src">Sem 1/ML/Question papers · {H.escape(fname)}</p>'
+        sec = f'<section id="{sid}"><h2>{H.escape(label)}</h2><p class="src">ML/questions · {H.escape(fname)}</p>'
         for qid, qtext, sol in split_questions(text):
             extra = enrich(qtext, sol)
             sol_html = esc_sol(sol) if sol else "<em>See official answer key in PDF.</em>"
-            sec += f'''<div class="q"><div class="badges">{badge(exam,session,year)}</div>
+            qnum = re.search(r"\d+", qid)
+            qkey = int(qnum.group()) if qnum else qid
+            topic_badges = render_question_tags(sid, qkey, qtext)
+            sec += f'''<div class="q"><div class="badges">{badge(exam,session,year)}{topic_badges}</div>
             <h4>{H.escape(qid)}</h4>
             <div class="stem"><strong>Question:</strong><br>{esc(qtext)}</div>
             {extra}
@@ -290,6 +316,7 @@ h2{{color:var(--navy);font-size:1.2rem;margin-bottom:.75rem}}
 .b.mid{{background:#dbeafe;color:#1d4ed8}} .b.end{{background:#fce7f3;color:#be185d}}
 .b.reg{{background:#d1fae5;color:#047857}} .b.makeup{{background:#fef3c7;color:#b45309}}
 .b.yr{{background:#f3e8ff;color:#7c3aed}}
+{TOPIC_BADGE_CSS}
 .stem{{font-size:.92rem;margin:.75rem 0 1rem;padding:.9rem 1.1rem;background:#f8fafc;border:1px solid var(--border);border-radius:8px;line-height:1.7;min-width:0;width:100%;box-sizing:border-box;overflow-wrap:break-word;word-wrap:break-word;word-break:normal;hyphens:auto}}
 .sol{{font-size:.92rem;margin-top:1rem;padding:1.1rem 1.25rem;background:#fff;border:1px solid #e2e8f0;border-left:3px solid #059669;border-radius:8px;line-height:1.65;min-width:0;width:100%;box-sizing:border-box;overflow-wrap:break-word;word-wrap:break-word}}
 .sol > strong{{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:#047857;margin-bottom:.75rem;padding-bottom:.35rem;border-bottom:1px solid #ecfdf5}}
@@ -310,6 +337,11 @@ h2{{color:var(--navy);font-size:1.2rem;margin-bottom:.75rem}}
 <div class="grp">Legend</div>
 <div class="badges" style="margin:.5rem"><span class="b mid">Mid Sem</span><span class="b end">End Sem</span></div>
 <div class="badges" style="margin:.5rem"><span class="b reg">Regular</span><span class="b makeup">Makeup</span></div>
+<div class="grp">Topics</div>
+<p style="font-size:.68rem;color:var(--muted);margin:.3rem 0 .6rem;line-height:1.35">Each question tagged from mid-sem syllabus</p>
+<div class="badges" style="margin:.35rem 0"><span class="b topic t1">Paradigms</span><span class="b topic t2">Logistic/GD</span></div>
+<div class="badges" style="margin:.35rem 0"><span class="b topic t3">Fit/Reg</span><span class="b topic t4">Data</span></div>
+<div class="badges" style="margin:.35rem 0"><span class="b topic t5">Metrics</span><span class="b topic t6">Trees</span></div>
 <div class="grp">Papers</div>
 {"".join(nav)}
 </aside>

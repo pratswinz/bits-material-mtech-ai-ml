@@ -3,8 +3,10 @@
 import fitz
 import html as H
 import re
+import shutil
 from pathlib import Path
 
+from ism_theme import LIGHT_HEADER
 from solution_format import SOL_CSS, format_solution, prepare_solution_raw
 from ism_stem_format import format_ism_stem
 from table_format import TABLE_CSS, format_content
@@ -13,13 +15,14 @@ from math_format import format_math_in_html
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "ISM_Past_Papers.html"
 BASE = Path("/Volumes/disc 2/bits pilani/ISM/previous question papers")
-JUNE = BASE / "june 2026"
+JUNE = BASE / "MidSem/2026-06_Regular"
+EXAM_IMG_DST = ROOT / "assets/exam-2026-06"
 
 PAPERS = [
-    ("S2-24_ISM_MID-EXAM_REGULAR.pdf", "Mid Sem", "Regular", "2025", "Jan 2025 Mid-Sem EC-2 Regular"),
-    ("S2-24_ISM_MID-Exam_Makeup.pdf", "Mid Sem", "Makeup", "2025", "Jun 2025 Mid-Sem EC-2 Makeup"),
-    ("Dec 2025 ISM Midsem Regular QP & answer key.pdf", "Mid Sem", "Regular", "2025", "Dec 2025 Mid-Sem EC-2 Regular (Key)"),
-    ("Jan 2026 ISM Midsem Makeup QP & answer key.pdf", "Mid Sem", "Makeup", "2026", "Jan 2026 Mid-Sem EC-2 Makeup (Key)"),
+    ("MidSem/2025-01_Regular_S2-24.pdf", "Mid Sem", "Regular", "2025", "Jan 2025 Mid-Sem EC-2 Regular"),
+    ("MidSem/2025-06_Makeup_S2-24.pdf", "Mid Sem", "Makeup", "2025", "Jun 2025 Mid-Sem EC-2 Makeup"),
+    ("MidSem/2025-12_Regular_QP-AnswerKey.pdf", "Mid Sem", "Regular", "2025", "Dec 2025 Mid-Sem EC-2 Regular (Key)"),
+    ("MidSem/2026-01_Makeup_QP-AnswerKey.pdf", "Mid Sem", "Makeup", "2026", "Jan 2026 Mid-Sem EC-2 Makeup (Key)"),
 ]
 
 DOCX_PAPERS = []
@@ -53,19 +56,136 @@ PMF_TABLE = """
 <table class="data-table cm-table"><thead><tr><th>x</th><th>0</th><th>1</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr></thead>
 <tbody><tr><td>p(x)</td><td>0</td><td>k</td><td>2k</td><td>2k</td><td>3k</td><td>k²</td><td>7k²+k</td></tr></tbody></table>"""
 
+# Syllabus topics 1–7 (index.html) + workbook TYPE numbers
+TOPICS = {
+    1: "Descriptive statistics",
+    2: "Probability basics",
+    3: "Conditional probability",
+    4: "Bayes & Naïve Bayes",
+    5: "Random variables",
+    6: "Probability distributions",
+    7: "Sampling",
+}
+
+# (paper_slug, question_key) -> list of (syllabus_topic, workbook_type, short_label)
+# question_key: int for PDF Q1..Qn, or "Q1" for June 2026
+QUESTION_TAGS = {
+    ("june2026", "Q1"): [(1, 2, "Five-number summary"), (3, 4, "Total probability")],
+    ("june2026", "Q2"): [(2, 3, "Inclusion–exclusion (3 sets)")],
+    ("june2026", "Q3"): [(6, 8, "Binomial")],
+    ("june2026", "Q4"): [(5, 10, "Continuous PDF / E[X]")],
+    ("june2026", "Q5"): [(4, 6, "Naïve Bayes — purchase table")],
+    ("june2026", "Q6"): [(4, 5, "Bayes — fraud flag"), (6, 9, "Normal — delivery time")],
+    ("dec-2025-mid-sem-ec-2-regular-key", 1): [(1, 1, "Mean, median, SD, outliers")],
+    ("dec-2025-mid-sem-ec-2-regular-key", 2): [(4, 6, "Naïve Bayes + Laplace α=1")],
+    ("dec-2025-mid-sem-ec-2-regular-key", 3): [(5, 7, "Discrete PMF"), (6, 8, "Poisson approx")],
+    ("dec-2025-mid-sem-ec-2-regular-key", 4): [(5, 10, "Joint PDF")],
+    ("dec-2025-mid-sem-ec-2-regular-key", 5): [(6, 9, "Normal / process capability")],
+    ("dec-2025-mid-sem-ec-2-regular-key", 6): [(2, 3, "Inclusion–exclusion (3 events)")],
+    ("jan-2026-mid-sem-ec-2-makeup-key", 1): [(1, 2, "Five-number summary, outlier")],
+    ("jan-2026-mid-sem-ec-2-makeup-key", 2): [(4, 5, "Bayes — VC appointment")],
+    ("jan-2026-mid-sem-ec-2-makeup-key", 3): [(6, 9, "Normal / Z-scores")],
+    ("jan-2026-mid-sem-ec-2-makeup-key", 5): [(5, 11, "CDF / PDF")],
+    ("jan-2026-mid-sem-ec-2-makeup-key", 6): [(6, 8, "Poisson"), (2, 3, "Inclusion–exclusion")],
+    ("jan-2025-mid-sem-ec-2-regular", 1): [(1, 1, "Descriptive stats")],
+    ("jan-2025-mid-sem-ec-2-regular", 2): [(6, 9, "Normal"), (6, 8, "Binomial vs Poisson")],
+    ("jan-2025-mid-sem-ec-2-regular", 3): [(4, 6, "Naïve Bayes — spam email")],
+    ("jan-2025-mid-sem-ec-2-regular", 4): [(4, 5, "Bayes — diagnostic test")],
+    ("jun-2025-mid-sem-ec-2-makeup", 1): [(1, 1, "Descriptive"), (7, None, "CLT sample mean")],
+    ("jun-2025-mid-sem-ec-2-makeup", 2): [(4, 6, "Naïve Bayes — spam text")],
+    ("jun-2025-mid-sem-ec-2-makeup", 4): [(4, 5, "Bayes — DNA match")],
+}
+
+EC3_TAGS = {
+    "Q1": [(None, 12, "Pearson correlation")],
+    "Q2": [(None, 13, "Exponential smoothing")],
+    "Q3": [(None, 14, "Hypothesis testing")],
+    "Q4": [(None, 15, "ANOVA / RBD")],
+    "Q5": [(None, 16, "Linear regression")],
+    "Q6": [(None, None, "Gaussian mixture")],
+    "Q7": [(None, 17, "Confidence interval")],
+    "Q8": [(None, 18, "Two-proportion & F-test")],
+}
+
+
+def classify_question(sid: str, qkey, qtext: str = "") -> list:
+    """Return list of (topic_id|None, type_id|None, label)."""
+    key = (sid, qkey)
+    if key in QUESTION_TAGS:
+        return QUESTION_TAGS[key]
+    t = (qtext or "").lower()
+    tags = []
+    if re.search(r"na[iï]ve|naive bayes|laplace", t):
+        tags.append((4, 6, "Naïve Bayes"))
+    elif "bayes" in t or re.search(r"p\([a-z]\|[a-z]\)", t):
+        tags.append((4, 5, "Bayes theorem"))
+    elif re.search(r"inclusion|∩|∪|three set", t):
+        tags.append((2, 3, "Inclusion–exclusion"))
+    elif re.search(r"total probability|p\(a\|b\)|conditional", t):
+        tags.append((3, 4, "Conditional / total probability"))
+    elif re.search(r"binomial|poisson", t):
+        tags.append((6, 8, "Binomial / Poisson"))
+    elif re.search(r"normal|z-score|z table", t):
+        tags.append((6, 9, "Normal distribution"))
+    elif re.search(r"joint pdf|joint pmf|f\(x,y\)", t):
+        tags.append((5, 10, "Joint PDF"))
+    elif re.search(r"\bcdf\b|probability density", t):
+        tags.append((5, 11, "CDF"))
+    elif re.search(r"five-number|quartile|iqr|outlier|mean|median", t):
+        tags.append((1, 1, "Descriptive statistics"))
+    elif re.search(r"sample mean|clt|central limit", t):
+        tags.append((7, None, "Sampling / CLT"))
+    return tags
+
+
+def render_question_tags(sid: str, qkey, qtext: str = "") -> str:
+    tags = QUESTION_TAGS.get((sid, qkey)) or classify_question(sid, qkey, qtext)
+    if sid.startswith("feb-2026") and isinstance(qkey, str):
+        tags = EC3_TAGS.get(qkey, [])
+    parts = []
+    for topic, typ, label in tags:
+        if topic:
+            parts.append(
+                f'<span class="b topic t{topic}" title="{H.escape(label)}">'
+                f'S{topic} · {H.escape(TOPICS[topic])}</span>'
+            )
+        if typ:
+            parts.append(
+                f'<a class="b wb-type" href="ISM_PYQ_Workbook.html#type{typ}" '
+                f'title="{H.escape(label)}">TYPE {typ}</a>'
+            )
+        elif topic == 7:
+            parts.append(f'<span class="b topic t7" title="{H.escape(label)}">{H.escape(label)}</span>')
+        elif not topic:
+            parts.append(f'<span class="b end-tag" title="{H.escape(label)}">{H.escape(label)}</span>')
+    return "".join(parts)
+
+
+TOPIC_BADGE_CSS = """
+.b.topic{font-size:.65rem;letter-spacing:.02em}
+.b.t1{background:#ecfdf5;color:#059669}.b.t2{background:#eff6ff;color:#2563eb}
+.b.t3{background:#f5f3ff;color:#7c3aed}.b.t4{background:#fdf2f8;color:#db2777}
+.b.t5{background:#fffbeb;color:#d97706}.b.t6{background:#fef2f2;color:#dc2626}
+.b.t7{background:#ecfeff;color:#0891b2}
+.b.wb-type{background:#f3e8ff;color:#7c3aed;text-decoration:none}
+.b.wb-type:hover{background:#e9d5ff}
+.b.end-tag{background:#fce7f3;color:#be185d}
+"""
+
 JUNE2026_BLOCKS = [
     ("Q1", "Five-number summary + conditional probability [5M]",
-     "WhatsApp Image 2026-06-21 at 18.24.10 (1).jpeg",
+     "Q1.jpeg",
      """<div class="sol-body">
-<div class="sol-step"><strong>(a)(i)</strong> Sorted waits (min): 1.5, 2.1, 2.2, 2.8, 2.9, 3.0, 3.3, 3.5, 3.7, 4.0, 4.1, 4.5, 4.9, 5.2, 5.8, 6.0, 6.8, 7.2, 7.5, 8.0 (n=20)<br>
+<div class="sol-step"><strong>(a)(i) Five-number summary</strong> [2M] — waiting times (min), n=20:<br>
+Data: 2.1, 3.5, 4.0, 5.2, 6.8, 2.9, 3.0, 4.5, 7.2, 8.0, 1.5, 2.8, 3.7, 4.9, 6.0, 7.5, 2.2, 3.3, 4.1, 5.8<br>
+Sorted: 1.5, 2.1, 2.2, 2.8, 2.9, 3.0, 3.3, 3.5, 3.7, 4.0, 4.1, 4.5, 4.9, 5.2, 5.8, 6.0, 6.8, 7.2, 7.5, 8.0<br>
 Min=1.5 · Q1≈2.95 · Median=(4.1+4.5)/2=4.3 · Q3≈6.4 · Max=8.0</div>
-<div class="sol-step"><strong>(a)(ii)</strong> IQR≈3.45 — half the customers wait 3–6.4 min (efficient). Max 8.0 min is not an outlier under 1.5×IQR; tail is moderate, not extreme.</div>
-<div class="sol-step"><strong>(b)</strong> Law of total probability:<br>
-\\(P(B\\text{ wins}) = P(A\\text{ fails})P(B|A\\text{ fails}) + P(A\\text{ completes})P(B|A\\text{ completes})\\)<br>
-\\(= 0.5(0.85) + 0.5(0.25) = 0.425 + 0.125 = \\mathbf{0.55}\\)</div>
+<div class="sol-step"><strong>(a)(ii) Interpret</strong> [1M] — IQR≈3.45: most waits 3–6.4 min (efficient). Max 8.0 is not an outlier under 1.5×IQR; moderate tail, not extreme.</div>
+<div class="sol-step"><strong>(b) Total probability</strong> [2M] — coding competition: A completes with P=0.5; if A fails, P(B wins)=0.85; if A completes, P(B wins)=0.25:<br>
+\\(P(B\\text{ wins}) = P(A^c)P(B|A^c) + P(A)P(B|A) = 0.5(0.85) + 0.5(0.25) = \\mathbf{0.55}\\)</div>
 </div>"""),
     ("Q2", "NEET inclusion–exclusion [6M]",
-     "WhatsApp Image 2026-06-21 at 18.24.09 (2).jpeg",
+     "Q2.jpeg",
      """<div class="sol-body">
 <div class="sol-step"><strong>Given</strong> N=600, |P|=380, |C|=260, |B|=420, |P∩C|=150, |P∩B|=250, |C∩B|=180</div>
 <div class="sol-step"><strong>(a)</strong> \\(|P\\cup C\\cup B| = |P|+|C|+|B| - |P\\cap C| - |P\\cap B| - |C\\cap B| + |P\\cap C\\cap B|\\)<br>
@@ -77,7 +197,7 @@ Min=1.5 · Q1≈2.95 · Median=(4.1+4.5)/2=4.3 · Q3≈6.4 · Max=8.0</div>
 <div class="sol-step"><strong>(f)</strong> Biology has largest solo qualification; all-three overlap 20% — strong cross-subject dependence.</div>
 </div>"""),
     ("Q3", "Binomial — defective chips [4M]",
-     "WhatsApp Image 2026-06-21 at 18.24.10 (2).jpeg",
+     "Q3.jpeg",
      """<div class="sol-body">
 <div class="sol-step"><strong>Model</strong> \\(X \\sim \\text{Binomial}(n=40, p=0.03)\\)</div>
 <div class="sol-step"><strong>(i)</strong> \\(P(X=4) = \\binom{40}{4}(0.03)^4(0.97)^{36} \\approx \\mathbf{0.062}\\)</div>
@@ -85,7 +205,7 @@ Min=1.5 · Q1≈2.95 · Median=(4.1+4.5)/2=4.3 · Q3≈6.4 · Max=8.0</div>
 <div class="sol-step"><strong>(iii)</strong> Flag if \\(X>4\\): \\(P(X>4) = 1 - P(X\\le 4) \\approx \\mathbf{0.096}\\)</div>
 </div>"""),
     ("Q4", "Continuous PDF — battery lifetime [5M]",
-     "WhatsApp Image 2026-06-21 at 18.24.09.jpeg",
+     "Q4.jpeg",
      """<div class="sol-body">
 <div class="sol-step"><strong>PDF</strong> \\(f(x)=x/50\\) for \\(0\\le x\\le 10\\), else 0</div>
 <div class="sol-step"><strong>(i)</strong> \\(\\int_0^{10} x/50\\,dx = [x^2/100]_0^{10} = 1\\) → valid PDF ✓</div>
@@ -95,7 +215,7 @@ Min=1.5 · Q1≈2.95 · Median=(4.1+4.5)/2=4.3 · Q3≈6.4 · Max=8.0</div>
 <div class="sol-step"><strong>(v)</strong> Mean ~6.7 yr with moderate spread — most batteries fail before 10 yr cap; 36% last beyond 8 yr.</div>
 </div>"""),
     ("Q5", "Naïve Bayes — customer purchase [5M]",
-     "WhatsApp Image 2026-06-21 at 18.24.10.jpeg",
+     "Q5.jpeg",
      NAIVE_BUY_TABLE + """
 <div class="sol-body">
 <div class="sol-step"><strong>(a)</strong> Total Yes=80, No=60, N=140 → \\(P(\\text{Yes})=4/7\\), \\(P(\\text{No})=3/7\\)</div>
@@ -104,15 +224,15 @@ Min=1.5 · Q1≈2.95 · Median=(4.1+4.5)/2=4.3 · Q3≈6.4 · Max=8.0</div>
 <div class="sol-step"><strong>(d)</strong> Predict <strong>Buy = Yes</strong> (75% posterior). Target Middle+High income segment in marketing.</div>
 </div>"""),
     ("Q6", "Bayes fraud + Normal delivery [5M]",
-     "WhatsApp Image 2026-06-21 at 18.24.09 (1).jpeg",
+     "Q6.jpeg",
      """<div class="sol-body">
-<div class="sol-step"><strong>(a)(i) Bayes</strong> F=fraud, S=flagged:<br>
+<div class="sol-step"><strong>(a)(i) Bayes</strong> [2M] — F=fraud, S=flagged:<br>
 \\(P(F)=0.02\\), \\(P(S|F)=0.90\\), \\(P(S|F^c)=0.05\\)<br>
 \\(P(S)=0.02(0.90)+0.98(0.05)=0.067\\)<br>
 \\(P(F|S)=0.018/0.067 \\approx \\mathbf{0.269}\\) (27%)</div>
-<div class="sol-step"><strong>(a)(ii)</strong> Flag is <em>not</em> strong evidence — ~73% flagged txns are legitimate → high false-alarm rate hurts trust.</div>
-<div class="sol-step"><strong>(b)(i)</strong> \\(X\\sim N(5,1.2^2)\\), \\(Z=(4-5)/1.2=-0.833\\) → \\(P(X<4)=P(Z<-0.83)\\approx\\mathbf{0.20}\\)</div>
-<div class="sol-step"><strong>(b)(ii)</strong> \\(P(4<X<6)=P(-0.83<Z<0.83)\\approx 0.793-0.207=\\mathbf{0.586}\\)</div>
+<div class="sol-step"><strong>(a)(ii) Interpret</strong> [1M] — Flag is <em>not</em> strong evidence — ~73% flagged txns are legitimate → high false-alarm rate hurts trust.</div>
+<div class="sol-step"><strong>(b)(i)</strong> [1M] \\(X\\sim N(5,1.2^2)\\), \\(Z=(4-5)/1.2=-0.833\\) → \\(P(X<4)=P(Z<-0.83)\\approx\\mathbf{0.20}\\)</div>
+<div class="sol-step"><strong>(b)(ii)</strong> [1M] \\(P(4<X<6)=P(-0.83<Z<0.83)\\approx 0.793-0.207=\\mathbf{0.586}\\)</div>
 </div>"""),
 ]
 
@@ -432,7 +552,8 @@ def ec3_section(exam, session, year, label, fname):
     sid = re.sub(r"[^a-z0-9]+", "-", label.lower()).strip("-")
     sec = f'<section id="{sid}"><h2>{H.escape(label)}</h2><p class="src">ISM/previous question papers · {H.escape(fname)}</p>'
     for qid, title, stem, sol in EC3_QUESTIONS:
-        sec += f"""<div class="q"><div class="badges">{badge(exam, session, year)}</div>
+        qtags = render_question_tags(sid, qid)
+        sec += f"""<div class="q"><div class="badges">{badge(exam, session, year)}{qtags}</div>
         <h4>{H.escape(qid)} — {title}</h4>
         <div class="stem"><strong>Question:</strong>{stem}</div>
         <div class="sol"><strong>Solution</strong>{format_math_in_html(sol)}</div></div>"""
@@ -440,15 +561,29 @@ def ec3_section(exam, session, year, label, fname):
     return sid, sec
 
 
+def sync_exam_images() -> int:
+    """Copy Q1–Q6 JPEGs into assets/ (no spaces — works on file://)."""
+    EXAM_IMG_DST.mkdir(parents=True, exist_ok=True)
+    n = 0
+    for i in range(1, 7):
+        src = JUNE / f"Q{i}.jpeg"
+        if src.exists():
+            shutil.copy2(src, EXAM_IMG_DST / f"Q{i}.jpeg")
+            n += 1
+    return n
+
+
 def june_section():
+    sync_exam_images()
     sec = (
         '<section id="june2026"><h2>June 2026 EC-2 Regular</h2>'
-        '<p class="src">ISM/previous question papers/june 2026/ (screenshots)</p>'
+        '<p class="src">June 2026 mid-sem · images from <code>MidSem/2026-06_Regular/Q1–Q6.jpeg</code></p>'
     )
     for qid, title, img, body in JUNE2026_BLOCKS:
-        img_path = f"../previous question papers/june 2026/{img}"
+        img_path = f"assets/exam-2026-06/{img}"
         sol = format_math_in_html(body)
-        sec += f"""<div class="q"><div class="badges">{badge("Mid Sem","Regular","2026")}</div>
+        qtags = render_question_tags("june2026", qid)
+        sec += f"""<div class="q"><div class="badges">{badge("Mid Sem","Regular","2026")}{qtags}</div>
         <h4>{H.escape(qid)} — {H.escape(title)}</h4>
         <img class="exam-img" src="{img_path}" alt="{H.escape(qid)}">
         <div class="sol"><strong>Solution</strong>{sol}</div></div>"""
@@ -479,14 +614,14 @@ def build():
                     sol_html = format_math_in_html(sol_html)
                 else:
                     sol_html = esc_sol(sol_html)
-            sec += f"""<div class="q"><div class="badges">{badge(exam,session,year)}</div>
+            sec += f"""<div class="q"><div class="badges">{badge(exam,session,year)}{render_question_tags(sid, qnum, qtext)}</div>
             <h4>{H.escape(qid)}</h4>
             <div class="stem"><strong>Question:</strong><br>{esc(qtext)}</div>
             <div class="sol"><strong>Solution</strong>{sol_html}</div></div>"""
         sec += "</section>"
         sections.append(sec)
 
-    sid, sec = ec3_section("End Sem", "Regular", "2026", "Feb 2026 End-Sem EC-3 Regular", "Feb 2026 ISM endsem regular QP & answer key.pdf")
+    sid, sec = ec3_section("End Sem", "Regular", "2026", "Feb 2026 End-Sem EC-3 Regular", "EndSem/2026-02_Regular_QP-AnswerKey.pdf")
     nav.append(f'<a href="#{sid}">2026 End Regular</a>')
     sections.append(sec)
 
@@ -512,8 +647,7 @@ window.MathJax = {{
 :root{{--navy:#1e3a5f;--blue:#2563eb;--green:#059669;--purple:#7c3aed;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}}
 *{{box-sizing:border-box;margin:0;padding:0}}
 body{{font-family:Georgia,"Segoe UI",serif;background:var(--bg);color:var(--text);line-height:1.65}}
-header{{background:var(--navy);color:#fff;padding:1.5rem;text-align:center}}
-header a{{color:#93c5fd}}
+{LIGHT_HEADER}
 .shell{{display:flex;max-width:1280px;margin:0 auto;width:100%}}
 aside{{width:260px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);padding:.8rem;position:sticky;top:0;height:100vh;overflow-y:auto;font-size:.75rem}}
 aside a{{display:block;padding:.3rem .5rem;color:var(--navy);text-decoration:none;border-radius:4px}}
@@ -529,6 +663,7 @@ h2{{color:var(--navy);font-size:1.2rem;margin-bottom:.75rem}}
 .b.mid{{background:#dbeafe;color:#1d4ed8}} .b.end{{background:#fce7f3;color:#be185d}}
 .b.reg{{background:#d1fae5;color:#047857}} .b.makeup{{background:#fef3c7;color:#b45309}}
 .b.yr{{background:#f3e8ff;color:#7c3aed}}
+{TOPIC_BADGE_CSS}
 .stem{{font-size:.92rem;margin:.75rem 0;padding:.9rem 1.1rem;background:#f8fafc;border:1px solid var(--border);border-radius:8px;line-height:1.7}}
 .stem p{{margin:.5rem 0}}
 .stem ol,.stem ul{{margin:.5rem 0 .75rem 1.4rem}}
@@ -539,7 +674,7 @@ h2{{color:var(--navy);font-size:1.2rem;margin-bottom:.75rem}}
 .sol{{font-size:.92rem;margin-top:1rem;padding:1.1rem 1.25rem;background:#fff;border:1px solid #e2e8f0;border-left:3px solid #059669;border-radius:8px}}
 .sol > strong{{display:block;font-size:.75rem;text-transform:uppercase;color:#047857;margin-bottom:.75rem}}
 .src{{font-size:.78rem;color:var(--muted);margin-bottom:.6rem}}
-.exam-img{{max-width:100%;border:1px solid var(--border);border-radius:6px;margin:.5rem 0}}
+.exam-img{{max-width:100%;width:100%;height:auto;border:1px solid var(--border);border-radius:6px;margin:.5rem 0;background:#fff}}
 {css_extra}
 @media(max-width:800px){{.shell{{flex-direction:column}}aside{{width:100%;height:auto;position:relative}}}}
 </style>
@@ -554,6 +689,11 @@ h2{{color:var(--navy);font-size:1.2rem;margin-bottom:.75rem}}
 <div class="grp">Legend</div>
 <div class="badges"><span class="b mid">Mid Sem</span><span class="b end">End Sem</span></div>
 <div class="badges"><span class="b reg">Regular</span><span class="b makeup">Makeup</span></div>
+<div class="grp">Syllabus (mid-sem)</div>
+<div class="badges"><span class="b topic t1">S1</span><span class="b topic t2">S2</span><span class="b topic t3">S3</span><span class="b topic t4">S4</span></div>
+<div class="badges"><span class="b topic t5">S5</span><span class="b topic t6">S6</span><span class="b topic t7">S7</span></div>
+<div class="grp">Workbook</div>
+<p style="font-size:.68rem;color:var(--muted);margin-bottom:.5rem">Purple <span class="b wb-type">TYPE n</span> links to PYQ Workbook</p>
 <div class="grp">Papers</div>
 {"".join(nav)}
 </aside>

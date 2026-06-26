@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear Models for Classification — Interactive Lecture</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-svg.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:#2C5AA0; --green:#2E7D52; --red:#B23A48; --amber:#8A5A1E; --purple:#6A4C93;
+    }
+    html[data-theme="light"] { --bg:#fff; --bg2:#f5f7fb; --text:#1a202c; --muted:#6b7280; --line:#d8dfeb; }
+    html[data-theme="dark"] { --bg:#111827; --bg2:#1f2937; --text:#f3f4f6; --muted:#9ca3af; --line:#374151; }
+    html:not([data-theme]) { --bg:#fff; --bg2:#f5f7fb; --text:#1a202c; --muted:#6b7280; --line:#d8dfeb; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.62;
+      overflow-wrap: break-word; word-break: break-word;
+    }
+
+    .progress { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: var(--line); z-index: 100; }
+    .fill { height: 100%; width: 0%; background: var(--navy); transition: width .2s; }
+
+    header {
+      background: linear-gradient(135deg,#21355E,#2C5AA0); color: #fff;
+      padding: 2.4rem 1.2rem 1.8rem; text-align: center; border-bottom: 4px solid var(--green);
+    }
+    header h1 { font-size: 2rem; margin-bottom: .3rem; }
+    header p { font-size: 1rem; opacity: .95; }
+
+    .layout { display: flex; max-width: 1400px; margin: 0 auto; }
+    aside {
+      width: 300px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--line);
+      padding: 1.1rem; height: 100vh; overflow-y: auto; position: sticky; top: 0;
+    }
+    .group { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: .72rem; margin: .9rem 0 .4rem; font-weight: 700; }
+    .nav-link {
+      display: block; text-decoration: none; color: var(--text); font-size: .9rem;
+      padding: .4rem .6rem; border-radius: 5px; margin: 2px 0; transition: .15s;
+    }
+    .nav-link:hover { background: var(--navy); color: #fff; }
+    .nav-link.active { background: var(--navy); color: #fff; font-weight: 600; }
+
+    .tool-btn { display:block; width:100%; border:0; border-radius:5px; background:var(--bg); color:var(--text); padding:.48rem .65rem; text-align:left; margin-top:.45rem; cursor:pointer; }
+    .tool-btn:hover { background: var(--navy); color:#fff; }
+
+    main { flex: 1; min-width: 0; padding: 1.8rem 2rem; }
+    .chapter { display: none; }
+    .chapter.active { display: block; }
+
+    h2 { color: var(--navy); border-bottom: 3px solid var(--green); padding-bottom: .4rem; margin-bottom: 1rem; font-size: 1.8rem; }
+    h3 { color: var(--navy); margin: 1.1rem 0 .45rem; font-size: 1.14rem; }
+    p { margin-bottom: .8rem; overflow-wrap: break-word; }
+    ul, ol { margin: 0 0 .8rem 1.4rem; }
+
+    .note, .everyday, .watch {
+      background: var(--bg2); border-left: 4px solid; border-radius: 0 6px 6px 0;
+      padding: .95rem 1.05rem; margin: 1rem 0;
+    }
+    .note { border-color: var(--navy); }
+    .everyday { border-color: var(--amber); }
+    .watch { border-color: var(--red); }
+    .note strong::before { content: "☞ "; }
+    .everyday strong::before { content: "★ "; }
+    .watch strong::before { content: "✗ "; }
+
+    .eq { background: var(--bg2); border-radius: 6px; padding: .8rem .9rem; margin: .9rem 0; overflow-x: auto; }
+
+    .key { background: #eef8f2; border:1px solid var(--green); border-radius:6px; padding:.9rem 1rem; margin:1rem 0; }
+    html[data-theme="dark"] .key { background:#163025; }
+
+    .lab { background:var(--bg2); border:1px solid var(--line); border-radius:8px; padding:1.1rem; margin:1rem 0; }
+    canvas { display:block; max-width:100%; border:1px solid var(--line); border-radius:6px; background:var(--bg); margin:.65rem 0; }
+    .controls { display:flex; flex-wrap:wrap; gap:.55rem; align-items:center; margin-top:.55rem; }
+    .btn { border:0; border-radius:5px; background:var(--navy); color:#fff; padding:.45rem .85rem; cursor:pointer; font-size:.88rem; }
+    .btn:hover { background:var(--green); }
+    .controls label { font-size:.9rem; display:flex; gap:.4rem; align-items:center; }
+    input[type="range"] { width: 140px; accent-color: var(--navy); }
+
+    .bottom { display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); margin-top:1.8rem; padding-top:.8rem; }
+    .bottom span { color: var(--muted); font-size:.88rem; }
+
+    table { width:100%; border-collapse: collapse; table-layout: fixed; margin: .7rem 0; }
+    th, td { border:1px solid var(--line); padding:.45rem .55rem; text-align:left; overflow-wrap:anywhere; }
+    th { background: var(--navy); color: #fff; }
+
+    #tourCard {
+      position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+      width: min(430px, calc(100% - 24px)); background: var(--bg2); border:2px solid var(--navy); border-radius:10px;
+      padding: .95rem 1rem; box-shadow: 0 8px 26px rgba(0,0,0,.25); z-index:120; display:none;
+    }
+    #tourCard.active { display:block; }
+    #tourStep { color: var(--muted); font-size:.8rem; margin-bottom:.3rem; }
+    #tourTitle { color: var(--navy); font-weight:700; margin-bottom:.35rem; }
+    #tourText { margin-bottom:.6rem; font-size:.92rem; }
+    .tourBtns { display:flex; gap:.45rem; justify-content:center; }
+
+    @media (max-width: 820px) {
+      aside { display:none; }
+      main { padding: 1rem; }
+      header h1 { font-size: 1.55rem; }
+      h2 { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <div class="progress"><div class="fill" id="fill"></div></div>
+
+  <div id="tourCard">
+    <div id="tourStep">Step 1 / 12</div>
+    <div id="tourTitle"></div>
+    <div id="tourText"></div>
+    <div class="tourBtns">
+      <button class="btn" id="tourPrev">← Back</button>
+      <button class="btn" id="tourNext">Next →</button>
+      <button class="btn" id="tourExit" style="background:var(--red)">Exit</button>
+    </div>
+  </div>
+
+  <header>
+    <h1>Linear Models for Classification</h1>
+    <p>AIML CZG565 · Module 4 · Logistic Regression to ROC and Multiclass</p>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <div class="group">Foundations</div>
+      <a href="#" class="nav-link active" data-ch="0">Classification Basics</a>
+      <a href="#" class="nav-link" data-ch="1">Why Linear Regression Fails</a>
+      <a href="#" class="nav-link" data-ch="2">Sigmoid and Logistic Model</a>
+      <a href="#" class="nav-link" data-ch="3">Decision Boundaries</a>
+
+      <div class="group">Training</div>
+      <a href="#" class="nav-link" data-ch="4">Cross-Entropy Cost</a>
+      <a href="#" class="nav-link" data-ch="5">Gradient Descent</a>
+      <a href="#" class="nav-link" data-ch="6">Regularization</a>
+
+      <div class="group">Evaluation</div>
+      <a href="#" class="nav-link" data-ch="7">Confusion Matrix</a>
+      <a href="#" class="nav-link" data-ch="8">ROC and AUC</a>
+      <a href="#" class="nav-link" data-ch="9">Class Imbalance</a>
+
+      <div class="group">Extensions</div>
+      <a href="#" class="nav-link" data-ch="10">Multiclass: OvR and OvO</a>
+      <a href="#" class="nav-link" data-ch="11">Summary and Checklist</a>
+
+      <button class="tool-btn" id="tourBtn">Start Guided Tour</button>
+      <button class="tool-btn" id="themeBtn">Dark Mode</button>
+    </aside>
+
+    <main>
+      <div class="chapter active" id="ch0">
+        <h2>Classification Basics</h2>
+        <p>Classification predicts a label. In binary classification, labels are usually 0 and 1. This module uses examples like job offered (1) vs not offered (0).</p>
+        <div class="note"><strong>The intuition:</strong> Regression asks “how much?”. Classification asks “which class?”.</div>
+        <div class="everyday"><strong>Everyday picture:</strong> An email filter puts each email in one tray: spam or not spam.</div>
+
+        <div class="lab">
+          <h3>Lab: Label Buckets</h3>
+          <canvas id="cv0" width="620" height="260"></canvas>
+          <p style="font-size:.85rem;color:var(--muted)">Toggle threshold to see how points switch between class 0 and class 1.</p>
+          <div class="controls">
+            <label>Threshold <input type="range" id="th0" min="0.2" max="0.8" value="0.5" step="0.01"></label>
+            <span id="th0Val" style="font-weight:600;color:var(--navy)">0.50</span>
+          </div>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>1 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch1">
+        <h2>Why Linear Regression Fails for Classification</h2>
+        <p>A least-squares line can produce values below 0 and above 1. These are invalid as probabilities.</p>
+        <div class="note"><strong>The intuition:</strong> A probability model must stay in [0,1]. Linear output has no such bound.</div>
+        <div class="watch"><strong>Watch out:</strong> Outliers can move least-squares boundaries heavily for binary labels.</div>
+
+        <div class="lab">
+          <h3>Lab: Unbounded Outputs</h3>
+          <canvas id="cv1" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>Slope <input type="range" id="slope1" min="0.05" max="0.35" value="0.16" step="0.01"></label>
+          </div>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>2 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch2">
+        <h2>Sigmoid and Logistic Model</h2>
+        <p>Logistic regression computes score \(z = w_0 + w^T x\), then applies sigmoid \(\sigma(z)=\frac{1}{1+e^{-z}}\).</p>
+        <div class="eq">\[\hat{y}=\sigma(z),\quad 0<\hat{y}<1\]</div>
+        <div class="key">
+          <strong>Worked example:</strong> For \(z=-0.8\),
+          \(\hat{y}=\sigma(-0.8)=\frac{1}{1+e^{0.8}}\approx0.31\), so with threshold 0.5 we predict class 0.
+        </div>
+
+        <div class="lab">
+          <h3>Lab: Sigmoid Explorer</h3>
+          <canvas id="cv2" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>z value <input type="range" id="z2" min="-8" max="8" value="0" step="0.1"></label>
+            <span id="z2Val" style="font-weight:600;color:var(--navy)">z=0.0, sigma=0.50</span>
+          </div>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>3 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch3">
+        <h2>Decision Boundaries</h2>
+        <p>With threshold 0.5, prediction is 1 when \(z\ge0\). So decision boundary is \(w_0+w^Tx=0\).</p>
+        <div class="note"><strong>The intuition:</strong> Linear score gives a straight boundary in feature space. Add polynomial features to create nonlinear boundaries in original coordinates.</div>
+
+        <div class="lab">
+          <h3>Lab: Boundary Rotator</h3>
+          <canvas id="cv3" width="620" height="300"></canvas>
+          <div class="controls">
+            <label>Angle <input type="range" id="ang3" min="-80" max="80" value="-25" step="1"></label>
+            <label>Offset <input type="range" id="off3" min="-2" max="2" value="0.3" step="0.05"></label>
+          </div>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>4 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch4">
+        <h2>Cross-Entropy Cost</h2>
+        <p>For logistic regression we use cross-entropy:</p>
+        <div class="eq">\[J = -\frac{1}{m}\sum_i\left[y^{(i)}\log\hat{y}^{(i)} + (1-y^{(i)})\log(1-\hat{y}^{(i)})\right]\]</div>
+        <div class="note"><strong>The intuition:</strong> Confident wrong predictions get very high penalty.</div>
+
+        <div class="lab">
+          <h3>Lab: Cost Curves</h3>
+          <canvas id="cv4" width="620" height="280"></canvas>
+          <p style="font-size:.85rem;color:var(--muted)">Blue: cost when true class is 1. Red: cost when true class is 0.</p>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>5 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch5">
+        <h2>Gradient Descent for Logistic Regression</h2>
+        <p>Update rule:</p>
+        <div class="eq">\[w_j \leftarrow w_j - \alpha\frac{1}{m}\sum_i (\hat{y}^{(i)}-y^{(i)})x_j^{(i)}\]</div>
+        <div class="key"><strong>Mini-step idea:</strong> if \(\hat{y}>y\), update pushes score down; if \(\hat{y}<y\), update pushes score up.</div>
+
+        <div class="lab">
+          <h3>Lab: Loss Descent</h3>
+          <canvas id="cv5" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>Learning rate α <input type="range" id="a5" min="0.02" max="0.6" value="0.15" step="0.01"></label>
+            <button class="btn" id="step5">Step</button>
+            <button class="btn" id="run5">Run 20</button>
+            <button class="btn" id="reset5">Reset</button>
+          </div>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>6 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch6">
+        <h2>Regularization</h2>
+        <p>Regularized objective adds penalty to control overfitting:</p>
+        <div class="eq">\[J_{reg}=J+\frac{\lambda}{2m}\sum_{j=1}^{d}w_j^2\]</div>
+        <div class="everyday"><strong>Everyday picture:</strong> Fit the data, but keep the model simple — like packing a bag under a strict weight limit.</div>
+
+        <div class="lab">
+          <h3>Lab: Weight Shrinkage</h3>
+          <canvas id="cv6" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>λ <input type="range" id="l6" min="0" max="8" value="0.5" step="0.1"></label>
+            <span id="l6Val" style="font-weight:600;color:var(--navy)">0.5</span>
+          </div>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>7 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch7">
+        <h2>Confusion Matrix and Metrics</h2>
+        <p>Confusion matrix gives TP, TN, FP, FN. Then compute accuracy, precision, recall, and F1.</p>
+        <div class="eq">\[Accuracy=\frac{TP+TN}{TP+TN+FP+FN},\quad Precision=\frac{TP}{TP+FP},\quad Recall=\frac{TP}{TP+FN}\]</div>
+
+        <div class="key">
+          <strong>Worked metrics:</strong> For TP=45, FN=5, FP=15, TN=135:
+          Accuracy=0.90, Precision=0.75, Recall=0.90, F1=0.818.
+        </div>
+
+        <div class="lab">
+          <h3>Lab: Confusion Matrix Slider</h3>
+          <canvas id="cv7" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>Threshold <input type="range" id="t7" min="0.1" max="0.9" value="0.5" step="0.01"></label>
+            <span id="m7" style="font-size:.88rem;color:var(--navy);font-weight:600"></span>
+          </div>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>8 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch8">
+        <h2>ROC Curve and AUC</h2>
+        <p>ROC plots TPR vs FPR as threshold moves. AUC summarizes ranking quality.</p>
+        <div class="eq">\[TPR=\frac{TP}{TP+FN},\quad FPR=\frac{FP}{FP+TN}\]</div>
+        <div class="note"><strong>The intuition:</strong> Threshold is a slider. ROC shows all sensitivity-specificity trade-offs.</div>
+
+        <div class="lab">
+          <h3>Lab: Threshold Sweep</h3>
+          <canvas id="cv8" width="620" height="300"></canvas>
+          <div class="controls">
+            <label>Threshold <input type="range" id="t8" min="0" max="1" value="0.5" step="0.01"></label>
+          </div>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>9 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch9">
+        <h2>Class Imbalance</h2>
+        <p>When positives are rare, accuracy can be misleading. A model predicting all negatives may still look good on accuracy.</p>
+        <div class="watch"><strong>Watch out:</strong> Optimize recall/precision trade-off for minority class, not raw accuracy.</div>
+        <div class="lab">
+          <h3>Lab: Imbalance Impact</h3>
+          <canvas id="cv9" width="620" height="260"></canvas>
+          <div class="controls">
+            <label>Positive rate <input type="range" id="p9" min="0.01" max="0.5" value="0.08" step="0.01"></label>
+            <span id="p9Val" style="font-weight:600;color:var(--navy)"></span>
+          </div>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>10 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch10">
+        <h2>Multiclass: One-vs-Rest and One-vs-One</h2>
+        <p>Logistic regression is binary. For K classes:
+          OvR uses K classifiers.
+          OvO uses K(K-1)/2 classifiers.</p>
+
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>Strategy</th><th>Classifiers</th><th>Pros</th><th>Cons</th></tr></thead>
+            <tbody>
+              <tr><td>OvR</td><td>K</td><td>Simple, fast</td><td>May be sensitive to imbalance in rest class</td></tr>
+              <tr><td>OvO</td><td>K(K-1)/2</td><td>Strong pairwise separation</td><td>More models to train</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="lab">
+          <h3>Lab: Classifier Count</h3>
+          <canvas id="cv10" width="620" height="260"></canvas>
+          <div class="controls">
+            <label>Number of classes K <input type="range" id="k10" min="3" max="15" value="5" step="1"></label>
+            <span id="k10Val" style="font-weight:600;color:var(--navy)"></span>
+          </div>
+        </div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>11 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+
+      <div class="chapter" id="ch11">
+        <h2>Summary and Exam Checklist</h2>
+        <ul>
+          <li>Logistic regression = linear score + sigmoid.</li>
+          <li>Use cross-entropy, not least squares, for classification loss.</li>
+          <li>Train with gradient descent.</li>
+          <li>Evaluate with confusion matrix metrics and ROC/AUC.</li>
+          <li>Handle class imbalance explicitly.</li>
+          <li>Extend to multiclass with OvR or OvO.</li>
+        </ul>
+        <div class="key"><strong>If you can derive:</strong> sigmoid output, one GD step, confusion metrics, and first ROC points, you are ready for this module.</div>
+        <div class="bottom"><button class="btn" onclick="goPrev()">← Prev</button><span>12 / 12</span><button class="btn" onclick="goNext()">Next →</button></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let chapter = 0;
+    const total = 12;
+
+    function showChapter(i) {
+      if (i < 0 || i >= total) return;
+      document.querySelectorAll('.chapter').forEach(ch => ch.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      document.getElementById('ch' + i).classList.add('active');
+      document.querySelector('.nav-link[data-ch="' + i + '"]').classList.add('active');
+      document.getElementById('fill').style.width = (i / (total - 1) * 100) + '%';
+      chapter = i;
+      window.scrollTo(0, 0);
+      setTimeout(drawCurrent, 50);
+    }
+    function goNext() { showChapter(chapter + 1); }
+    function goPrev() { showChapter(chapter - 1); }
+
+    document.querySelectorAll('.nav-link').forEach(el => {
+      el.addEventListener('click', e => {
+        e.preventDefault();
+        showChapter(Number(el.dataset.ch));
+      });
+    });
+
+    // Theme
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('lc-theme', theme);
+      document.getElementById('themeBtn').textContent = theme === 'light' ? 'Dark Mode' : 'Light Mode';
+    }
+    applyTheme(localStorage.getItem('lc-theme') || 'light');
+    document.getElementById('themeBtn').addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      applyTheme(cur === 'light' ? 'dark' : 'light');
+      drawCurrent();
+    });
+
+    const COLORS = { navy:'#2C5AA0', green:'#2E7D52', red:'#B23A48', amber:'#8A5A1E', gray:'#9ca3af' };
+
+    function clear(cv) {
+      const cx = cv.getContext('2d');
+      cx.clearRect(0,0,cv.width,cv.height);
+      cx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg') || '#fff';
+      cx.fillRect(0,0,cv.width,cv.height);
+      return cx;
+    }
+
+    // ch0
+    const probs0 = [0.05,0.12,0.22,0.28,0.31,0.35,0.42,0.49,0.55,0.61,0.67,0.74,0.81,0.89,0.94];
+    function draw0() {
+      const cv = document.getElementById('cv0'); if (!cv) return;
+      const cx = clear(cv); const th = Number(document.getElementById('th0').value);
+      document.getElementById('th0Val').textContent = th.toFixed(2);
+      const y0=70,y1=190;
+      cx.fillStyle = '#333'; cx.font='12px sans-serif';
+      cx.fillText('Class 1 bucket', 30, 30); cx.fillText('Class 0 bucket', 30, 150);
+      probs0.forEach((p,i)=>{
+        const x=120+i*32;
+        const y = p>=th?y0:y1;
+        cx.fillStyle = p>=th?COLORS.navy:COLORS.red;
+        cx.beginPath(); cx.arc(x,y,9,0,Math.PI*2); cx.fill();
+        cx.fillStyle='#333'; cx.font='10px sans-serif'; cx.fillText(p.toFixed(2),x-10,y+22);
+      });
+      cx.strokeStyle=COLORS.gray; cx.setLineDash([5,4]); cx.beginPath(); cx.moveTo(100,130); cx.lineTo(610,130); cx.stroke(); cx.setLineDash([]);
+      cx.fillStyle='#333'; cx.fillText('threshold = '+th.toFixed(2), 500, 122);
+    }
+
+    // ch1
+    function draw1() {
+      const cv=document.getElementById('cv1'); if(!cv) return;
+      const cx=clear(cv); const m=Number(document.getElementById('slope1').value);
+      const W=cv.width,H=cv.height,p=50;
+      function sx(x){ return p + x/10*(W-2*p); }
+      function sy(y){ return H-p - (y+0.5)/2.3*(H-2*p); }
+      cx.strokeStyle=COLORS.gray; cx.beginPath(); cx.moveTo(p,H-p); cx.lineTo(W-p,H-p); cx.moveTo(p,p); cx.lineTo(p,H-p); cx.stroke();
+      cx.strokeStyle=COLORS.green; cx.lineWidth=2.2; cx.beginPath();
+      for(let i=0;i<=100;i++){ const x=i/10; const y=m*x-0.2; const X=sx(x),Y=sy(y); if(i===0) cx.moveTo(X,Y); else cx.lineTo(X,Y); }
+      cx.stroke();
+      cx.strokeStyle='#666'; cx.setLineDash([4,3]);
+      cx.beginPath(); cx.moveTo(p,sy(0)); cx.lineTo(W-p,sy(0)); cx.moveTo(p,sy(1)); cx.lineTo(W-p,sy(1)); cx.stroke(); cx.setLineDash([]);
+      cx.fillStyle='#333'; cx.fillText('probability bounds', p+8, sy(1)-6);
+      cx.fillStyle=COLORS.red; cx.fillText('values > 1 (invalid)', W-200, sy(1)-6);
+      cx.fillStyle=COLORS.amber; cx.fillText('values < 0 (invalid)', W-200, sy(0)+16);
+    }
+
+    // ch2
+    function sig(z){ return 1/(1+Math.exp(-z)); }
+    function draw2(){
+      const cv=document.getElementById('cv2'); if(!cv) return; const cx=clear(cv); const z=Number(document.getElementById('z2').value);
+      const W=cv.width,H=cv.height,p=45;
+      function sx(x){ return p + (x+8)/16*(W-2*p); }
+      function sy(y){ return H-p - y*(H-2*p); }
+      cx.strokeStyle=COLORS.gray; cx.beginPath(); cx.moveTo(p,H-p); cx.lineTo(W-p,H-p); cx.moveTo(p,p); cx.lineTo(p,H-p); cx.stroke();
+      cx.strokeStyle=COLORS.navy; cx.lineWidth=2.2; cx.beginPath();
+      for(let i=0;i<=320;i++){ const x=-8+i/20; const y=sig(x); const X=sx(x),Y=sy(y); if(i===0)cx.moveTo(X,Y);else cx.lineTo(X,Y);} cx.stroke();
+      const py=sig(z),X=sx(z),Y=sy(py);
+      cx.fillStyle=COLORS.red; cx.beginPath(); cx.arc(X,Y,6,0,Math.PI*2); cx.fill();
+      cx.strokeStyle=COLORS.gray; cx.setLineDash([4,3]); cx.beginPath(); cx.moveTo(X,H-p); cx.lineTo(X,Y); cx.lineTo(p,Y); cx.stroke(); cx.setLineDash([]);
+      document.getElementById('z2Val').textContent = `z=${z.toFixed(1)}, sigma=${py.toFixed(3)}`;
+    }
+
+    // ch3
+    function draw3(){
+      const cv=document.getElementById('cv3'); if(!cv) return; const cx=clear(cv);
+      const ang=Number(document.getElementById('ang3').value)*Math.PI/180;
+      const off=Number(document.getElementById('off3').value);
+      const W=cv.width,H=cv.height,p=30;
+      const pts=[];
+      for(let i=0;i<160;i++){
+        const x=(Math.random()*2-1)*3.8, y=(Math.random()*2-1)*3.8;
+        pts.push([x,y]);
+      }
+      function cls(x,y){ return Math.cos(ang)*x + Math.sin(ang)*y + off >=0 ? 1:0; }
+      function sx(x){return p+(x+4)/(8)*(W-2*p);} function sy(y){return H-p-(y+4)/(8)*(H-2*p);} 
+      pts.forEach(([x,y])=>{ cx.fillStyle=cls(x,y)?COLORS.navy:COLORS.red; cx.beginPath(); cx.arc(sx(x),sy(y),3.5,0,Math.PI*2); cx.fill(); });
+      const x1=-4, x2=4;
+      const y1=(-(Math.cos(ang)*x1+off)/(Math.sin(ang)||1e-6));
+      const y2=(-(Math.cos(ang)*x2+off)/(Math.sin(ang)||1e-6));
+      cx.strokeStyle=COLORS.green; cx.lineWidth=2.2; cx.beginPath(); cx.moveTo(sx(x1),sy(y1)); cx.lineTo(sx(x2),sy(y2)); cx.stroke();
+    }
+
+    // ch4
+    function draw4(){
+      const cv=document.getElementById('cv4'); if(!cv) return; const cx=clear(cv); const W=cv.width,H=cv.height,p=45;
+      function sx(x){return p+x*(W-2*p);} function sy(y){return H-p-(y/6)*(H-2*p);} 
+      cx.strokeStyle=COLORS.gray; cx.beginPath(); cx.moveTo(p,H-p); cx.lineTo(W-p,H-p); cx.moveTo(p,p); cx.lineTo(p,H-p); cx.stroke();
+      cx.strokeStyle=COLORS.navy; cx.lineWidth=2; cx.beginPath();
+      for(let i=1;i<=999;i++){ const h=i/1000; const y=-Math.log(h); const X=sx(h),Y=sy(Math.min(y,6)); if(i===1)cx.moveTo(X,Y); else cx.lineTo(X,Y);} cx.stroke();
+      cx.strokeStyle=COLORS.red; cx.beginPath();
+      for(let i=1;i<=999;i++){ const h=i/1000; const y=-Math.log(1-h); const X=sx(h),Y=sy(Math.min(y,6)); if(i===1)cx.moveTo(X,Y); else cx.lineTo(X,Y);} cx.stroke();
+      cx.fillStyle='#333'; cx.fillText('y=1',sx(0.8),sy(0.6)); cx.fillText('y=0',sx(0.2),sy(0.6));
+    }
+
+    // ch5
+    let loss5=[];
+    function reset5(){ loss5=[0.95]; draw5(); }
+    function step5(){ const a=Number(document.getElementById('a5').value); const last=loss5[loss5.length-1]; loss5.push(Math.max(0.08,last*(1-0.4*a))); draw5(); }
+    function draw5(){
+      const cv=document.getElementById('cv5'); if(!cv) return; const cx=clear(cv); const W=cv.width,H=cv.height,p=45;
+      cx.strokeStyle=COLORS.gray; cx.beginPath(); cx.moveTo(p,H-p); cx.lineTo(W-p,H-p); cx.moveTo(p,p); cx.lineTo(p,H-p); cx.stroke();
+      function sx(i){return p + i/40*(W-2*p);} function sy(v){return H-p - (v/1.0)*(H-2*p);} 
+      cx.strokeStyle=COLORS.navy; cx.lineWidth=2.2; cx.beginPath();
+      loss5.forEach((v,i)=>{ const X=sx(i),Y=sy(v); if(i===0)cx.moveTo(X,Y); else cx.lineTo(X,Y); });
+      cx.stroke();
+      const i=loss5.length-1; cx.fillStyle=COLORS.red; cx.beginPath(); cx.arc(sx(i),sy(loss5[i]),5,0,Math.PI*2); cx.fill();
+      cx.fillStyle='#333'; cx.fillText('current loss='+loss5[i].toFixed(3), p, p-8);
+    }
+
+    // ch6
+    function draw6(){
+      const cv=document.getElementById('cv6'); if(!cv) return; const cx=clear(cv); const lam=Number(document.getElementById('l6').value);
+      document.getElementById('l6Val').textContent=lam.toFixed(1);
+      const ws=[2.2*Math.exp(-0.42*lam), -1.7*Math.exp(-0.36*lam), 1.0*Math.exp(-0.3*lam), -0.7*Math.exp(-0.33*lam)];
+      const W=cv.width,H=cv.height,base=H/2,bar=70,g=40,start=80,scale=80;
+      cx.strokeStyle=COLORS.gray; cx.beginPath(); cx.moveTo(25,base); cx.lineTo(W-25,base); cx.stroke();
+      ws.forEach((w,i)=>{ const x=start+i*(bar+g),h=w*scale; cx.fillStyle=w>=0?COLORS.navy:COLORS.red; cx.fillRect(x,h>0?base-h:base,bar,Math.abs(h)); cx.fillStyle='#333'; cx.fillText('w'+(i+1),x+28,base+16); });
+    }
+
+    // ch7
+    function draw7(){
+      const cv=document.getElementById('cv7'); if(!cv) return; const cx=clear(cv); const t=Number(document.getElementById('t7').value);
+      const probs=[0.97,0.91,0.83,0.76,0.69,0.61,0.57,0.51,0.46,0.41,0.33,0.22,0.17,0.09];
+      const y=[1,1,1,0,1,0,1,0,0,1,0,0,0,1];
+      let TP=0,TN=0,FP=0,FN=0;
+      probs.forEach((p,i)=>{ const pred=p>=t?1:0; if(pred===1&&y[i]===1)TP++; if(pred===0&&y[i]===0)TN++; if(pred===1&&y[i]===0)FP++; if(pred===0&&y[i]===1)FN++; });
+      const acc=(TP+TN)/(TP+TN+FP+FN), prec=TP/(TP+FP||1), rec=TP/(TP+FN||1);
+      document.getElementById('m7').textContent=`TP=${TP}, TN=${TN}, FP=${FP}, FN=${FN} | Acc=${acc.toFixed(2)} Prec=${prec.toFixed(2)} Rec=${rec.toFixed(2)}`;
+      const W=cv.width,H=cv.height;
+      cx.fillStyle='#333'; cx.font='13px sans-serif'; cx.fillText('Confusion Matrix', 28, 28);
+      const x0=80,y0=50,w=180,h=90;
+      const vals=[[TN,FP],[FN,TP]];
+      const labels=[['TN','FP'],['FN','TP']];
+      for(let r=0;r<2;r++)for(let c=0;c<2;c++){
+        cx.fillStyle='rgba(44,90,160,'+(0.15+vals[r][c]/14)+')';
+        cx.fillRect(x0+c*w,y0+r*h,w,h); cx.strokeStyle='#555'; cx.strokeRect(x0+c*w,y0+r*h,w,h);
+        cx.fillStyle='#111'; cx.fillText(labels[r][c]+': '+vals[r][c],x0+18+c*w,y0+45+r*h);
+      }
+    }
+
+    // ch8
+    const rocScores=[0.95,0.93,0.87,0.85,0.85,0.85,0.76,0.53,0.43,0.25];
+    const rocY=[1,1,0,0,0,1,0,1,0,1];
+    function rocPoint(t){
+      let TP=0,TN=0,FP=0,FN=0;
+      for(let i=0;i<rocScores.length;i++){ const pred=rocScores[i]>=t?1:0; const y=rocY[i]; if(pred&&y)TP++; else if(pred&&!y)FP++; else if(!pred&&y)FN++; else TN++; }
+      return {tpr:TP/(TP+FN||1), fpr:FP/(FP+TN||1)};
+    }
+    function draw8(){
+      const cv=document.getElementById('cv8'); if(!cv) return; const cx=clear(cv); const t=Number(document.getElementById('t8').value);
+      const W=cv.width,H=cv.height,p=45;
+      function sx(x){return p+x*(W-2*p);} function sy(y){return H-p-y*(H-2*p);} 
+      cx.strokeStyle=COLORS.gray; cx.beginPath(); cx.moveTo(p,H-p); cx.lineTo(W-p,H-p); cx.moveTo(p,p); cx.lineTo(p,H-p); cx.stroke();
+      cx.strokeStyle='#999'; cx.setLineDash([4,4]); cx.beginPath(); cx.moveTo(p,H-p); cx.lineTo(W-p,p); cx.stroke(); cx.setLineDash([]);
+      const thrs=[1,0.95,0.93,0.87,0.85,0.76,0.53,0.43,0.25,0];
+      const pts=thrs.map(rocPoint);
+      cx.strokeStyle=COLORS.navy; cx.lineWidth=2.2; cx.beginPath();
+      pts.forEach((pt,i)=>{ const X=sx(pt.fpr),Y=sy(pt.tpr); if(i===0)cx.moveTo(X,Y); else cx.lineTo(X,Y); }); cx.stroke();
+      pts.forEach(pt=>{ cx.fillStyle=COLORS.navy; cx.beginPath(); cx.arc(sx(pt.fpr),sy(pt.tpr),4,0,Math.PI*2); cx.fill(); });
+      const cur=rocPoint(t); cx.fillStyle=COLORS.red; cx.beginPath(); cx.arc(sx(cur.fpr),sy(cur.tpr),6,0,Math.PI*2); cx.fill();
+      cx.fillStyle='#333'; cx.fillText(`threshold=${t.toFixed(2)} | FPR=${cur.fpr.toFixed(2)} TPR=${cur.tpr.toFixed(2)}`, p, 20);
+    }
+
+    // ch9
+    function draw9(){
+      const cv=document.getElementById('cv9'); if(!cv) return; const cx=clear(cv); const r=Number(document.getElementById('p9').value);
+      const total=1000, pos=Math.round(total*r), neg=total-pos;
+      const alwaysNegAcc=neg/total;
+      document.getElementById('p9Val').textContent=`positives=${pos}, negatives=${neg}, always-negative accuracy=${alwaysNegAcc.toFixed(3)}`;
+      const W=cv.width,H=cv.height;
+      const pw=(W-120)*(pos/total), nw=(W-120)-pw;
+      cx.fillStyle=COLORS.red; cx.fillRect(60,70,nw,56);
+      cx.fillStyle=COLORS.navy; cx.fillRect(60+nw,70,pw,56);
+      cx.strokeStyle='#555'; cx.strokeRect(60,70,W-120,56);
+      cx.fillStyle='#222'; cx.fillText('Class distribution',60,55);
+      cx.fillText('Majority class',70,102); cx.fillText('Minority class',60+nw+8,102);
+      cx.fillText('Accuracy can look high and still be useless for minority class.',60,170);
+    }
+
+    // ch10
+    function draw10(){
+      const cv=document.getElementById('cv10'); if(!cv) return; const cx=clear(cv); const K=Number(document.getElementById('k10').value);
+      const ovr=K, ovo=K*(K-1)/2;
+      document.getElementById('k10Val').textContent=`K=${K} | OvR=${ovr} classifiers | OvO=${ovo} classifiers`;
+      const W=cv.width,H=cv.height;
+      const max=Math.max(ovr,ovo);
+      const h1=(ovr/max)*170, h2=(ovo/max)*170;
+      cx.fillStyle=COLORS.navy; cx.fillRect(180,H-50-h1,90,h1);
+      cx.fillStyle=COLORS.green; cx.fillRect(360,H-50-h2,90,h2);
+      cx.fillStyle='#222'; cx.fillText('OvR',210,H-25); cx.fillText('OvO',390,H-25);
+      cx.fillText(ovr,210,H-58-h1); cx.fillText(ovo,390,H-58-h2);
+    }
+
+    function drawCurrent(){
+      const draws=[draw0,draw1,draw2,draw3,draw4,draw5,draw6,draw7,draw8,draw9,draw10,()=>{}];
+      if(draws[chapter]) draws[chapter]();
+    }
+
+    // bind inputs
+    document.getElementById('th0').addEventListener('input', draw0);
+    document.getElementById('slope1').addEventListener('input', draw1);
+    document.getElementById('z2').addEventListener('input', draw2);
+    document.getElementById('ang3').addEventListener('input', draw3);
+    document.getElementById('off3').addEventListener('input', draw3);
+    document.getElementById('a5').addEventListener('input', draw5);
+    document.getElementById('step5').addEventListener('click', step5);
+    document.getElementById('run5').addEventListener('click', ()=>{ for(let i=0;i<20;i++) step5(); });
+    document.getElementById('reset5').addEventListener('click', reset5);
+    document.getElementById('l6').addEventListener('input', draw6);
+    document.getElementById('t7').addEventListener('input', draw7);
+    document.getElementById('t8').addEventListener('input', draw8);
+    document.getElementById('p9').addEventListener('input', draw9);
+    document.getElementById('k10').addEventListener('input', draw10);
+
+    // tour
+    const tour=[
+      {t:'Classification Basics',d:'Classification predicts labels, not continuous values.'},
+      {t:'Why Linear Regression Fails',d:'Linear outputs can go below 0 and above 1.'},
+      {t:'Sigmoid',d:'Sigmoid squashes any score into a valid probability.'},
+      {t:'Decision Boundary',d:'At threshold 0.5, boundary is where z=0.'},
+      {t:'Cross-Entropy',d:'Confident wrong predictions get high penalty.'},
+      {t:'Gradient Descent',d:'Weights move opposite the logistic cost gradient.'},
+      {t:'Regularization',d:'Lambda controls weight shrinkage and overfitting.'},
+      {t:'Confusion Matrix',d:'Use TP, FP, TN, FN; not just accuracy.'},
+      {t:'ROC and AUC',d:'Threshold sweep gives full trade-off curve.'},
+      {t:'Class Imbalance',d:'High accuracy can hide failure on minority class.'},
+      {t:'OvR and OvO',d:'Multiclass wrappers use K or K(K-1)/2 models.'},
+      {t:'Final Checklist',d:'You now have the full module pipeline.'}
+    ];
+    let ts=0;
+    function showTour(i){ if(i<0||i>=tour.length){ endTour(); return;} ts=i; document.getElementById('tourStep').textContent=`Step ${i+1} / ${tour.length}`; document.getElementById('tourTitle').textContent=tour[i].t; document.getElementById('tourText').textContent=tour[i].d; showChapter(i); }
+    function startTour(){ document.getElementById('tourCard').classList.add('active'); showTour(0); }
+    function endTour(){ document.getElementById('tourCard').classList.remove('active'); }
+    document.getElementById('tourBtn').addEventListener('click', startTour);
+    document.getElementById('tourPrev').addEventListener('click', ()=>showTour(ts-1));
+    document.getElementById('tourNext').addEventListener('click', ()=>showTour(ts+1));
+    document.getElementById('tourExit').addEventListener('click', endTour);
+
+    reset5();
+    showChapter(0);
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear Models for Classification - Interactive Lecture</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-svg.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2C5AA0;
+      --green: #2E7D52;
+      --red: #B23A48;
+      --amber: #8A5A1E;
+    }
+
+    html[data-theme="light"] {
+      --bg: #ffffff;
+      --bg2: #f4f7fc;
+      --text: #1a202c;
+      --border: #dbe3ef;
+      --muted: #6b7280;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #0f172a;
+      --bg2: #1e293b;
+      --text: #e5e7eb;
+      --border: #334155;
+      --muted: #94a3b8;
+    }
+
+    html:not([data-theme]) {
+      --bg: #ffffff;
+      --bg2: #f4f7fc;
+      --text: #1a202c;
+      --border: #dbe3ef;
+      --muted: #6b7280;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .progress-track {
+      height: 4px;
+      background: var(--border);
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      z-index: 100;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: var(--blue);
+      transition: width .2s;
+    }
+
+    header {
+      background: linear-gradient(135deg, #21355E 0%, #2C5AA0 100%);
+      color: #fff;
+      padding: 2.4rem 1.2rem;
+      text-align: center;
+      border-bottom: 4px solid var(--green);
+    }
+
+    header h1 { font-size: 2rem; margin-bottom: .4rem; }
+
+    .wrap {
+      display: flex;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    aside {
+      width: 280px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+
+    .group {
+      margin-top: .8rem;
+      color: var(--muted);
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+    }
+
+    .nav-link {
+      display: block;
+      text-decoration: none;
+      color: var(--text);
+      padding: .45rem .55rem;
+      border-radius: 5px;
+      margin-top: .25rem;
+      font-size: .9rem;
+    }
+
+    .nav-link:hover { background: var(--blue); color: #fff; }
+    .nav-link.active { background: var(--blue); color: #fff; font-weight: 600; }
+
+    .tools { margin-top: 1rem; border-top: 1px solid var(--border); padding-top: .8rem; }
+
+    .tools button {
+      width: 100%;
+      margin-bottom: .4rem;
+      padding: .5rem .6rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .tools button:hover { background: var(--blue); color: #fff; }
+
+    main {
+      flex: 1;
+      max-width: 980px;
+      padding: 1.4rem 2rem;
+      min-width: 0;
+    }
+
+    .chapter { display: none; }
+    .chapter.active { display: block; }
+
+    h2 {
+      color: var(--blue);
+      font-size: 1.8rem;
+      border-bottom: 3px solid var(--green);
+      margin-bottom: .9rem;
+      padding-bottom: .35rem;
+    }
+
+    h3 {
+      color: var(--blue);
+      font-size: 1.15rem;
+      margin: 1rem 0 .5rem;
+    }
+
+    p { margin-bottom: .8rem; }
+
+    .note, .everyday, .watch {
+      margin: 1rem 0;
+      padding: .95rem 1.05rem;
+      border-left: 4px solid;
+      border-radius: 0 6px 6px 0;
+      background: var(--bg2);
+    }
+
+    .note { border-color: var(--blue); }
+    .everyday { border-color: var(--amber); }
+    .watch { border-color: var(--red); }
+
+    .note strong::before { content: "☞ "; }
+    .everyday strong::before { content: "★ "; }
+    .watch strong::before { content: "✗ "; }
+
+    .eqbox {
+      overflow-x: auto;
+      padding: .8rem .95rem;
+      margin: .8rem 0;
+      border-radius: 6px;
+      background: var(--bg2);
+    }
+
+    .lab {
+      margin: 1.1rem 0;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      background: var(--bg2);
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 620px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      display: block;
+      margin: .6rem 0;
+      background: var(--bg);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .55rem;
+      align-items: center;
+    }
+
+    .controls input[type="range"] { width: 160px; accent-color: var(--blue); }
+
+    .controls button {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: .42rem .8rem;
+      cursor: pointer;
+    }
+
+    .controls button:hover { background: var(--green); }
+
+    .bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      padding-top: .9rem;
+    }
+
+    .bottom button {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: .45rem .95rem;
+      cursor: pointer;
+    }
+
+    .bottom button:hover { background: var(--green); }
+
+    #story {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(430px, calc(100% - 1rem));
+      background: var(--bg2);
+      border: 2px solid var(--blue);
+      border-radius: 8px;
+      padding: 1rem;
+      z-index: 95;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    #story.active { display: block; }
+    #storyStep { font-size: .8rem; color: var(--muted); margin-bottom: .35rem; }
+    #storyTitle { color: var(--blue); font-weight: 700; margin-bottom: .4rem; }
+    #storyText { margin-bottom: .8rem; font-size: .92rem; }
+
+    .storyBtns {
+      display: flex;
+      justify-content: center;
+      gap: .4rem;
+      flex-wrap: wrap;
+    }
+
+    .storyBtns button {
+      border: none;
+      border-radius: 4px;
+      padding: .38rem .7rem;
+      cursor: pointer;
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .storyBtns button:hover { background: var(--green); }
+
+    @media (max-width: 800px) {
+      aside { display: none; }
+      main { padding: 1rem; }
+      header h1 { font-size: 1.45rem; }
+      h2 { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <div class="progress-track"><div class="progress-fill" id="prog"></div></div>
+
+  <div id="story">
+    <div id="storyStep"></div>
+    <div id="storyTitle"></div>
+    <div id="storyText"></div>
+    <div class="storyBtns">
+      <button id="storyPrev">Previous</button>
+      <button id="storyNext">Next</button>
+      <button id="storyExit" style="background:var(--red)">Exit</button>
+    </div>
+  </div>
+
+  <header>
+    <h1>Linear Models for Classification</h1>
+    <p>Module 4 - Logistic Regression, Evaluation, ROC, Imbalance, and Multiclass</p>
+  </header>
+
+  <div class="wrap">
+    <aside>
+      <div class="group">Core Setup</div>
+      <a class="nav-link active" href="#" data-ch="0">Classification Basics</a>
+      <a class="nav-link" href="#" data-ch="1">Why Linear Regression Fails</a>
+      <a class="nav-link" href="#" data-ch="2">Sigmoid and Logistic Model</a>
+
+      <div class="group">Training</div>
+      <a class="nav-link" href="#" data-ch="3">Decision Boundary</a>
+      <a class="nav-link" href="#" data-ch="4">Cross-Entropy Loss</a>
+      <a class="nav-link" href="#" data-ch="5">Gradient Descent</a>
+
+      <div class="group">Evaluation</div>
+      <a class="nav-link" href="#" data-ch="6">Confusion Matrix</a>
+      <a class="nav-link" href="#" data-ch="7">ROC and AUC</a>
+      <a class="nav-link" href="#" data-ch="8">Class Imbalance</a>
+
+      <div class="group">Multiclass</div>
+      <a class="nav-link" href="#" data-ch="9">OvR and OvO</a>
+
+      <div class="tools">
+        <button id="tourBtn">Start Guided Tour</button>
+        <button id="themeBtn">Dark Mode</button>
+      </div>
+    </aside>
+
+    <main>
+      <div class="chapter active" id="ch0">
+        <h2>Classification Basics</h2>
+        <p>Classification predicts a class label. In binary classification, that label is 0 or 1.</p>
+        <div class="note"><strong>The intuition:</strong> The model puts each point into one bucket. It does not predict a free real number.</div>
+        <div class="everyday"><strong>Everyday picture:</strong> A hiring screen puts a candidate into "offer" or "no offer". That is a classification output.</div>
+
+        <div class="lab">
+          <h3>Interactive Scatter</h3>
+          <canvas id="c0" width="620" height="280"></canvas>
+          <div class="controls">
+            <button id="c0gen">New Random Data</button>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <button onclick="prevCh()">Prev</button>
+          <span>1 / 10</span>
+          <button onclick="nextCh()">Next</button>
+        </div>
+      </div>
+
+      <div class="chapter" id="ch1">
+        <h2>Why Linear Regression Fails for Classification</h2>
+        <p>Least-squares output is unbounded. It can go below 0 or above 1. Those values are invalid as probabilities.</p>
+        <div class="note"><strong>The intuition:</strong> Probability needs a strict range. Linear regression does not enforce that range.</div>
+        <div class="watch"><strong>Watch out:</strong> One distant outlier can swing the linear fit and change the classification cutoff badly.</div>
+
+        <div class="lab">
+          <h3>Line vs Probability Range</h3>
+          <canvas id="c1" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>Slope <input id="slope1" type="range" min="0.05" max="0.35" step="0.01" value="0.16"></label>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <button onclick="prevCh()">Prev</button>
+          <span>2 / 10</span>
+          <button onclick="nextCh()">Next</button>
+        </div>
+      </div>
+
+      <div class="chapter" id="ch2">
+        <h2>Sigmoid and Logistic Model</h2>
+        <p>Logistic regression builds a score \(z = w_0 + w^T x\), then maps it using sigmoid:</p>
+        <div class="eqbox">\[ \sigma(z)=\frac{1}{1+e^{-z}} \]</div>
+        <p>So \(\hat{y}=\sigma(z)\) is always between 0 and 1.</p>
+
+        <div class="lab">
+          <h3>Sigmoid Slider</h3>
+          <canvas id="c2" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>z value <input id="zslider" type="range" min="-8" max="8" step="0.1" value="0"></label>
+            <span id="zout"></span>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <button onclick="prevCh()">Prev</button>
+          <span>3 / 10</span>
+          <button onclick="nextCh()">Next</button>
+        </div>
+      </div>
+
+      <div class="chapter" id="ch3">
+        <h2>Decision Boundary</h2>
+        <p>At threshold 0.5, \(\sigma(z)\ge 0.5\) exactly when \(z\ge 0\). So the boundary is \(w_0 + w^Tx = 0\).</p>
+        <div class="everyday"><strong>Everyday picture:</strong> Think of a line on a map. One side is "yes" and the other side is "no".</div>
+
+        <div class="lab">
+          <h3>Move the Boundary</h3>
+          <canvas id="c3" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>Bias <input id="bias3" type="range" min="-3" max="3" step="0.1" value="0"></label>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <button onclick="prevCh()">Prev</button>
+          <span>4 / 10</span>
+          <button onclick="nextCh()">Next</button>
+        </div>
+      </div>
+
+      <div class="chapter" id="ch4">
+        <h2>Cross-Entropy Loss</h2>
+        <p>Logistic regression uses cross-entropy:</p>
+        <div class="eqbox">\[ J = -\frac{1}{m}\sum_{i=1}^{m}\left(y^{(i)}\log\hat{y}^{(i)}+(1-y^{(i)})\log(1-\hat{y}^{(i)})\right) \]</div>
+        <div class="note"><strong>The intuition:</strong> Confident wrong predictions get very large penalty.</div>
+
+        <div class="lab">
+          <h3>Loss Curves</h3>
+          <canvas id="c4" width="620" height="280"></canvas>
+        </div>
+
+        <div class="bottom">
+          <button onclick="prevCh()">Prev</button>
+          <span>5 / 10</span>
+          <button onclick="nextCh()">Next</button>
+        </div>
+      </div>
+
+      <div class="chapter" id="ch5">
+        <h2>Gradient Descent</h2>
+        <p>Weights update by:</p>
+        <div class="eqbox">\[ w_j \leftarrow w_j - \alpha\frac{1}{m}\sum_{i=1}^{m}(\hat{y}^{(i)}-y^{(i)})x_j^{(i)} \]</div>
+        <p>Small learning rate gives slow but stable updates. Large learning rate can diverge.</p>
+
+        <div class="lab">
+          <h3>Loss vs Iteration</h3>
+          <canvas id="c5" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>learning rate <input id="lr5" type="range" min="0.02" max="0.6" step="0.02" value="0.2"></label>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <button onclick="prevCh()">Prev</button>
+          <span>6 / 10</span>
+          <button onclick="nextCh()">Next</button>
+        </div>
+      </div>
+
+      <div class="chapter" id="ch6">
+        <h2>Confusion Matrix and Metrics</h2>
+        <p>Confusion matrix tracks TP, TN, FP, and FN. Use precision, recall, F1, and accuracy together.</p>
+        <div class="watch"><strong>Watch out:</strong> Accuracy alone can mislead on skewed classes.</div>
+
+        <div class="lab">
+          <h3>Metric Calculator</h3>
+          <canvas id="c6" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>TP <input id="tp" type="range" min="0" max="100" value="45"></label>
+            <label>FP <input id="fp" type="range" min="0" max="100" value="15"></label>
+            <label>FN <input id="fn" type="range" min="0" max="100" value="5"></label>
+            <label>TN <input id="tn" type="range" min="0" max="200" value="135"></label>
+            <span id="m6"></span>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <button onclick="prevCh()">Prev</button>
+          <span>7 / 10</span>
+          <button onclick="nextCh()">Next</button>
+        </div>
+      </div>
+
+      <div class="chapter" id="ch7">
+        <h2>ROC and AUC</h2>
+        <p>ROC plots TPR against FPR over many thresholds. AUC summarizes curve quality in one number.</p>
+
+        <div class="lab">
+          <h3>Threshold Trade-off</h3>
+          <canvas id="c7" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>threshold <input id="thr7" type="range" min="0" max="1" step="0.01" value="0.5"></label>
+            <span id="rocpt"></span>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <button onclick="prevCh()">Prev</button>
+          <span>8 / 10</span>
+          <button onclick="nextCh()">Next</button>
+        </div>
+      </div>
+
+      <div class="chapter" id="ch8">
+        <h2>Class Imbalance</h2>
+        <p>If positives are rare, high accuracy can still hide bad model behavior. Use class weights, resampling, or threshold tuning.</p>
+        <div class="everyday"><strong>Everyday picture:</strong> Looking for rare fraud in many normal transactions needs a metric focus on minority detection.</div>
+
+        <div class="lab">
+          <h3>Imbalance Visual</h3>
+          <canvas id="c8" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>minority count <input id="min8" type="range" min="10" max="150" step="5" value="30"></label>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <button onclick="prevCh()">Prev</button>
+          <span>9 / 10</span>
+          <button onclick="nextCh()">Next</button>
+        </div>
+      </div>
+
+      <div class="chapter" id="ch9">
+        <h2>Multiclass: One-vs-Rest and One-vs-One</h2>
+        <p>Logistic regression is binary by default. For many classes:</p>
+        <ul style="margin-left:1.2rem; margin-bottom:.8rem;">
+          <li>OvR trains \(N\) classifiers.</li>
+          <li>OvO trains \(N(N-1)/2\) classifiers.</li>
+        </ul>
+
+        <div class="lab">
+          <h3>Classifier Count Explorer</h3>
+          <canvas id="c9" width="620" height="280"></canvas>
+          <div class="controls">
+            <label>number of classes N <input id="n9" type="range" min="3" max="15" step="1" value="5"></label>
+            <span id="count9"></span>
+          </div>
+        </div>
+
+        <div class="note"><strong>The intuition:</strong> OvR is simpler and often preferred. OvO can be costly for many classes.</div>
+
+        <div class="bottom">
+          <button onclick="prevCh()">Prev</button>
+          <span>10 / 10</span>
+          <button onclick="nextCh()">Next</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let current = 0;
+    const total = 10;
+
+    function showChapter(i) {
+      document.querySelectorAll('.chapter').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
+      document.getElementById('ch' + i).classList.add('active');
+      document.querySelector('.nav-link[data-ch="' + i + '"]').classList.add('active');
+      document.getElementById('prog').style.width = (i / (total - 1) * 100) + '%';
+      current = i;
+      drawCurrent();
+      window.scrollTo(0, 0);
+    }
+
+    function nextCh() { if (current < total - 1) showChapter(current + 1); }
+    function prevCh() { if (current > 0) showChapter(current - 1); }
+
+    document.querySelectorAll('.nav-link').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        showChapter(Number(a.dataset.ch));
+      });
+    });
+
+    const themeBtn = document.getElementById('themeBtn');
+    function setTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('clf-theme', t);
+      themeBtn.textContent = t === 'light' ? 'Dark Mode' : 'Light Mode';
+      drawCurrent();
+    }
+    themeBtn.addEventListener('click', () => {
+      setTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+    });
+    setTheme(localStorage.getItem('clf-theme') || 'light');
+
+    function bg() { return document.documentElement.getAttribute('data-theme') === 'dark' ? '#0f172a' : '#ffffff'; }
+    function text() { return document.documentElement.getAttribute('data-theme') === 'dark' ? '#e5e7eb' : '#1a202c'; }
+
+    function clear(cv, cx) {
+      cx.clearRect(0, 0, cv.width, cv.height);
+      cx.fillStyle = bg();
+      cx.fillRect(0, 0, cv.width, cv.height);
+    }
+
+    function rng(seed) {
+      let s = seed % 2147483647;
+      if (s <= 0) s += 2147483646;
+      return () => {
+        s = (s * 16807) % 2147483647;
+        return (s - 1) / 2147483646;
+      };
+    }
+
+    let points0 = [];
+    function draw0() {
+      const cv = document.getElementById('c0');
+      if (!cv) return;
+      const cx = cv.getContext('2d');
+      clear(cv, cx);
+      if (points0.length === 0) gen0();
+
+      cx.strokeStyle = '#9ca3af';
+      cx.beginPath();
+      cx.moveTo(40, 240); cx.lineTo(590, 240);
+      cx.moveTo(40, 20); cx.lineTo(40, 240);
+      cx.stroke();
+
+      points0.forEach(p => {
+        cx.fillStyle = p[2] ? '#2C5AA0' : '#B23A48';
+        cx.beginPath();
+        cx.arc(40 + p[0] * 55, 240 - p[1] * 18, 4, 0, 2 * Math.PI);
+        cx.fill();
+      });
+    }
+
+    function gen0() {
+      points0 = [];
+      const r = rng(Date.now() % 100000 + 7);
+      for (let i = 0; i < 40; i++) {
+        const x = 1 + r() * 9;
+        const y = 2 + r() * 10;
+        const label = y > 7 ? 1 : 0;
+        points0.push([x, y, label]);
+      }
+      draw0();
+    }
+
+    document.getElementById('c0gen').addEventListener('click', gen0);
+
+    function draw1() {
+      const cv = document.getElementById('c1');
+      if (!cv) return;
+      const cx = cv.getContext('2d');
+      clear(cv, cx);
+      const m = Number(document.getElementById('slope1').value);
+
+      cx.strokeStyle = '#9ca3af';
+      cx.beginPath();
+      cx.moveTo(40, 240); cx.lineTo(590, 240);
+      cx.moveTo(40, 20); cx.lineTo(40, 240);
+      cx.stroke();
+
+      cx.strokeStyle = '#2E7D52';
+      cx.lineWidth = 2;
+      cx.beginPath();
+      for (let x = 0; x <= 10; x += 0.1) {
+        const y = m * x - 0.2;
+        const sx = 40 + x * 55;
+        const sy = 240 - y * 120;
+        if (x === 0) cx.moveTo(sx, sy); else cx.lineTo(sx, sy);
+      }
+      cx.stroke();
+
+      cx.strokeStyle = '#334155';
+      cx.setLineDash([5, 4]);
+      cx.beginPath(); cx.moveTo(40, 240 - 1 * 120); cx.lineTo(590, 240 - 1 * 120); cx.stroke();
+      cx.beginPath(); cx.moveTo(40, 240); cx.lineTo(590, 240); cx.stroke();
+      cx.setLineDash([]);
+
+      cx.fillStyle = text();
+      cx.font = '12px sans-serif';
+      cx.fillText('Valid probability range is [0,1]', 360, 30);
+    }
+
+    document.getElementById('slope1').addEventListener('input', draw1);
+
+    function sig(z) { return 1 / (1 + Math.exp(-z)); }
+
+    function draw2() {
+      const cv = document.getElementById('c2');
+      if (!cv) return;
+      const cx = cv.getContext('2d');
+      clear(cv, cx);
+      const z = Number(document.getElementById('zslider').value);
+
+      cx.strokeStyle = '#2C5AA0';
+      cx.lineWidth = 2;
+      cx.beginPath();
+      for (let x = -8; x <= 8; x += 0.1) {
+        const y = sig(x);
+        const sx = 40 + (x + 8) / 16 * 550;
+        const sy = 240 - y * 200;
+        if (x <= -7.99) cx.moveTo(sx, sy); else cx.lineTo(sx, sy);
+      }
+      cx.stroke();
+
+      const y0 = sig(z);
+      const sx = 40 + (z + 8) / 16 * 550;
+      const sy = 240 - y0 * 200;
+      cx.fillStyle = '#B23A48';
+      cx.beginPath(); cx.arc(sx, sy, 6, 0, 2 * Math.PI); cx.fill();
+
+      document.getElementById('zout').textContent = `sigma(${z.toFixed(1)}) = ${y0.toFixed(3)}`;
+    }
+
+    document.getElementById('zslider').addEventListener('input', draw2);
+
+    function draw3() {
+      const cv = document.getElementById('c3');
+      if (!cv) return;
+      const cx = cv.getContext('2d');
+      clear(cv, cx);
+      const b = Number(document.getElementById('bias3').value);
+
+      cx.strokeStyle = '#94a3b8';
+      cx.beginPath();
+      cx.moveTo(40, 240); cx.lineTo(590, 240);
+      cx.moveTo(40, 20); cx.lineTo(40, 240);
+      cx.stroke();
+
+      cx.strokeStyle = '#2E7D52';
+      cx.lineWidth = 2.5;
+      cx.beginPath();
+      cx.moveTo(40, 220 - b * 20);
+      cx.lineTo(590, 30 + b * 20);
+      cx.stroke();
+
+      cx.fillStyle = text();
+      cx.font = '12px sans-serif';
+      cx.fillText('line: w0 + w1 x1 + w2 x2 = 0', 365, 25);
+    }
+
+    document.getElementById('bias3').addEventListener('input', draw3);
+
+    function draw4() {
+      const cv = document.getElementById('c4');
+      if (!cv) return;
+      const cx = cv.getContext('2d');
+      clear(cv, cx);
+
+      cx.strokeStyle = '#2C5AA0';
+      cx.lineWidth = 2;
+      cx.beginPath();
+      for (let h = 0.01; h <= 0.99; h += 0.01) {
+        const cost = -Math.log(h);
+        const sx = 40 + h * 550;
+        const sy = 240 - Math.min(6, cost) / 6 * 200;
+        if (h < 0.02) cx.moveTo(sx, sy); else cx.lineTo(sx, sy);
+      }
+      cx.stroke();
+
+      cx.strokeStyle = '#B23A48';
+      cx.beginPath();
+      for (let h = 0.01; h <= 0.99; h += 0.01) {
+        const cost = -Math.log(1 - h);
+        const sx = 40 + h * 550;
+        const sy = 240 - Math.min(6, cost) / 6 * 200;
+        if (h < 0.02) cx.moveTo(sx, sy); else cx.lineTo(sx, sy);
+      }
+      cx.stroke();
+
+      cx.fillStyle = text();
+      cx.font = '12px sans-serif';
+      cx.fillText('blue: y=1 loss', 450, 70);
+      cx.fillText('red: y=0 loss', 450, 88);
+    }
+
+    function draw5() {
+      const cv = document.getElementById('c5');
+      if (!cv) return;
+      const cx = cv.getContext('2d');
+      clear(cv, cx);
+      const lr = Number(document.getElementById('lr5').value);
+
+      cx.strokeStyle = '#94a3b8';
+      cx.beginPath();
+      cx.moveTo(40, 240); cx.lineTo(590, 240);
+      cx.moveTo(40, 20); cx.lineTo(40, 240);
+      cx.stroke();
+
+      cx.strokeStyle = '#2C5AA0';
+      cx.lineWidth = 2;
+      cx.beginPath();
+      for (let t = 0; t <= 40; t++) {
+        const loss = 0.1 + 0.8 * Math.exp(-lr * t / 0.18);
+        const sx = 40 + t / 40 * 550;
+        const sy = 240 - loss / 1.0 * 200;
+        if (t === 0) cx.moveTo(sx, sy); else cx.lineTo(sx, sy);
+      }
+      cx.stroke();
+
+      cx.fillStyle = text();
+      cx.font = '12px sans-serif';
+      cx.fillText(`learning rate = ${lr.toFixed(2)}`, 430, 24);
+    }
+
+    document.getElementById('lr5').addEventListener('input', draw5);
+
+    function draw6() {
+      const cv = document.getElementById('c6');
+      if (!cv) return;
+      const cx = cv.getContext('2d');
+      clear(cv, cx);
+
+      const tp = Number(document.getElementById('tp').value);
+      const fp = Number(document.getElementById('fp').value);
+      const fn = Number(document.getElementById('fn').value);
+      const tn = Number(document.getElementById('tn').value);
+
+      const total = tp + fp + fn + tn;
+      const acc = (tp + tn) / total;
+      const prec = tp / Math.max(1, tp + fp);
+      const rec = tp / Math.max(1, tp + fn);
+      const f1 = 2 * prec * rec / Math.max(1e-9, prec + rec);
+
+      const cells = [
+        {x: 120, y: 50, v: tp, c: '#c7f9d5', t: 'TP'},
+        {x: 300, y: 50, v: fn, c: '#fde2e4', t: 'FN'},
+        {x: 120, y: 150, v: fp, c: '#fde2e4', t: 'FP'},
+        {x: 300, y: 150, v: tn, c: '#c7f9d5', t: 'TN'}
+      ];
+      cells.forEach(a => {
+        cx.fillStyle = a.c;
+        cx.fillRect(a.x, a.y, 140, 80);
+        cx.strokeStyle = '#64748b';
+        cx.strokeRect(a.x, a.y, 140, 80);
+        cx.fillStyle = '#0f172a';
+        cx.font = '13px sans-serif';
+        cx.fillText(`${a.t}: ${a.v}`, a.x + 32, a.y + 45);
+      });
+
+      document.getElementById('m6').textContent =
+        `acc=${acc.toFixed(3)}  precision=${prec.toFixed(3)}  recall=${rec.toFixed(3)}  f1=${f1.toFixed(3)}`;
+    }
+
+    ['tp', 'fp', 'fn', 'tn'].forEach(id => document.getElementById(id).addEventListener('input', draw6));
+
+    function draw7() {
+      const cv = document.getElementById('c7');
+      if (!cv) return;
+      const cx = cv.getContext('2d');
+      clear(cv, cx);
+      const t = Number(document.getElementById('thr7').value);
+
+      cx.strokeStyle = '#94a3b8';
+      cx.beginPath();
+      cx.moveTo(40, 240); cx.lineTo(590, 240);
+      cx.moveTo(40, 20); cx.lineTo(40, 240);
+      cx.stroke();
+
+      const points = [];
+      for (let th = 0; th <= 1.001; th += 0.05) {
+        const fpr = Math.max(0, Math.min(1, 1 - Math.pow(1 - th, 1.3)));
+        const tpr = Math.max(0, Math.min(1, 1 - Math.pow(th, 0.6)));
+        points.push([fpr, tpr]);
+      }
+
+      cx.strokeStyle = '#2C5AA0';
+      cx.lineWidth = 2;
+      cx.beginPath();
+      points.forEach((p, i) => {
+        const sx = 40 + p[0] * 550;
+        const sy = 240 - p[1] * 220;
+        if (i === 0) cx.moveTo(sx, sy); else cx.lineTo(sx, sy);
+      });
+      cx.stroke();
+
+      cx.strokeStyle = '#64748b';
+      cx.setLineDash([5, 4]);
+      cx.beginPath(); cx.moveTo(40, 240); cx.lineTo(590, 20); cx.stroke();
+      cx.setLineDash([]);
+
+      const fpr = Math.max(0, Math.min(1, 1 - Math.pow(1 - t, 1.3)));
+      const tpr = Math.max(0, Math.min(1, 1 - Math.pow(t, 0.6)));
+      const sx = 40 + fpr * 550;
+      const sy = 240 - tpr * 220;
+      cx.fillStyle = '#B23A48';
+      cx.beginPath(); cx.arc(sx, sy, 6, 0, 2 * Math.PI); cx.fill();
+
+      document.getElementById('rocpt').textContent = `TPR=${tpr.toFixed(3)}  FPR=${fpr.toFixed(3)}`;
+    }
+
+    document.getElementById('thr7').addEventListener('input', draw7);
+
+    function draw8() {
+      const cv = document.getElementById('c8');
+      if (!cv) return;
+      const cx = cv.getContext('2d');
+      clear(cv, cx);
+      const m = Number(document.getElementById('min8').value);
+      const M = 320;
+      const total = M + m;
+
+      const majorW = 520 * M / total;
+      const minorW = 520 * m / total;
+
+      cx.fillStyle = '#B23A48';
+      cx.fillRect(50, 120, majorW, 50);
+      cx.fillStyle = '#2C5AA0';
+      cx.fillRect(50 + majorW, 120, minorW, 50);
+
+      cx.fillStyle = text();
+      cx.font = '13px sans-serif';
+      cx.fillText(`majority = ${M}`, 55, 114);
+      cx.fillText(`minority = ${m}`, 50 + majorW + 4, 114);
+      cx.fillText(`imbalance ratio ≈ 1:${(M / m).toFixed(1)}`, 50, 195);
+    }
+
+    document.getElementById('min8').addEventListener('input', draw8);
+
+    function draw9() {
+      const cv = document.getElementById('c9');
+      if (!cv) return;
+      const cx = cv.getContext('2d');
+      clear(cv, cx);
+
+      const n = Number(document.getElementById('n9').value);
+      const ovr = n;
+      const ovo = n * (n - 1) / 2;
+
+      cx.fillStyle = '#2C5AA0';
+      cx.fillRect(110, 220 - ovr * 10, 120, ovr * 10);
+      cx.fillStyle = '#2E7D52';
+      cx.fillRect(350, 220 - ovo * 4, 120, ovo * 4);
+
+      cx.fillStyle = text();
+      cx.font = '13px sans-serif';
+      cx.fillText('OvR classifiers', 110, 245);
+      cx.fillText('OvO classifiers', 350, 245);
+      cx.fillText(`OvR = ${ovr}`, 115, 35);
+      cx.fillText(`OvO = ${ovo}`, 355, 35);
+
+      document.getElementById('count9').textContent = `N=${n}  ->  OvR=${ovr},  OvO=${ovo}`;
+    }
+
+    document.getElementById('n9').addEventListener('input', draw9);
+
+    function drawCurrent() {
+      if (current === 0) draw0();
+      if (current === 1) draw1();
+      if (current === 2) draw2();
+      if (current === 3) draw3();
+      if (current === 4) draw4();
+      if (current === 5) draw5();
+      if (current === 6) draw6();
+      if (current === 7) draw7();
+      if (current === 8) draw8();
+      if (current === 9) draw9();
+    }
+
+    const tour = [
+      { title: 'Classification Basics', text: 'Start here: predict labels, not numbers.' },
+      { title: 'Linear Regression Failure', text: 'Probabilities must stay in [0,1]. Linear regression cannot guarantee that.' },
+      { title: 'Sigmoid', text: 'Sigmoid maps any score to a valid probability.' },
+      { title: 'Decision Boundary', text: 'At threshold 0.5, boundary is z = 0.' },
+      { title: 'Cross-Entropy', text: 'Cross-entropy strongly penalizes confident mistakes.' },
+      { title: 'Gradient Descent', text: 'Update weights from prediction error and learning rate.' },
+      { title: 'Confusion Matrix', text: 'Read TP, TN, FP, FN and derived metrics.' },
+      { title: 'ROC and AUC', text: 'Evaluate model quality over all thresholds.' },
+      { title: 'Class Imbalance', text: 'Accuracy can lie on rare positive tasks.' },
+      { title: 'OvR and OvO', text: 'Extend binary logistic regression to multiclass.' }
+    ];
+
+    let tIdx = 0;
+    function showTour(i) {
+      if (i < 0 || i >= tour.length) {
+        document.getElementById('story').classList.remove('active');
+        return;
+      }
+      tIdx = i;
+      document.getElementById('story').classList.add('active');
+      document.getElementById('storyStep').textContent = `Step ${i + 1} / ${tour.length}`;
+      document.getElementById('storyTitle').textContent = tour[i].title;
+      document.getElementById('storyText').textContent = tour[i].text;
+      showChapter(i);
+    }
+
+    document.getElementById('tourBtn').addEventListener('click', () => showTour(0));
+    document.getElementById('storyPrev').addEventListener('click', () => showTour(tIdx - 1));
+    document.getElementById('storyNext').addEventListener('click', () => showTour(tIdx + 1));
+    document.getElementById('storyExit').addEventListener('click', () => {
+      document.getElementById('story').classList.remove('active');
+    });
+
+    showChapter(0);
+  </script>
+</body>
+</html>

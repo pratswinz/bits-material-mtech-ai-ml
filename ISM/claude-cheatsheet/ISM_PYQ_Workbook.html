@@ -13,8 +13,13 @@ window.MathJax = {
 :root{--navy:#1e3a5f;--blue:#2563eb;--green:#059669;--purple:#7c3aed;--amber:#d97706;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Georgia,"Segoe UI",serif;background:var(--bg);color:var(--text);line-height:1.65}
-header{background:var(--navy);color:#fff;padding:1.5rem;text-align:center}
-header a{color:#93c5fd}
+
+header{background:#fff;color:var(--text);border-bottom:1px solid var(--border);padding:1.4rem 1.5rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+header h1{color:var(--navy);margin:0 0 .25rem;font-size:1.35rem}
+header p{color:var(--muted);margin:0}
+header a{color:var(--blue);text-decoration:none}
+header a:hover{text-decoration:underline}
+
 .shell{display:flex;max-width:1280px;margin:0 auto;width:100%}
 aside{width:260px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);padding:.8rem;position:sticky;top:0;height:100vh;overflow-y:auto;font-size:.72rem}
 aside a{display:block;padding:.28rem .45rem;color:var(--navy);text-decoration:none;border-radius:4px}

@@ -3,6 +3,7 @@
 import html as H
 from pathlib import Path
 
+from ism_theme import LIGHT_HEADER, LIGHT_DAY_HEADER
 from svg_inline import SVG_WRAP_CSS, reset_uid, svg_figure
 
 ROOT = Path(__file__).resolve().parent
@@ -51,13 +52,10 @@ def build():
 :root{--navy:#1e3a5f;--blue:#2563eb;--green:#059669;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
-header{background:linear-gradient(135deg,#1e3a5f,#059669);color:#fff;padding:1.8rem;text-align:center}
-header a{color:#a7f3d0}
+""" + LIGHT_HEADER + """
 .wrap{max-width:820px;margin:0 auto;padding:1.5rem 1rem 3rem}
 .day{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:1.2rem 0;overflow:hidden}
-.day-h{background:var(--navy);color:#fff;padding:.8rem 1.2rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
-.day-h h2{font-size:1.05rem;margin:0}
-.day-h span{font-size:.75rem;opacity:.85}
+""" + LIGHT_DAY_HEADER + """
 .day-b{padding:1rem 1.2rem}
 .block{margin:.8rem 0;padding:.75rem 1rem;background:#f8fafc;border-radius:8px;border-left:4px solid var(--blue)}
 .block h3{font-size:.88rem;color:var(--navy);margin-bottom:.4rem}

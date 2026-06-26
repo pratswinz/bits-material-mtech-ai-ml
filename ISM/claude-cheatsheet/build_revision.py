@@ -5,6 +5,7 @@ import html as H
 import re
 from pathlib import Path
 
+from ism_theme import LIGHT_HEADER_FLEX
 from math_format import format_math_in_html
 
 ROOT = Path(__file__).resolve().parent
@@ -109,9 +110,7 @@ window.MathJax = {{
 :root{{--navy:#1e3a5f;--green:#059669;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}}
 *{{box-sizing:border-box;margin:0;padding:0}}
 body{{font-family:-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.5;font-size:13px}}
-header{{background:linear-gradient(135deg,#1e3a5f,#059669);color:#fff;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}}
-header h1{{font-size:1.3rem}}
-header a{{color:#a7f3d0}}
+{LIGHT_HEADER_FLEX}
 .container{{max-width:1200px;margin:0 auto;padding:1rem}}
 .part{{margin:1.2rem 0}}
 .part h2{{font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--green);background:#ecfdf5;padding:.4rem .8rem;border-radius:6px;margin-bottom:.6rem}}
@@ -123,7 +122,7 @@ header a{{color:#a7f3d0}}
 .diagram-img{{width:100%;max-width:640px;height:auto;display:block;margin:0 auto;border:1px solid var(--border);border-radius:8px;background:#fff}}
 .fig-cap{{font-size:.78rem;color:var(--muted);margin-top:.4rem;max-width:640px;margin-left:auto;margin-right:auto;text-align:left}}
 .note{{font-size:.78rem;color:var(--muted);margin-top:1rem;padding:.8rem;background:#fffbeb;border-radius:8px;border:1px solid #fcd34d}}
-@media print{{header{{background:#1e3a5f;-webkit-print-color-adjust:exact}}}}
+@media print{{header{{background:#fff;border-bottom:1px solid var(--border);-webkit-print-color-adjust:exact}}}}
 </style>
 </head>
 <body>
