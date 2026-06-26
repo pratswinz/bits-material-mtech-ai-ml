@@ -53,6 +53,17 @@ details.sol-toggle[open] summary::before{transform:rotate(90deg)}
 details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 .sol-body{padding:1rem 1.15rem 1.2rem}
 .sol-body h4{color:var(--purple);font-size:.9rem;margin:.65rem 0 .3rem}
+.sol-body{line-height:1.75}
+.sol-body p{margin:.45rem 0}
+.sol-body .sol-part{margin:1.1rem 0;padding:.85rem 0 .5rem;border-bottom:1px dashed var(--border)}
+.sol-body .sol-part:last-child{border-bottom:none;margin-bottom:0}
+.sol-body .part-head{font-weight:700;color:var(--navy);font-size:.92rem;margin:0 0 .55rem}
+.sol-body .sol-lines{margin:.35rem 0 .5rem 1.35rem}
+.sol-body .sol-lines li{margin:.35rem 0}
+.sol-body .calc-block{background:#f8fafc;border-left:3px solid var(--blue);padding:.55rem .85rem;margin:.55rem 0;border-radius:0 6px 6px 0}
+.sol-body .calc-line{margin:.25rem 0}
+.sol-body .sol-table{margin:.65rem 0}
+.sol-body .ans p{margin:.35rem 0}
 .sol-body .step,.sol-body .ans,.sol-body .formula,.sol-body .diagram{margin-top:.45rem}
 .toolbar{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:.45rem}
 .toolbar button{background:#fff;border:1px solid var(--border);padding:.35rem .85rem;border-radius:6px;cursor:pointer;color:var(--navy);font-size:.8rem}
@@ -95,49 +106,62 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <!-- JUNE 2026 -->
 <section id="june2026">
 <h2>June 2026 EC2 Regular — Full Paper</h2>
-<span class="tag">ML/questions/june mid sem regular 2026/</span>
+<span class="tag">ML/questions/MidSem/2026-06_Regular/</span>
 
 <div class="q">
 <div class="q-stem">
 <h3>Q1 — Electricity Bill Regression [5M]</h3>
 <div class="q-prompt"><p><strong>Question [5M].</strong> Monthly bill model: \(\hat y = 120 + 7.5X_1 + 45X_2 - 4X_3 + 18X_4\) where \(X_1\)=kWh, \(X_2\)=AC units, \(X_3\)=temperature (°C), \(X_4\)=family size.</p>
-<ol><li>(a)(i) Interpret each coefficient in dollars. (ii) If \(X_1\) is re-recorded in Wh instead of kWh, what happens to \(w_1\)?</li>
-<li>(b) Given \(\partial J/\partial\theta_3 = -12\), which direction should GD move \(\theta_3\)? Write the update.</li>
-<li>(c) Which feature appears most influential? What caveat applies before comparing raw magnitudes?</li></ol></div>
+<ol><li>(a)(i) Interpret each coefficient in dollars. (ii) If \(X_1\) is re-recorded in Wh instead of kWh (1 kWh = 1000 Wh), what happens to the coefficient of \(X_1\)? Will the predicted bill change?</li>
+<li>(b) Gradients observed: \(\partial J/\partial\theta_0=18\), \(\partial J/\partial\theta_1=0.02\), \(\partial J/\partial\theta_2=-12\), \(\partial J/\partial\theta_3=0.001\). What does the <strong>negative</strong> gradient for \(\theta_2\) indicate?</li>
+<li>(c) Which feature has the strongest influence based on coefficient magnitudes alone? Why treat this conclusion carefully?</li></ol></div>
 <img class="exam-img" src="assets/exam-2026-06/Q1.jpeg" alt="June 2026 Q1">
-<p>\(Bill = 120 + 7.5X_1 + 45X_2 - 4X_3 + 18X_4\) · kWh, AC count, temp °C, family size</p>
 <h4>(a)(i) Interpret coefficients</h4>
 <h4>(a)(ii) kWh → Wh</h4>
-<h4>(b) \(\partial J/\partial\theta_3 = -12\)</h4>
+<h4>(b) \(\partial J/\partial\theta_2 = -12\)</h4>
 <h4>(c) Strongest feature?</h4></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
-<div class="sol-body"><div class="step">\(w_0=120\): base bill $120 · \(w_1=7.5\): +$7.50 per kWh · \(w_2=45\): +$45 per AC · \(w_3=-4\): −$4 per °C · \(w_4=18\): +$18 per person</div>
-<div class="step">1 kWh = 1000 Wh → coefficient becomes \(7.5/1000 = 0.0075\) per Wh. Prediction unchanged if input scaled consistently.</div>
-<div class="formula"><h5>Gradient descent</h5>\(\theta_j \leftarrow \theta_j - \alpha\frac{\partial J}{\partial\theta_j}\)</div>
-<figure class="diagram"><div class="svg-wrap" role="img" aria-label="GD flow"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 140" font-family="system-ui,sans-serif">
-  <defs><marker id="a-u1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#2563eb"/></marker></defs>
-  <rect width="520" height="140" fill="#f8fafc" rx="8"/>
-  <text x="260" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Gradient Descent - One Iteration</text>
-  <rect x="20" y="40" width="90" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
-  <text x="65" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Predict</text>
-  <text x="65" y="72" text-anchor="middle" font-size="9" fill="#64748b">h = theta^T x</text>
-  <line x1="110" y1="62" x2="130" y2="62" stroke="#2563eb" marker-end="url(#a-u1)"/>
-  <rect x="130" y="40" width="90" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
-  <text x="175" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Error</text>
-  <text x="175" y="72" text-anchor="middle" font-size="9" fill="#64748b">e = h - y</text>
-  <line x1="220" y1="62" x2="240" y2="62" stroke="#2563eb" marker-end="url(#a-u1)"/>
-  <rect x="240" y="40" width="100" height="44" rx="6" fill="#eff6ff" stroke="#2563eb"/>
-  <text x="290" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Gradient</text>
-  <text x="290" y="72" text-anchor="middle" font-size="9" fill="#64748b">dJ/dtheta</text>
-  <line x1="340" y1="62" x2="360" y2="62" stroke="#2563eb" marker-end="url(#a-u1)"/>
-  <rect x="360" y="40" width="130" height="44" rx="6" fill="#ecfdf5" stroke="#059669"/>
-  <text x="425" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Update</text>
-  <text x="425" y="72" text-anchor="middle" font-size="9" fill="#64748b">theta -= alpha * grad</text>
-  <text x="260" y="115" text-anchor="middle" font-size="11" fill="#7c3aed">Ridge adds (lambda/m)*theta | Lasso adds alpha*lambda*sign(theta)</text>
-</svg></div><figcaption>Predict → error → gradient → update</figcaption></figure>
-<div class="ans">Negative gradient → increasing \(\theta_3\) lowers cost → GD increases weight: \(\theta_3 \leftarrow \theta_3 + 12\alpha\).</div>
-<div class="ans">Largest |coef| = AC count (45). Caveat: compare on same scale — raw magnitude misleading before normalization.</div>
+<div class="sol-body"><div class="formula"><h5>Model</h5>\(\hat y = 120 + 7.5X_1 + 45X_2 - 4X_3 + 18X_4\)</div>
+
+<div class="sol-part">
+<p class="part-head">(a)(i) Interpret each coefficient</p>
+<ul class="sol-lines">
+<li><strong>Intercept \(120\):</strong> base bill of \(\$120\) when all features are zero.</li>
+<li><strong>\(7.5\) on \(X_1\) (kWh):</strong> each extra kWh adds \(\$7.50\) to the bill.</li>
+<li><strong>\(45\) on \(X_2\) (AC units):</strong> each additional AC adds \(\$45\).</li>
+<li><strong>\(-4\) on \(X_3\) (°C):</strong> each 1°C rise <em>reduces</em> the bill by \(\$4\) (ceteris paribus).</li>
+<li><strong>\(18\) on \(X_4\) (family size):</strong> each extra person adds \(\$18\).</li>
+</ul>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(a)(ii) Change \(X_1\) from kWh to Wh</p>
+<p>Given: \(1\) kWh \(= 1000\) Wh.</p>
+<div class="calc-block">
+<p class="calc-line">New coefficient \(= 7.5 / 1000 = 0.0075\) per Wh</p>
+</div>
+<p>If inputs are also multiplied by 1000 when switching units, \(\hat y\) stays the same.</p>
+<p>If only the coefficient is rescaled without rescaling \(X_1\), predictions become wrong.</p>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(b) Negative gradient for \(\theta_2\)</p>
+<div class="formula"><h5>Update rule</h5>\(\theta_j \leftarrow \theta_j - \alpha\,\partial J/\partial\theta_j\)</div>
+<p>\(\partial J/\partial\theta_2 = -12 &lt; 0\) means cost <em>decreases</em> when \(\theta_2\) increases.</p>
+<p>GD therefore <strong>increases</strong> the AC weight:</p>
+<div class="calc-block">
+<p class="calc-line">\(\theta_2 \leftarrow \theta_2 - \alpha(-12) = \theta_2 + 12\alpha\)</p>
+</div>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(c) Strongest feature by raw magnitude</p>
+<div class="ans">
+<p>Largest \(|\text{coefficient}|\) is <strong>AC count (45)</strong>.</p>
+<p><strong>Caveat:</strong> features are on different scales (kWh vs °C vs headcount). Raw magnitudes ≠ true importance until features are normalized.</p>
+</div>
+</div>
 </div>
 </details>
 </div>
@@ -145,34 +169,76 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <div class="q">
 <div class="q-stem">
 <h3>Q2 — Decision Tree: Loan Approval</h3>
-<div class="q-prompt"><p><strong>Question.</strong> Loan approval dataset: 10 applicants — 6 Approved, 4 Denied.</p>
-<ol><li>Compute parent entropy \(H(S)\) using log base 2.</li>
-<li>(Bonus) Split on <em>Existing Loan = No</em>: 5 Approved / 0 Denied vs 1 Approved / 4 Denied. Compute IG.</li></ol></div>
+<div class="q-prompt"><p><strong>Question [6M].</strong> Decision tree for loan approval — 10 applicants (A1–A10). Target: Loan Approved (Yes/No).</p>
+<ol><li>(i) Calculate entropy of Loan Approved. [2M]</li>
+<li>(ii) Compute entropy and Information Gain for split on <em>Existing Loan</em>. [2M]</li>
+<li>(iii) Build the full tree (root = max IG attribute). [2M]</li></ol>
+<p><em>Dataset: 5 Yes / 5 No overall. Features: Credit Score, Income Level, Employment Type, Existing Loan.</em></p></div>
 <img class="exam-img" src="assets/exam-2026-06/Q2.jpeg" alt="June 2026 Q2">
-<p>10 applicants: 6 Approved, 4 Denied</p>
-<h4>Bonus — IG on "Existing Loan = No"</h4></div>
+<h4>(i) Entropy of Loan Approved</h4>
+<h4>(ii) IG on Existing Loan</h4>
+<h4>(iii) Full decision tree</h4></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
-<div class="sol-body"><div class="step">\(p_{Yes}=0.6,\ p_{No}=0.4\)</div>
-<div class="step">\(H = -0.6\log_2(0.6) - 0.4\log_2(0.4) = 0.442 + 0.529\)</div>
-<div class="ans"><strong>Entropy ≈ 0.971 bits</strong></div>
-<figure class="diagram"><div class="svg-wrap" role="img" aria-label="IG tree"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200" font-family="system-ui,sans-serif">
-  <rect width="420" height="200" fill="#f8fafc" rx="8"/>
-  <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Information Gain - Split Flow</text>
-  <rect x="170" y="35" width="80" height="36" rx="6" fill="#f3e8ff" stroke="#7c3aed"/>
-  <text x="210" y="58" text-anchor="middle" font-size="10" fill="#1e3a5f">Parent H(S)</text>
-  <line x1="190" y1="71" x2="100" y2="95" stroke="#64748b"/>
-  <line x1="230" y1="71" x2="320" y2="95" stroke="#64748b"/>
-  <rect x="50" y="95" width="100" height="36" rx="6" fill="#eff6ff" stroke="#2563eb"/>
-  <text x="100" y="118" text-anchor="middle" font-size="10" fill="#1e3a5f">Child A</text>
-  <rect x="270" y="95" width="100" height="36" rx="6" fill="#eff6ff" stroke="#2563eb"/>
-  <text x="320" y="118" text-anchor="middle" font-size="10" fill="#1e3a5f">Child B</text>
-  <text x="210" y="155" text-anchor="middle" font-size="11" fill="#1e3a5f">H_after = weighted average of child entropies</text>
-  <text x="210" y="175" text-anchor="middle" font-size="12" font-weight="600" fill="#059669">IG = H(S) - H_after (pick max IG)</text>
-  <text x="210" y="192" text-anchor="middle" font-size="10" fill="#64748b">H = -sum p_k log2(p_k) | pure node H=0</text>
-</svg></div><figcaption>IG = H(parent) − weighted H(children)</figcaption></figure>
-<div class="step">No loan branch: 5 Yes, 0 No → H=0 · Has loan: 1 Yes, 4 No → H≈0.722</div>
-<div class="step">Weighted H = 0.361 · <strong>IG = 0.971 − 0.361 = 0.610</strong></div>
+<div class="sol-body"><div class="sol-part">
+<p class="part-head">Dataset (10 applicants)</p>
+<table class="sol-table"><thead><tr><th>ID</th><th>Credit</th><th>Income</th><th>Employment</th><th>Existing Loan</th><th>Approved</th></tr></thead><tbody>
+<tr><td>A1</td><td>High</td><td>High</td><td>Salaried</td><td>No</td><td>Yes</td></tr>
+<tr><td>A2</td><td>Low</td><td>Low</td><td>Self-employed</td><td>Yes</td><td>No</td></tr>
+<tr><td>A3</td><td>Medium</td><td>High</td><td>Salaried</td><td>No</td><td>Yes</td></tr>
+<tr><td>A4</td><td>Low</td><td>Medium</td><td>Unemployed</td><td>Yes</td><td>No</td></tr>
+<tr><td>A5</td><td>High</td><td>Medium</td><td>Self-employed</td><td>No</td><td>Yes</td></tr>
+<tr><td>A6</td><td>Medium</td><td>Low</td><td>Salaried</td><td>Yes</td><td>No</td></tr>
+<tr><td>A7</td><td>High</td><td>Low</td><td>Salaried</td><td>No</td><td>Yes</td></tr>
+<tr><td>A8</td><td>Medium</td><td>Medium</td><td>Self-employed</td><td>Yes</td><td>No</td></tr>
+<tr><td>A9</td><td>Low</td><td>High</td><td>Salaried</td><td>No</td><td>Yes</td></tr>
+<tr><td>A10</td><td>Medium</td><td>Medium</td><td>Unemployed</td><td>Yes</td><td>No</td></tr>
+</tbody></table>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(i) Entropy of target</p>
+<p>Class counts: \(5\) Yes, \(5\) No \(\Rightarrow p_{Yes} = p_{No} = 0.5\).</p>
+<div class="calc-block">
+<p class="calc-line">\(H(S) = -0.5\log_2 0.5 - 0.5\log_2 0.5\)</p>
+<p class="calc-line">\(= 0.5 + 0.5 = \mathbf{1.0\ bit}\)</p>
+</div>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(ii) Split on Existing Loan</p>
+<p><strong>Branch Existing Loan = No</strong> (A1, A3, A5, A7, A9):</p>
+<p>\(5\) Yes, \(0\) No \(\Rightarrow H = 0\)</p>
+<p><strong>Branch Existing Loan = Yes</strong> (A2, A4, A6, A8, A10):</p>
+<p>\(0\) Yes, \(5\) No \(\Rightarrow H = 0\)</p>
+<div class="calc-block">
+<p class="calc-line">\(H_{after} = \tfrac{5}{10}(0) + \tfrac{5}{10}(0) = 0\)</p>
+<p class="calc-line">\(\mathrm{IG} = H(S) - H_{after} = 1.0 - 0 = \mathbf{1.0\ bit}\)</p>
+</div>
+<p>Maximum possible IG — both child nodes are pure.</p>
+<p>Comparison: Credit Score IG \(\approx 0.40\), Income IG \(\approx 0.60\), Employment IG \(\approx 0.36\).</p>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(iii) Complete decision tree</p>
+<div class="ans">
+<p><strong>Root:</strong> Existing Loan (highest IG)</p>
+<ul class="sol-lines">
+<li>Existing Loan = <strong>No</strong> \(\rightarrow\) leaf <strong>Yes</strong> (Approve)</li>
+<li>Existing Loan = <strong>Yes</strong> \(\rightarrow\) leaf <strong>No</strong> (Deny)</li>
+</ul>
+<p>One split achieves 100% training accuracy.</p>
+</div>
+</div>
+
+<div class="sol-part">
+<p class="part-head">Unseen attribute values</p>
+<p>If test data has categories not seen in training (e.g. Employment = Contract):</p>
+<ul class="sol-lines">
+<li>No learned branch exists for that value.</li>
+<li>Use a fallback: majority class at parent, surrogate split, or manual review.</li>
+</ul>
+</div>
 </div>
 </details>
 </div>
@@ -180,41 +246,85 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <div class="q">
 <div class="q-stem">
 <h3>Q3 — Min-Max + Logistic</h3>
-<div class="q-prompt"><p><strong>Question.</strong> Credit scores in training set: min=590, max=710 (range 120). Samples S1=620, S2=680, S3=590, S4=710.</p>
-<ol><li>Min-max normalize each sample to [0,1].</li>
-<li>Normalize a new applicant with score 650.</li>
-<li>Write the logistic regression gradient update for weights (cross-entropy loss).</li></ol></div>
+<div class="q-prompt"><p><strong>Question [8M].</strong> Loan default prediction (1=default, 0=not) from Credit Score and Debt-to-Income Ratio.</p>
+<table><tr><th>Sample</th><th>Credit Score</th><th>Debt-to-Income</th><th>y</th></tr>
+<tr><td>S1</td><td>620</td><td>0.80</td><td>1</td></tr>
+<tr><td>S2</td><td>680</td><td>0.40</td><td>0</td></tr>
+<tr><td>S3</td><td>590</td><td>0.90</td><td>1</td></tr>
+<tr><td>S4</td><td>710</td><td>0.30</td><td>0</td></tr></table>
+<p>\(w_0=0, w_1=0.5, w_2=-0.5, \eta=0.5\)</p>
+<ol><li>(a) Min-max normalize Credit Score (\(x'=(x-x_{min})/(x_{max}-x_{min})\)): (i) all 4 samples, (ii) new applicant score 650.</li>
+<li>(b) Using normalized credit score as \(x_1\) and raw debt ratio as \(x_2\): (i) compute \(\hat p=\sigma(w_0+w_1 x_1+w_2 x_2)\) for each sample, (ii) binary cross-entropy loss, (iii) one GD step for updated weights.</li>
+<li>(c) Overfitting — L1 vs L2 to drive some weights to exactly zero? Effect of large \(\lambda\)?</li></ol></div>
 <img class="exam-img" src="assets/exam-2026-06/Q3.jpeg" alt="June 2026 Q3">
-<p>Credit scores: min=590, max=710, range=120</p>
-<table><tr><th>Sample</th><th>Raw</th><th>Normalized</th></tr>
-<tr><td>S1</td><td>620</td><td><strong>0.25</strong></td></tr>
-<tr><td>S2</td><td>680</td><td><strong>0.75</strong></td></tr>
-<tr><td>S3</td><td>590</td><td><strong>0.00</strong></td></tr>
-<tr><td>S4</td><td>710</td><td><strong>1.00</strong></td></tr></table></div>
+<h4>(a) Min-max normalization</h4>
+<h4>(b)(i) Sigmoid predictions</h4>
+<h4>(b)(ii) Binary cross-entropy</h4>
+<h4>(b)(iii) One GD step</h4>
+<h4>(c) Regularization</h4></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
-<div class="sol-body"><div class="ans">New applicant 650 → \((650-590)/120 = \mathbf{0.50}\)</div>
-<div class="step">Logistic update: \(z=w^Tx\), \(\hat y=\sigma(z)\), \(\nabla w_j=\frac1m\sum(\hat y-y)x_j\), \(w_j\leftarrow w_j-\eta\nabla w_j\)</div>
-<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Min-max"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" font-family="system-ui,sans-serif">
-  <rect width="400" height="160" fill="#f8fafc" rx="8"/>
-  <text x="200" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Min-Max Normalization</text>
-  <line x1="40" y1="100" x2="360" y2="100" stroke="#cbd5e1" stroke-width="2"/>
-  <circle cx="80" cy="100" r="5" fill="#2563eb"/>
-  <text x="80" y="120" text-anchor="middle" font-size="9" fill="#64748b">x_min = 0.00</text>
-  <circle cx="200" cy="100" r="5" fill="#2563eb"/>
-  <text x="200" y="120" text-anchor="middle" font-size="9" fill="#64748b">x</text>
-  <circle cx="360" cy="100" r="5" fill="#2563eb"/>
-  <text x="360" y="120" text-anchor="middle" font-size="9" fill="#64748b">x_max = 1.00</text>
-  <text x="200" y="145" text-anchor="middle" font-size="12" fill="#7c3aed">x_prime = (x - x_min) / (x_max - x_min)</text>
-</svg></div><div class="svg-wrap" role="img" aria-label="Sigmoid" style="margin-top:.5rem"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 180" font-family="system-ui,sans-serif">
-  <rect width="400" height="180" fill="#f8fafc" rx="8"/>
-  <text x="200" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Logistic Regression</text>
-  <line x1="50" y1="130" x2="350" y2="130" stroke="#cbd5e1"/>
-  <line x1="200" y1="40" x2="200" y2="130" stroke="#cbd5e1" stroke-dasharray="4"/>
-  <path d="M 60,125 Q 120,125 160,120 T 240,70 T 340,48" fill="none" stroke="#2563eb" stroke-width="2.5"/>
-  <text x="200" y="155" text-anchor="middle" font-size="11" fill="#7c3aed">sigma(z) = 1 / (1 + exp(-z)) | threshold z=0 gives p=0.5</text>
-  <text x="200" y="172" text-anchor="middle" font-size="10" fill="#64748b">z = theta^T x | update with cross-entropy gradient</text>
-</svg></div></figure>
+<div class="sol-body"><div class="sol-part">
+<p class="part-head">(a) Min-max normalize Credit Score</p>
+<p>From training data: \(x_{min} = 590\), \(x_{max} = 710\), range \(= 120\).</p>
+<p>Formula: \(x' = (x - x_{min}) / (x_{max} - x_{min})\)</p>
+<table class="sol-table"><thead><tr><th>Sample</th><th>Raw score</th><th>Calculation</th><th>\(x_1\)</th></tr></thead><tbody>
+<tr><td>S1</td><td>620</td><td>\((620-590)/120\)</td><td><strong>0.25</strong></td></tr>
+<tr><td>S2</td><td>680</td><td>\((680-590)/120\)</td><td><strong>0.75</strong></td></tr>
+<tr><td>S3</td><td>590</td><td>\((590-590)/120\)</td><td><strong>0.00</strong></td></tr>
+<tr><td>S4</td><td>710</td><td>\((710-590)/120\)</td><td><strong>1.00</strong></td></tr>
+<tr><td>New</td><td>650</td><td>\((650-590)/120\)</td><td><strong>0.50</strong></td></tr>
+</tbody></table>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(b)(i) Predicted probabilities</p>
+<p>\(z = w_0 + w_1 x_1 + w_2 x_2\), &nbsp; \(\hat p = \sigma(z) = 1/(1+e^{-z})\)</p>
+<p>Initial weights: \(w_0=0\), \(w_1=0.5\), \(w_2=-0.5\). Debt ratio used as raw \(x_2\).</p>
+<table class="sol-table"><thead><tr><th>Sample</th><th>\(x_1\)</th><th>\(x_2\)</th><th>\(z\)</th><th>\(\hat p\)</th><th>\(y\)</th></tr></thead><tbody>
+<tr><td>S1</td><td>0.25</td><td>0.80</td><td>\(-0.275\)</td><td><strong>0.432</strong></td><td>1</td></tr>
+<tr><td>S2</td><td>0.75</td><td>0.40</td><td>\(0.175\)</td><td><strong>0.544</strong></td><td>0</td></tr>
+<tr><td>S3</td><td>0.00</td><td>0.90</td><td>\(-0.450\)</td><td><strong>0.389</strong></td><td>1</td></tr>
+<tr><td>S4</td><td>1.00</td><td>0.30</td><td>\(0.350\)</td><td><strong>0.587</strong></td><td>0</td></tr>
+</tbody></table>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(b)(ii) Binary cross-entropy loss</p>
+<div class="formula"><h5>Loss</h5>\(L = -\tfrac{1}{m}\sum_i \big[y_i\ln\hat p_i + (1-y_i)\ln(1-\hat p_i)\big]\), &nbsp; \(m=4\)</div>
+<table class="sol-table"><thead><tr><th>Sample</th><th>Term</th><th>Value</th></tr></thead><tbody>
+<tr><td>S1</td><td>\(-\ln(0.432)\)</td><td>0.839</td></tr>
+<tr><td>S2</td><td>\(-\ln(1-0.544)\)</td><td>0.785</td></tr>
+<tr><td>S3</td><td>\(-\ln(0.389)\)</td><td>0.944</td></tr>
+<tr><td>S4</td><td>\(-\ln(1-0.587)\)</td><td>0.886</td></tr>
+</tbody></table>
+<div class="calc-block">
+<p class="calc-line">\(L = (0.839 + 0.785 + 0.944 + 0.886) / 4 = \mathbf{0.864}\)</p>
+</div>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(b)(iii) One gradient-descent step</p>
+<p>\(\partial L/\partial w_j = \tfrac{1}{m}\sum_i (\hat p_i - y_i)\,x_{j,i}\)</p>
+<table class="sol-table"><thead><tr><th>Weight</th><th>Gradient</th><th>Update (\(\eta=0.5\))</th><th>New value</th></tr></thead><tbody>
+<tr><td>\(w_0\)</td><td>\(-0.0121\)</td><td>\(0 - 0.5(-0.0121)\)</td><td><strong>0.006</strong></td></tr>
+<tr><td>\(w_1\)</td><td>\(0.2131\)</td><td>\(0.5 - 0.5(0.2131)\)</td><td><strong>0.393</strong></td></tr>
+<tr><td>\(w_2\)</td><td>\(-0.1527\)</td><td>\(-0.5 - 0.5(-0.1527)\)</td><td><strong>−0.424</strong></td></tr>
+</tbody></table>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(c) Regularization</p>
+<div class="ans">
+<p><strong>(c)(i)</strong> Use <strong>L1 (Lasso)</strong> to drive weights to exactly zero.</p>
+<p>L1 penalty \(|w|\) has corners at 0; L2 (Ridge) shrinks but rarely zeros weights.</p>
+</div>
+<div class="ans">
+<p><strong>(c)(ii)</strong> As \(\lambda \to \infty\): \(w_1^*, w_2^* \to 0\).</p>
+<p>Predictions collapse toward \(\sigma(w_0) \approx 0.5\) — high bias / underfitting.</p>
+<p>\(\lambda\) too large → poor generalization on new loan applicants.</p>
+</div>
+</div>
 </div>
 </details>
 </div>
@@ -222,35 +332,97 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <div class="q">
 <div class="q-stem">
 <h3>Q4 — Fraud Confusion Matrix</h3>
-<div class="q-prompt"><p><strong>Question.</strong> Fraud detection on 10,000 transactions (100 fraud). Model A: TP=45, FN=55, FP=90, TN=9810.</p>
-<p>Compute accuracy, precision, recall, FPR, and F1. Why can accuracy mislead here? Which model trait matters for fraud?</p></div>
+<div class="q-prompt"><p><strong>Question [6M].</strong> Fraud detection on 10,000 transactions (100 fraud, 9,900 legit). Confusion matrices:</p>
+<table><tr><th></th><th>Pred Fraud</th><th>Pred Legit</th></tr>
+<tr><td><strong>Model A — Actual Fraud</strong></td><td>45 (TP)</td><td>55 (FN)</td></tr>
+<tr><td><strong>Model A — Actual Legit</strong></td><td>90 (FP)</td><td>9810 (TN)</td></tr>
+<tr><td><strong>Model B — Actual Fraud</strong></td><td>80 (TP)</td><td>20 (FN)</td></tr>
+<tr><td><strong>Model B — Actual Legit</strong></td><td>500 (FP)</td><td>9400 (TN)</td></tr></table>
+<ol><li>(a)(i) Model A: accuracy and error rate. (ii) Precision, recall (TPR), FPR, F1. (iii) Colleague says Model A is excellent from accuracy alone — agree?</li>
+<li>(b)(i) TPR and FPR for both models — ROC points. (ii) Which model for fraud? (FN vs FP trade-off.) (iii) What if ROC point lies on diagonal? AUC?</li></ol></div>
 <img class="exam-img" src="assets/exam-2026-06/Q4.jpeg" alt="June 2026 Q4">
-<p>10,000 txns, 100 fraud · Model A: TP=45, FN=55, FP=90, TN=9810</p></div>
+<h4>(a)(i) Accuracy &amp; error rate</h4>
+<h4>(a)(ii) Precision, recall, FPR, F1</h4>
+<h4>(a)(iii) Is high accuracy enough?</h4>
+<h4>(b)(i) ROC points</h4>
+<h4>(b)(ii) Model choice</h4>
+<h4>(b)(iii) Diagonal ROC</h4></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
-<div class="sol-body"><table><tr><th>Metric</th><th>Answer</th></tr>
-<tr><td>Accuracy</td><td><strong>98.55%</strong></td></tr>
-<tr><td>Precision</td><td><strong>33.33%</strong></td></tr>
-<tr><td>Recall</td><td><strong>45%</strong></td></tr>
-<tr><td>FPR</td><td><strong>0.91%</strong></td></tr>
-<tr><td>F1</td><td><strong>38.3%</strong></td></tr></table>
-<div class="ans">High accuracy is misleading — only 45% fraud caught. Prefer Model B (80% recall) for fraud.</div>
-<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Confusion matrix"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 220" font-family="system-ui,sans-serif">
-  <rect width="380" height="220" fill="#f8fafc" rx="8"/>
-  <text x="190" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Confusion Matrix</text>
-  <text x="190" y="42" text-anchor="middle" font-size="10" fill="#64748b">Actual = rows | Predicted = columns</text>
-  <text x="155" y="68" font-size="10" fill="#64748b">Pred +</text>
-  <text x="255" y="68" font-size="10" fill="#64748b">Pred -</text>
-  <rect x="120" y="78" width="90" height="55" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
-  <text x="165" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">TP</text>
-  <rect x="210" y="78" width="90" height="55" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-  <text x="255" y="110" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">FN</text>
-  <rect x="120" y="133" width="90" height="55" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
-  <text x="165" y="162" text-anchor="middle" font-size="14" font-weight="700" fill="#dc2626">FP</text>
-  <rect x="210" y="133" width="90" height="55" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
-  <text x="255" y="162" text-anchor="middle" font-size="14" font-weight="700" fill="#059669">TN</text>
-  <text x="190" y="205" text-anchor="middle" font-size="10" fill="#7c3aed">Prec=TP/(TP+FP) | Rec=TP/(TP+FN) | F1=2PR/(P+R)</text>
-</svg></div></figure>
+<div class="sol-body"><div class="sol-part">
+<p class="part-head">Setup</p>
+<p>10,000 transactions: 100 fraud (positive), 9,900 legit (negative).</p>
+<table class="sol-table"><thead><tr><th>Model</th><th></th><th>Pred Fraud</th><th>Pred Legit</th></tr></thead><tbody>
+<tr><td rowspan="2"><strong>A</strong></td><td>Actual Fraud</td><td>45 (TP)</td><td>55 (FN)</td></tr>
+<tr><td>Actual Legit</td><td>90 (FP)</td><td>9810 (TN)</td></tr>
+<tr><td rowspan="2"><strong>B</strong></td><td>Actual Fraud</td><td>80 (TP)</td><td>20 (FN)</td></tr>
+<tr><td>Actual Legit</td><td>500 (FP)</td><td>9400 (TN)</td></tr>
+</tbody></table>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(a)(i) Model A — accuracy &amp; error rate</p>
+<div class="calc-block">
+<p class="calc-line">Accuracy \(= (TP + TN) / N = (45 + 9810) / 10000\)</p>
+<p class="calc-line">\(= \mathbf{98.55\%}\)</p>
+<p class="calc-line">Error rate \(= 100\% - 98.55\% = \mathbf{1.45\%}\)</p>
+</div>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(a)(ii) Model A — precision, recall, FPR, F1</p>
+<table class="sol-table"><thead><tr><th>Metric</th><th>Formula</th><th>Result</th></tr></thead><tbody>
+<tr><td>Precision</td><td>\(TP/(TP+FP) = 45/135\)</td><td><strong>33.33%</strong></td></tr>
+<tr><td>Recall (TPR)</td><td>\(TP/(TP+FN) = 45/100\)</td><td><strong>45%</strong></td></tr>
+<tr><td>FPR</td><td>\(FP/(FP+TN) = 90/9900\)</td><td><strong>0.91%</strong></td></tr>
+<tr><td>F1</td><td>\(2PR/(P+R)\)</td><td><strong>38.3%</strong></td></tr>
+</tbody></table>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(a)(iii) Is Model A excellent?</p>
+<div class="ans">
+<p><strong>No.</strong> With only 1% fraud, a dummy “always legit” classifier gets ~99% accuracy but catches zero fraud.</p>
+<p>Model A detects only 45 of 100 fraud cases (55 missed).</p>
+</div>
+</div>
+
+<div class="sol-part">
+<p class="part-head">Model B summary</p>
+<table class="sol-table"><thead><tr><th>Metric</th><th>Result</th></tr></thead><tbody>
+<tr><td>Accuracy</td><td>94.80%</td></tr>
+<tr><td>Recall (TPR)</td><td><strong>80%</strong></td></tr>
+<tr><td>FPR</td><td>5.05%</td></tr>
+<tr><td>Precision</td><td>13.79%</td></tr>
+<tr><td>F1</td><td>23.5%</td></tr>
+</tbody></table>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(b)(i) ROC curve points</p>
+<p>Plot \((\text{FPR}, \text{TPR})\):</p>
+<ul class="sol-lines">
+<li><strong>Model A:</strong> \((0.0091,\; 0.45)\)</li>
+<li><strong>Model B:</strong> \((0.0505,\; 0.80)\) — higher recall, more false alarms</li>
+</ul>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(b)(ii) Which model for fraud detection?</p>
+<div class="ans">
+<p>Recommend <strong>Model B</strong>.</p>
+<p>Missing fraud (FN) is costlier than flagging legit transactions (FP).</p>
+<p>B catches 80% of fraud vs 45% for A, despite lower accuracy.</p>
+</div>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(b)(iii) Point on diagonal</p>
+<div class="ans">
+<p>Diagonal \(\Rightarrow\) TPR = FPR (random guessing).</p>
+<p>AUC \(= 0.5\) — no discriminative power.</p>
+</div>
+</div>
 </div>
 </details>
 </div>
@@ -258,30 +430,61 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <div class="q">
 <div class="q-stem">
 <h3>Q5 — Bias-Variance (Spam)</h3>
-<div class="q-prompt"><p><strong>Question.</strong> Spam filter comparison:</p>
-<table><tr><th>Model</th><th>Train acc</th><th>Test acc</th></tr>
-<tr><td>A (2 features)</td><td>61%</td><td>60%</td></tr>
-<tr><td>B (47 features)</td><td>99%</td><td>67%</td></tr></table>
-<p>Diagnose bias vs variance for each model and suggest fixes.</p></div>
+<div class="q-prompt"><p><strong>Question [3M].</strong> Spam classifier (y=1 spam, y=0 legit). 70/30 train-test split.</p>
+<table><tr><th>Model</th><th>Description</th><th>Train acc</th><th>Test acc</th></tr>
+<tr><td>A</td><td>Logistic — email length + punctuation only (2 features)</td><td>61%</td><td>60%</td></tr>
+<tr><td>B</td><td>Logistic — all features + interactions (47 total)</td><td>99%</td><td>67%</td></tr></table>
+<p>Learning curves: A — train &amp; CV both plateau ~61%. B — train ~99%, CV rises slowly to ~70% only at full data.</p>
+<ol><li>(a) Bias/variance diagnosis + learning-curve interpretation; would more data help each?</li>
+<li>(b) Regularization strategies to address each model's failure.</li>
+<li>(c) One improved model balancing bias and variance.</li></ol></div>
 <img class="exam-img" src="assets/exam-2026-06/Q5.jpeg" alt="June 2026 Q5">
-<table><tr><th>Model</th><th>Train</th><th>Test</th><th>Diagnosis</th></tr>
-<tr><td>A (2 features)</td><td>61%</td><td>60%</td><td><strong>High bias</strong> — underfitting</td></tr>
-<tr><td>B (47 features)</td><td>99%</td><td>67%</td><td><strong>High variance</strong> — overfitting</td></tr></table></div>
+<h4>(a) Bias–variance diagnosis</h4>
+<h4>(b) Regularization strategies</h4>
+<h4>(c) Improved balanced model</h4></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
-<div class="sol-body"><figure class="diagram"><div class="svg-wrap" role="img" aria-label="Bias variance"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 180" font-family="system-ui,sans-serif">
-  <rect width="440" height="180" fill="#f8fafc" rx="8"/>
-  <text x="220" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Bias-Variance Diagnosis</text>
-  <rect x="20" y="40" width="120" height="70" rx="6" fill="#fef2f2" stroke="#dc2626"/>
-  <text x="80" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#dc2626">High Bias</text>
-  <text x="80" y="88" text-anchor="middle" font-size="9" fill="#64748b">underfit</text>
-  <rect x="160" y="40" width="120" height="70" rx="6" fill="#ecfdf5" stroke="#059669"/>
-  <text x="220" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#059669">Good Fit</text>
-  <rect x="300" y="40" width="120" height="70" rx="6" fill="#fffbeb" stroke="#d97706"/>
-  <text x="360" y="58" text-anchor="middle" font-size="10" font-weight="600" fill="#d97706">High Variance</text>
-  <text x="360" y="88" text-anchor="middle" font-size="9" fill="#64748b">overfit</text>
-  <text x="220" y="135" text-anchor="middle" font-size="10" fill="#1e3a5f">Fix bias: more features | Fix variance: Ridge/Lasso, more data</text>
-</svg></div></figure>
+<div class="sol-body"><div class="sol-part">
+<p class="part-head">(a) Model A — high bias</p>
+<p>Train 61%, test 60% — small gap but both low.</p>
+<p><strong>Diagnosis:</strong> high bias / underfitting (too simple).</p>
+<p><strong>Learning curve:</strong> train &amp; CV plateau together at ~61%.</p>
+<p><strong>More data?</strong> Unlikely to help — model capacity is the bottleneck.</p>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(a) Model B — high variance</p>
+<p>Train 99%, test 67% — large gap.</p>
+<p><strong>Diagnosis:</strong> high variance / overfitting.</p>
+<p><strong>Learning curve:</strong> train stays ~99%; CV only reaches ~70% at full data.</p>
+<p><strong>More data?</strong> Helps CV slowly, but 47 features + interactions need regularization or feature reduction.</p>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(b) Regularization strategies</p>
+<p><strong>For Model B (high variance):</strong></p>
+<ul class="sol-lines">
+<li>L2 Ridge or L1 Lasso — penalize large / irrelevant weights</li>
+<li>Drop interaction terms; reduce feature count</li>
+<li>Cross-validate \(\lambda\); early stopping</li>
+</ul>
+<p><strong>For Model A (high bias):</strong></p>
+<ul class="sol-lines">
+<li>Add informative features (word frequencies, sender reputation)</li>
+<li>Selective interaction terms</li>
+<li>Reduce regularization if currently over-penalized</li>
+</ul>
+</div>
+
+<div class="sol-part">
+<p class="part-head">(c) Improved balanced model</p>
+<div class="ans">
+<p>Logistic regression with a <strong>moderate</strong> feature set (10–15 curated features + selective interactions).</p>
+<p>Add <strong>L2 regularization</strong> tuned by cross-validation.</p>
+<p>Enough capacity to beat 61% test (lower bias), but penalty + fewer parameters control variance.</p>
+<p>Target: train/test gap \(&lt;\) 10%, test accuracy above both A and B.</p>
+</div>
+</div>
 </div>
 </details>
 </div>
@@ -292,7 +495,7 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <h2>TYPE 1 — Tom Mitchell &amp; Learning Types</h2>
 <div class="q">
 <div class="q-stem">
-<p class="src">ML/questions/ML Midsem Practice — TYPE 1</p>
+<p class="src">ML/questions/_Resources/ML_MidSem_Practice_PastPapers_Mock.pdf — TYPE 1</p>
 <div class="q-prompt"><p><strong>Question.</strong> For each scenario, name the learning paradigm (supervised / unsupervised / reinforcement) and task type (classification / regression / clustering).</p>
 <ol><li>Self-driving car learns from reward signals after each trip.</li>
 <li>Classify product reviews as positive/negative using labelled data.</li>
@@ -338,7 +541,7 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <div class="q">
 <div class="q-stem">
 <p class="src">Student dataset — 6 issues</p>
-<div class="q-prompt"><p><strong>Question.</strong> Inspect each messy dataset table. List at least 5–6 <em>data quality issues</em> (missing values, outliers, duplicates, inconsistent formats, invalid types, etc.) and state how you would fix each <em>without writing code</em>.</p></div></div>
+<div class="q-prompt"><p><strong>Question.</strong> Inspect each messy dataset table below (Student records and B.Tech admissions). List at least 5–6 <em>data quality issues</em> per dataset (missing values, outliers, duplicates, inconsistent formats, invalid types, etc.) and state how you would fix each <em>without writing code</em>.</p></div></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
 <div class="sol-body"><div class="step">Duplicate (Rina×2) · Outlier Age=210 · Missing Grade · Missing Age · Attendance=110% · City case mismatch</div>
@@ -486,12 +689,34 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <h2>TYPE 6 — Regularization</h2>
 <div class="q">
 <div class="q-stem">
-<p class="src">L1 vs L2 — many irrelevant features → <strong>Lasso (L1)</strong> zeros them out</p>
-<div class="q-prompt"><p><strong>Question.</strong> (a) High-dimensional data with many irrelevant features — choose Ridge vs Lasso and justify. (b) Logistic regression overfits with very large weights — how does L1/L2 regularization help?</p></div>
-<p class="src">Overfit logistic with large weights → add L2/L1, reduce features, tune λ via CV</p></div>
+<p class="src">Regularization — L1 vs L2 (practice)</p>
+<div class="q-prompt"><p><strong>Question.</strong> (a) High-dimensional data with many irrelevant features — choose Ridge vs Lasso and justify. (b) Logistic regression overfits with very large weights — how does L1/L2 regularization help?</p></div></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
-<div class="sol-body"><figure class="diagram"><div class="svg-wrap" role="img" aria-label="Ridge vs Lasso"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150" font-family="system-ui,sans-serif">
+<div class="sol-body"><div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div><div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. Ridge shrinks but rarely zeros.</div>
+<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>
+<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Ridge vs Lasso"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 150" font-family="system-ui,sans-serif">
   <rect width="420" height="150" fill="#f8fafc" rx="8"/>
   <text x="210" y="22" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">Ridge vs Lasso Updates</text>
   <rect x="30" y="40" width="170" height="95" rx="6" fill="#eff6ff" stroke="#2563eb"/>
@@ -539,11 +764,12 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 </div>
 <div class="q">
 <div class="q-stem">
-<p class="src">4 equal classes → H = log₂(4) = <strong>2 bits</strong></p>
+<p class="src">Practice — entropy &amp; leaf labelling</p>
 <div class="q-prompt"><p><strong>Question.</strong> (a) What is the entropy of a set with 4 equally likely classes? (b) A leaf has 3 Yes and 1 No — what class label does the tree assign?</p></div></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
-<div class="sol-body"><div class="step">Leaf 3 Yes, 1 No → majority class <strong>Yes</strong></div>
+<div class="sol-body"><div class="step">(a) 4 equal classes → H = log₂(4) = <strong>2 bits</strong></div>
+<div class="step">(b) Leaf 3 Yes, 1 No → majority class <strong>Yes</strong></div>
 </div>
 </details>
 </div>
@@ -611,16 +837,14 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <h2>TYPE 10 — Model Robustness</h2>
 <div class="q">
 <div class="q-stem">
-<p class="src">ML/questions/ML Midsem Practice — TYPE 10</p>
-<div class="q-prompt"><p><strong>Question.</strong> Three models (Linear Regression, Decision Tree, Random Forest) are trained on Dataset A (noisy labels) and Dataset B (outliers in features). For each model × dataset, state whether performance is <strong>Affected</strong> or <strong>Less Affected</strong> and justify in 1–2 sentences.</p></div>
-<p>Three models on two datasets (noise vs outliers). State <strong>Affected</strong> or <strong>Less Affected</strong> with justification.</p>
-<table><tr><th>Model</th><th>Noise</th><th>Outliers</th></tr>
-<tr><td>Linear Regression</td><td><strong>Affected</strong></td><td><strong>Affected</strong></td></tr>
-<tr><td>Decision Tree</td><td><strong>Affected</strong></td><td><strong>Less Affected</strong></td></tr>
-<tr><td>Random Forest</td><td><strong>Less Affected</strong></td><td><strong>Less Affected</strong></td></tr></table></div>
+<p class="src">ML/questions/_Resources/ML_MidSem_Practice_PastPapers_Mock.pdf — TYPE 10</p>
+<div class="q-prompt"><p><strong>Question.</strong> Three models (Linear Regression, Decision Tree, Random Forest) are trained on Dataset A (noisy labels) and Dataset B (outliers in features). For each model × dataset, state whether performance is <strong>Affected</strong> or <strong>Less Affected</strong> and justify in 1–2 sentences.</p></div></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
-<div class="sol-body"><div class="step"><strong>LR + noise/outliers:</strong> MSE squares errors — every point pulls the line; outliers dominate.</div>
+<div class="sol-body"><table><tr><th>Model</th><th>Noise</th><th>Outliers</th></tr>
+<tr><td>Linear Regression</td><td><strong>Affected</strong></td><td><strong>Affected</strong></td></tr>
+<tr><td>Decision Tree</td><td><strong>Affected</strong></td><td><strong>Less Affected</strong></td></tr>
+<tr><td>Random Forest</td><td><strong>Less Affected</strong></td><td><strong>Less Affected</strong></td></tr></table><div class="step"><strong>LR + noise/outliers:</strong> MSE squares errors — every point pulls the line; outliers dominate.</div>
 <div class="step"><strong>Tree + noise:</strong> Overfits with extra splits. <strong>Tree + outliers:</strong> Outlier often isolated in its own leaf.</div>
 <div class="step"><strong>RF:</strong> Bagging + averaging many trees smooths noise and dilutes outlier impact.</div>
 <figure class="diagram"><div class="svg-wrap" role="img" aria-label="Robustness"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 180" font-family="system-ui,sans-serif">
@@ -646,9 +870,8 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <h2>TYPE 11 — Normal Equation Dimensions</h2>
 <div class="q">
 <div class="q-stem">
-<p class="src">ML/questions/ML Midsem Practice — TYPE 11</p>
-<div class="q-prompt"><p><strong>Question.</strong> \(m=28\) training examples, \(n=4\) features (excluding bias). Using \(\boldsymbol{\theta}=(X^TX)^{-1}X^Ty\) with bias column \(x_0=1\), state the matrix dimensions of \(X\), \(\mathbf{y}\), and \(\boldsymbol{\theta}\). Show \(X^TX\) size and final product shape.</p></div>
-<p>\(m=28\) samples, \(n=4\) features (add bias \(x_0=1\)). Dimensions of \(X\), \(y\), \(\theta\) in \(\theta=(X^TX)^{-1}X^Ty\)?</p></div>
+<p class="src">ML/questions/_Resources/ML_MidSem_Practice_PastPapers_Mock.pdf — TYPE 11</p>
+<div class="q-prompt"><p><strong>Question.</strong> \(m=28\) training examples, \(n=4\) features (excluding bias). Using \(\boldsymbol{\theta}=(X^TX)^{-1}X^Ty\) with bias column \(x_0=1\), state the matrix dimensions of \(X\), \(\mathbf{y}\), and \(\boldsymbol{\theta}\). Show \(X^TX\) size and final product shape.</p></div></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
 <div class="sol-body"><div class="ans"><strong>\(X\): 28×5</strong> · <strong>\(y\): 28×1</strong> · <strong>\(\theta\): 5×1</strong></div>
@@ -709,17 +932,17 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 </div>
 </details>
 </div><div class="q">
-<div class="q-stem"><h3>Ridge — Iteration 2 → final</h3> → Final</h3></div>
+<div class="q-stem"><h3>Ridge — Iteration 2 → final</h3></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
-<div class="sol-body"><div class="ans"><strong>w = [4.59, −36.09, −12.40]</strong> — λ too large, weights diverge (show 1 iter correctly in exam)</div>
+<div class="sol-body">→ Final</h3><div class="ans"><strong>w = [4.59, −36.09, −12.40]</strong> — λ too large, weights diverge (show 1 iter correctly in exam)</div>
 </div>
 </details>
 </div><div class="q">
-<div class="q-stem"><h3>Lasso — Final after 2 iter</h3> after 2 iter</h3></div>
+<div class="q-stem"><h3>Lasso — Final after 2 iter</h3></div>
 <details class="sol-toggle">
 <summary>Show detailed solution</summary>
-<div class="sol-body"><div class="ans"><strong>w = [4.36, −55.87, −19.22]</strong></div>
+<div class="sol-body">after 2 iter</h3><div class="ans"><strong>w = [4.36, −55.87, −19.22]</strong></div>
 <div class="step">Ridge: multiply by (1−αλ) · Lasso: subtract αλ·sign(wⱼ) — can zero weights</div>
 </div>
 </details>
@@ -728,7 +951,7 @@ details.sol-toggle[open] summary{border-bottom:1px solid #bbf7d0}
 <!-- MOCK -->
 <section id="mock">
 <h2>Mock Exam — Full Solutions</h2>
-<span class="tag">ML/questions/ML Midsem Practice — Mock Q1–6</span>
+<span class="tag">ML/questions/_Resources/ML_MidSem_Practice_PastPapers_Mock.pdf — Mock Q1–6</span>
 
 <div class="q">
 <div class="q-stem">

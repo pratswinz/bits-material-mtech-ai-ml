@@ -12,15 +12,15 @@ TYPE10_11 = """
 <section id="type10">
 <h2>TYPE 10 — Model Robustness</h2>
 <div class="q">
-<p class="src">ML/questions/ML Midsem Practice — TYPE 10</p>
+<p class="src">ML/questions/_Resources/ML_MidSem_Practice_PastPapers_Mock.pdf — TYPE 10</p>
 <p>Three models on two datasets (noise vs outliers). State <strong>Affected</strong> or <strong>Less Affected</strong> with justification.</p>
+<div class="step"><strong>LR + noise/outliers:</strong> MSE squares errors — every point pulls the line; outliers dominate.</div>
+<div class="step"><strong>Tree + noise:</strong> Overfits with extra splits. <strong>Tree + outliers:</strong> Outlier often isolated in its own leaf.</div>
+<div class="step"><strong>RF:</strong> Bagging + averaging many trees smooths noise and dilutes outlier impact.</div>
 <table><tr><th>Model</th><th>Noise</th><th>Outliers</th></tr>
 <tr><td>Linear Regression</td><td><strong>Affected</strong></td><td><strong>Affected</strong></td></tr>
 <tr><td>Decision Tree</td><td><strong>Affected</strong></td><td><strong>Less Affected</strong></td></tr>
 <tr><td>Random Forest</td><td><strong>Less Affected</strong></td><td><strong>Less Affected</strong></td></tr></table>
-<div class="step"><strong>LR + noise/outliers:</strong> MSE squares errors — every point pulls the line; outliers dominate.</div>
-<div class="step"><strong>Tree + noise:</strong> Overfits with extra splits. <strong>Tree + outliers:</strong> Outlier often isolated in its own leaf.</div>
-<div class="step"><strong>RF:</strong> Bagging + averaging many trees smooths noise and dilutes outlier impact.</div>
 {diag}
 </div>
 </section>
@@ -29,7 +29,7 @@ TYPE10_11 = """
 <section id="type11">
 <h2>TYPE 11 — Normal Equation Dimensions</h2>
 <div class="q">
-<p class="src">ML/questions/ML Midsem Practice — TYPE 11</p>
+<p class="src">ML/questions/_Resources/ML_MidSem_Practice_PastPapers_Mock.pdf — TYPE 11</p>
 <p>\(m=28\) samples, \(n=4\) features (add bias \(x_0=1\)). Dimensions of \(X\), \(y\), \(\theta\) in \(\theta=(X^TX)^{-1}X^Ty\)?</p>
 <div class="ans"><strong>\(X\): 28×5</strong> · <strong>\(y\): 28×1</strong> · <strong>\(\theta\): 5×1</strong></div>
 <div class="step">\(X^T\): 5×28 · \(X^TX\): 5×5 · \((X^TX)^{-1}X^Ty\): 5×1 ✓</div>
@@ -78,15 +78,15 @@ def ensure_diagram_placeholders(html: str) -> str:
     """Insert img placeholders only where diagrams are still missing."""
     inserts = [
         (
-            '<h4>(b) \\(\\partial J/\\partial\\theta_3 = -12\\)</h4>\n<div class="formula">',
+            '<h4>(b) \\(\\partial J/\\partial\\theta_2 = -12\\)</h4>\n<div class="formula">',
             None,  # already has diagram if formula present
         ),
     ]
     # img-based placeholders for re-inline after rebuild
     img_inserts = [
         (
-            '<h4>(b) \\(\\partial J/\\partial\\theta_3 = -12\\)</h4>\n<div class="formula">',
-            '<h4>(b) \\(\\partial J/\\partial\\theta_3 = -12\\)</h4>\n'
+            '<h4>(b) \\(\\partial J/\\partial\\theta_2 = -12\\)</h4>\n<div class="formula">',
+            '<h4>(b) \\(\\partial J/\\partial\\theta_2 = -12\\)</h4>\n'
             '<div class="formula"><h5>Gradient descent</h5>\\(\\theta_j \\leftarrow \\theta_j - \\alpha\\frac{\\partial J}{\\partial\\theta_j}\\)</div>\n'
             '<figure class="diagram"><img src="assets/gd-flow.svg" alt="GD flow"><figcaption>Predict → error → gradient → update</figcaption></figure>\n'
             '<div class="formula">',

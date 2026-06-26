@@ -1,0 +1,27 @@
+ML Question Papers — naming: YYYY-MM_Session_Type
+  MidSem/  — mid-semester papers
+  EndSem/  — end-semester papers
+  _Resources/ — practice QPs, study guides, compiled docs
+
+MidSem/
+  2023-12_Regular_ML.pdf
+  2023-12_Regular_Set2_ML.pdf
+  2024-12_Regular_ML.pdf
+  2024-07_Makeup_ML.pdf
+  2025-12_Regular_QP-AnswerKey.pdf
+  2026-01_Makeup_QP-AnswerKey.pdf
+  2026-06_Regular/          — June 2026 EC-2 (photos Q1–Q5 + PDF)
+
+EndSem/
+  2021_Regular_ML.pdf
+  2021_Makeup_ML.pdf
+  2026-03_Regular_QP-AnswerKey.pdf
+  2026-03_Makeup_QP-AnswerKey.pdf
+
+_Resources/
+  ML_MidSem_Practice_PastPapers_Mock.pdf
+  ML_Past_Papers.docx
+  ML_Questions_and_Answers.pdf
+  ML_Comprehensive_Sample_QP.pdf
+  Sample_QP_MidSem.pdf
+  ML_Study_Guide_Part1.pdf

@@ -25,18 +25,18 @@ from ml_topics import TOPIC_BADGE_CSS, render_question_tags
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "ML_Past_Papers.html"
 BASE = Path("/Volumes/disc 2/bits pilani/ML/questions")
-JUNE_SRC = BASE / "june mid sem regular 2026"
+JUNE_SRC = BASE / "MidSem/2026-06_Regular"
 EXAM_IMG_DST = ROOT / "assets/exam-2026-06"
 
 PAPERS = [
-    ("2023 MidSem Regular ML.pdf", "Mid Sem", "Regular", "2023", "2023 Mid-Sem EC-2 Regular"),
-    ("2023 MidSem Regular ML 2.pdf", "Mid Sem", "Regular", "2023", "2023 Mid-Sem EC-2 Regular (Set 2)"),
-    ("2024 MidSem Regular ML.pdf", "Mid Sem", "Regular", "2024", "2024 Mid-Sem EC-2 Regular"),
-    ("2024 MidSem Makeup ML.pdf", "Mid Sem", "Makeup", "2024", "2024 Mid-Sem EC-2 Makeup"),
-    ("Dec 2025 ML Midsem Regular QP & answer key.pdf", "Mid Sem", "Regular", "2025", "Dec 2025 Mid-Sem Regular"),
-    ("Jan 2026 ML Midsem Makeup QP & answer key.pdf", "Mid Sem", "Makeup", "2026", "Jan 2026 Mid-Sem Makeup"),
-    ("Mar 2026 ML endsem regular QP & answer key.pdf", "End Sem", "Regular", "2026", "Mar 2026 End-Sem EC-3 Regular"),
-    ("Mar 2026 ML endsem makeup QP & answer key.pdf", "End Sem", "Makeup", "2026", "Mar 2026 End-Sem EC-3 Makeup"),
+    ("MidSem/2023-12_Regular_ML.pdf", "Mid Sem", "Regular", "2023", "2023 Mid-Sem EC-2 Regular", "2023-midsem-regular-ml"),
+    ("MidSem/2023-12_Regular_Set2_ML.pdf", "Mid Sem", "Regular", "2023", "2023 Mid-Sem EC-2 Regular (Set 2)", "2023-midsem-regular-ml-2"),
+    ("MidSem/2024-12_Regular_ML.pdf", "Mid Sem", "Regular", "2024", "2024 Mid-Sem EC-2 Regular", "2024-midsem-regular-ml"),
+    ("MidSem/2024-07_Makeup_ML.pdf", "Mid Sem", "Makeup", "2024", "2024 Mid-Sem EC-2 Makeup", "2024-midsem-makeup-ml"),
+    ("MidSem/2025-12_Regular_QP-AnswerKey.pdf", "Mid Sem", "Regular", "2025", "Dec 2025 Mid-Sem Regular", "dec-2025-ml-midsem-regular-qp-answer-key"),
+    ("MidSem/2026-01_Makeup_QP-AnswerKey.pdf", "Mid Sem", "Makeup", "2026", "Jan 2026 Mid-Sem Makeup", "jan-2026-ml-midsem-makeup-qp-answer-key"),
+    ("EndSem/2026-03_Regular_QP-AnswerKey.pdf", "End Sem", "Regular", "2026", "Mar 2026 End-Sem EC-3 Regular", "mar-2026-ml-endsem-regular-qp-answer-key"),
+    ("EndSem/2026-03_Makeup_QP-AnswerKey.pdf", "End Sem", "Makeup", "2026", "Mar 2026 End-Sem EC-3 Makeup", "mar-2026-ml-endsem-makeup-qp-answer-key"),
 ]
 
 # (keyword list, formula html, diagram filename or None)
@@ -90,27 +90,30 @@ JUNE2026_BLOCKS = [
      "assets/exam-2026-06/Q1.jpeg",
      r"""<div class="formula"><h5>Model</h5>\(\hat y = 120 + 7.5x_1 + 45x_2 - 4x_3 + 18x_4\)</div>
 {gd}
-<p>(a) Interpret coefs · (b) kWh→Wh: \(w_1' = 7.5/1000 = 0.0075\) · (c) \(\partial J/\partial\theta_3=-12 \Rightarrow \theta_3\leftarrow\theta_3+12\alpha\)</p>""".format(gd=svg_figure("gd-flow.svg", "GD"))),
-    ("Q2", "Decision tree — entropy [2M+]",
+<p>(a)(i) Intercept \$120; +\$7.50/kWh; +\$45/AC; −\$4/°C; +\$18/person. (ii) kWh→Wh: coef \(7.5/1000=0.0075\)/Wh; prediction unchanged if input rescaled. (b) \(\partial J/\partial\theta_2=-12&lt;0\) → increase \(\theta_2\). (c) AC count (45) largest |coef|; compare on same scale.</p>""".format(gd=svg_figure("gd-flow.svg", "GD"))),
+    ("Q2", "Decision tree — entropy &amp; IG [6M]",
      "assets/exam-2026-06/Q2.jpeg",
-     r"""<div class="formula"><h5>Entropy</h5>\(H=-0.6\log_2 0.6-0.4\log_2 0.4\approx 0.971\)</div>
+     r"""<div class="formula"><h5>Entropy</h5>\(H=-0.5\log_2 0.5-0.5\log_2 0.5=1.0\) bit (5 Yes, 5 No)</div>
 {ig}
-<p>Split Existing Loan=No → IG ≈ 0.610</p>""".format(ig=svg_figure("entropy-ig-tree.svg", "IG"))),
-    ("Q3", "Logistic + min-max [4M+]",
+<p>Existing Loan: No→5Y/0N (H=0), Yes→0Y/5N (H=0) → IG = 1.0 bit. Root = Existing Loan; No→Approve, Yes→Deny.</p>""".format(ig=svg_figure("entropy-ig-tree.svg", "IG"))),
+    ("Q3", "Logistic + min-max [8M]",
      "assets/exam-2026-06/Q3.jpeg",
-     r"""<div class="formula"><h5>Min-max</h5>\(x'=(x-590)/120\) → S1=0.25, S2=0.75, S3=0, S4=1.0 · 650→0.50</div>
+     r"""<div class="formula"><h5>Min-max + Logistic</h5>\(x'=(x-590)/120\) → 0.25, 0.75, 0, 1.0 · 650→0.50</div>
+<p>\(\hat p\): S1=0.432, S2=0.544, S3=0.389, S4=0.587 · BCE \(L=0.864\) · GD: \(w_0^*=0.006, w_1^*=0.393, w_2^*=-0.424\) · L1 zeros weights; large \(\lambda\) → underfit.</p>
 <figure class="diagram">{scale}{sig}</figure>""".format(
          scale=svg_div("min-max-scaling.svg", "scale"),
          sig=svg_div("logistic-sigmoid.svg", "sigmoid", "margin-top:.5rem"),
      )),
-    ("Q4", "Fraud confusion matrix [2.5M]",
+    ("Q4", "Fraud confusion matrix [6M]",
      "assets/exam-2026-06/Q4.jpeg",
      r"""{cm}
-<div class="formula"><h5>Model A</h5>Acc=98.55% · Prec=33.3% · Rec=45% · F1=38.3%</div>""".format(cm=svg_figure("confusion-matrix.svg", "CM"))),
-    ("Q5", "Bias-variance spam [1M+]",
+<div class="formula"><h5>Model A</h5>Acc=98.55% · Prec=33.3% · Rec=45% · FPR=0.91% · F1=38.3%</div>
+<div class="formula"><h5>Model B</h5>Acc=94.8% · TPR=80% · FPR=5.05% · Prec=13.8%</div>
+<p>Accuracy misleading (imbalanced). ROC: A=(0.009,0.45), B=(0.051,0.80). Prefer B — higher recall catches fraud. Diagonal ROC → AUC=0.5.</p>""".format(cm=svg_figure("confusion-matrix.svg", "CM"))),
+    ("Q5", "Bias-variance spam [3M]",
      "assets/exam-2026-06/Q5.jpeg",
      r"""{bv}
-<p>A: 61%/60% high bias · B: 99%/67% high variance</p>""".format(bv=svg_figure("bias-variance.svg", "BV"))),
+<p>A: 61%/60% → high bias; curves plateau — more data won't help. B: 99%/67% → high variance; L1/L2, fewer features. Improved: logistic + moderate features + L2 CV.</p>""".format(bv=svg_figure("bias-variance.svg", "BV"))),
 ]
 
 
@@ -204,11 +207,11 @@ def sync_exam_images():
     """Copy June 2026 question photos into assets/ for reliable file:// viewing."""
     EXAM_IMG_DST.mkdir(parents=True, exist_ok=True)
     mapping = [
-        ("WhatsApp Image 2026-06-21 at 11.43.21.jpeg", "Q1.jpeg"),
-        ("WhatsApp Image 2026-06-21 at 11.43.22.jpeg", "Q2.jpeg"),
-        ("WhatsApp Image 2026-06-21 at 11.43.23.jpeg", "Q3.jpeg"),
-        ("WhatsApp Image 2026-06-21 at 11.43.24.jpeg", "Q4.jpeg"),
-        ("WhatsApp Image 2026-06-21 at 11.43.21 (1).jpeg", "Q5.jpeg"),
+        ("Q1.jpeg", "Q1.jpeg"),
+        ("Q2.jpeg", "Q2.jpeg"),
+        ("Q3.jpeg", "Q3.jpeg"),
+        ("Q4.jpeg", "Q4.jpeg"),
+        ("Q5.jpeg", "Q5.jpeg"),
     ]
     for src_name, dst_name in mapping:
         src = JUNE_SRC / src_name
@@ -217,7 +220,7 @@ def sync_exam_images():
 
 
 def june_section():
-    sec = '<section id="june2026"><h2>June 2026 EC-2 Regular</h2><p class="src">ML/questions/june mid sem regular 2026/</p>'
+    sec = '<section id="june2026"><h2>June 2026 EC-2 Regular</h2><p class="src">ML/questions/MidSem/2026-06_Regular/</p>'
     for qid, title, img, body in JUNE2026_BLOCKS:
         topic_badges = render_question_tags("june2026", qid)
         sec += f'''<div class="q"><div class="badges">{badge("Mid Sem","Regular","2026")}{topic_badges}</div>
@@ -249,10 +252,9 @@ def build():
     sync_exam_images()
     sections = [june_section()]
     nav = ['<a href="#june2026">June 2026 Mid Regular</a>']
-    for fname, exam, session, year, label in PAPERS:
+    for fname, exam, session, year, label, sid in PAPERS:
         path = BASE / fname
         text = "\n".join(p.get_text() for p in fitz.open(path))
-        sid = re.sub(r"[^a-z0-9]+", "-", Path(fname).stem.lower()).strip("-")
         short = f"{year} {exam.split()[0]} {session}"
         if "Set 2" in label:
             short += " (Set 2)"
