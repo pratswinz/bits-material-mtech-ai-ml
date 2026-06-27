@@ -3,6 +3,7 @@
 import html as H
 from pathlib import Path
 
+from ism_midsem_catalog import collect_midsem_by_type
 from ism_theme import LIGHT_HEADER
 from svg_inline import SVG_WRAP_CSS, reset_uid, svg_figure, asset_figure
 
@@ -38,7 +39,23 @@ body{font-family:Georgia,"Segoe UI",serif;background:var(--bg);color:var(--text)
 .shell{display:flex;max-width:1280px;margin:0 auto;width:100%}
 aside{width:260px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);padding:.8rem;position:sticky;top:0;height:100vh;overflow-y:auto;font-size:.72rem}
 aside a{display:block;padding:.28rem .45rem;color:var(--navy);text-decoration:none;border-radius:4px}
+aside a.nav-type{line-height:1.4;padding:.35rem .5rem}
+aside a.nav-type .nav-num{font-weight:600;display:block}
+aside a.nav-type .nav-topic{color:var(--muted);font-size:.68rem;display:block;margin-top:.05rem}
+aside a.nav-type .nav-exam{color:var(--blue);font-weight:600;font-size:.64rem;margin-left:.25rem}
 aside a:hover{background:#eff6ff}
+.pyq-group{margin:1rem 0 0;padding:.85rem 0 0;border-top:1px dashed var(--border)}
+.pyq-group .grp-head{font-size:.72rem;font-weight:700;text-transform:uppercase;color:var(--purple);letter-spacing:.04em;margin:0 0 .5rem}
+.pyq-list{list-style:none;margin:0;padding:0;font-size:.82rem}
+.pyq-list li{padding:.35rem 0;border-bottom:1px solid #f1f5f9;display:flex;flex-wrap:wrap;gap:.35rem .5rem;align-items:baseline}
+.pyq-list li:last-child{border-bottom:none}
+.pyq-paper{font-weight:600;color:var(--navy)}
+.pyq-q{color:var(--muted)}
+.pyq-label{color:var(--text)}
+.pyq-list a{font-size:.75rem;color:var(--blue);text-decoration:none;white-space:nowrap}
+.pyq-list a:hover{text-decoration:underline}
+.tag.mid{background:#dbeafe;color:#1d4ed8}
+.tag.end{background:#fce7f3;color:#be185d}
 aside .grp{font-weight:700;color:var(--purple);font-size:.62rem;text-transform:uppercase;margin:.7rem 0 .15rem}
 main{flex:1;min-width:0;max-width:920px;padding:1.5rem 2rem}
 section{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:2px solid var(--border)}
@@ -171,22 +188,85 @@ TYPES = [
 ]
 
 
+def _type_parts(title: str) -> tuple[str, str]:
+    """Split 'TYPE 1 — Descriptive Statistics' → ('TYPE 1', 'Descriptive Statistics')."""
+    if "—" in title:
+        num, topic = title.split("—", 1)
+        return num.strip(), topic.strip()
+    return title.strip(), ""
+
+
+def _exam_short(exam: str) -> str:
+    return "Mid" if exam.startswith("Mid") else "End"
+
+
+def fix_latex_escapes(html: str) -> str:
+    """Restore LaTeX commands eaten by Python \\t, \\a, \\b escapes in plain strings."""
+    for bad, good in (
+        ("\t" + "ext", r"\text"),
+        ("\t" + "imes", r"\times"),
+        ("\t" + "heta", r"\theta"),
+        ("\a" + "pprox", r"\approx"),
+        ("\a" + "lpha", r"\alpha"),
+        ("\b" + "ar", r"\bar"),
+        ("\b" + "eta", r"\beta"),
+        ("\b" + "inom", r"\binom"),
+        ("\f" + "rac", r"\frac"),
+    ):
+        html = html.replace(bad, good)
+    return html
+
+
+def _render_pyq_group(type_num: int, catalog: dict) -> str:
+    items = catalog.get(type_num, [])
+    if not items:
+        return ""
+    rows = []
+    for paper, href, qid, label, year, session in items:
+        sess = "Makeup" if session == "Makeup" else "Reg"
+        rows.append(
+            f'<li><span class="pyq-paper">{H.escape(paper)}</span>'
+            f'<span class="pyq-q">{H.escape(qid)}</span>'
+            f'<span class="pyq-label">— {H.escape(label)}</span>'
+            f'<span class="pyq-q">({year} {sess})</span>'
+            f'<a href="{href}">Past paper →</a></li>'
+        )
+    return (
+        '<div class="pyq-group"><p class="grp-head">Mid-sem PYQs of this type</p>'
+        f'<ul class="pyq-list">{"".join(rows)}</ul></div>'
+    )
+
+
 def build():
     reset_uid()
+    catalog = collect_midsem_by_type()
     nav = ['<a href="#overview">Overview</a>']
-    body = """<section id="overview"><h2>Question Type Index</h2>
+    overview_rows = ""
+    for tid, title, exam, svg, formula, solution in TYPES:
+        num, topic = _type_parts(title)
+        exam_short = _exam_short(exam)
+        type_num = int(tid.replace("type", ""))
+        overview_rows += (
+            f"<tr><td><strong>{H.escape(num)}</strong></td>"
+            f"<td>{H.escape(topic)}</td>"
+            f"<td>{exam_short}</td></tr>\n"
+        )
+        nav.append(
+            f'<a href="#{tid}" class="nav-type">'
+            f'<span class="nav-num">{H.escape(num)}</span>'
+            f'<span class="nav-topic">{H.escape(topic)} '
+            f'<span class="nav-exam">{exam_short}</span></span></a>'
+        )
+
+    body = f"""<section id="overview"><h2>Question Type Index</h2>
 <p class="src">Organised by exam pattern · Sources: <code>ISM/previous question papers/</code> answer keys + June 2026</p>
 <p>Each TYPE has the core formula, a diagram where helpful, and a fully worked PYQ from official papers.</p>
-<table class="data-table"><thead><tr><th>Type</th><th>Topic</th><th>Exam</th></tr></thead><tbody>
-<tr><td>1–2</td><td>Descriptive stats, five-number summary</td><td>Mid</td></tr>
-<tr><td>3–5</td><td>Inclusion–exclusion, conditional, Bayes</td><td>Mid</td></tr>
-<tr><td>6</td><td>Naïve Bayes</td><td>Mid</td></tr>
-<tr><td>7–11</td><td>PMF, Binomial/Poisson, Normal, Joint PDF, CDF</td><td>Mid</td></tr>
-<tr><td>12–18</td><td>Correlation, smoothing, tests, ANOVA, regression, CI</td><td>End</td></tr>
-</tbody></table></section>"""
+<table class="data-table"><thead><tr><th>Type</th><th>Problem type</th><th>Exam</th></tr></thead><tbody>
+{overview_rows}</tbody></table></section>"""
 
     for tid, title, exam, svg, formula, solution in TYPES:
-        nav.append(f'<a href="#{tid}">{title.split("—")[0].strip()}</a>')
+        type_num = int(tid.replace("type", ""))
+        exam_short = _exam_short(exam)
         if tid in PNG_DIAGRAMS:
             alt, cap = PNG_DIAGRAMS[tid]
             diag = asset_figure(alt, cap, png="bell-curve-skewness.png")
@@ -194,11 +274,15 @@ def build():
             diag = svg_figure(svg, title)
         else:
             diag = ""
+        pyq_block = _render_pyq_group(type_num, catalog) if exam_short == "Mid" else ""
+        tag_cls = "mid" if exam_short == "Mid" else "end"
         body += f"""<section id="{tid}"><h2>{H.escape(title)}</h2>
+<span class="tag {tag_cls}">{exam_short}</span>
 <span class="tag">{H.escape(exam)}</span>
 <div class="formula"><h5>Core formula</h5>\\[{formula}\\]</div>
 {diag}
-<div class="q">{solution}</div></section>"""
+<div class="q">{solution}</div>
+{pyq_block}</section>"""
 
     html = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -208,6 +292,7 @@ def build():
 <div class="shell"><aside><div class="grp">Types</div>{"".join(nav)}
 <div class="grp">Also</div><a href="ISM_Past_Papers.html">Past Papers</a><a href="ISM_Theory_Guide.html">Theory</a>
 </aside><main>{body}</main></div></body></html>"""
+    html = fix_latex_escapes(html)
     OUT.write_text(html, encoding="utf-8")
     print("Wrote", OUT, "—", len(TYPES), "types")
 

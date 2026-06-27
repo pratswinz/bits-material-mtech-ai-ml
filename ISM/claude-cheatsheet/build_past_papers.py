@@ -19,6 +19,8 @@ JUNE = BASE / "MidSem/2026-06_Regular"
 EXAM_IMG_DST = ROOT / "assets/exam-2026-06"
 
 PAPERS = [
+    ("MidSem/2024-07_Regular_Answers.pdf", "Mid Sem", "Regular", "2024", "Jul 2024 Mid-Sem EC-2 Regular (Answers)"),
+    ("MidSem/2024-07_Makeup_Answers.pdf", "Mid Sem", "Makeup", "2024", "Jul 2024 Mid-Sem EC-2 Makeup (Answers)"),
     ("MidSem/2025-01_Regular_S2-24.pdf", "Mid Sem", "Regular", "2025", "Jan 2025 Mid-Sem EC-2 Regular"),
     ("MidSem/2025-06_Makeup_S2-24.pdf", "Mid Sem", "Makeup", "2025", "Jun 2025 Mid-Sem EC-2 Makeup"),
     ("MidSem/2025-12_Regular_QP-AnswerKey.pdf", "Mid Sem", "Regular", "2025", "Dec 2025 Mid-Sem EC-2 Regular (Key)"),
@@ -94,6 +96,21 @@ QUESTION_TAGS = {
     ("jun-2025-mid-sem-ec-2-makeup", 1): [(1, 1, "Descriptive"), (7, None, "CLT sample mean")],
     ("jun-2025-mid-sem-ec-2-makeup", 2): [(4, 6, "Naïve Bayes — spam text")],
     ("jun-2025-mid-sem-ec-2-makeup", 4): [(4, 5, "Bayes — DNA match")],
+    ("jul-2024-mid-sem-ec-2-regular-answers", 1): [(1, 1, "Summary table — three inferences")],
+    ("jul-2024-mid-sem-ec-2-regular-answers", 2): [(2, None, "Independence validation")],
+    ("jul-2024-mid-sem-ec-2-regular-answers", 3): [(3, 4, "Conditional probability")],
+    ("jul-2024-mid-sem-ec-2-regular-answers", 4): [(4, 5, "Bayes — captain selection")],
+    ("jul-2024-mid-sem-ec-2-regular-answers", 5): [(5, 10, "Continuous PDF on [0,2]")],
+    ("jul-2024-mid-sem-ec-2-regular-answers", 6): [(5, 10, "Joint distribution (independent)")],
+    ("jul-2024-mid-sem-ec-2-regular-answers", 7): [(6, 8, "Binomial — normal approx")],
+    ("jul-2024-mid-sem-ec-2-regular-answers", 8): [(6, 9, "Sampling distribution of mean")],
+    ("jul-2024-mid-sem-ec-2-makeup-answers", 1): [(2, 4, "Independent events")],
+    ("jul-2024-mid-sem-ec-2-makeup-answers", 2): [(6, 8, "Binomial from μ, σ")],
+    ("jul-2024-mid-sem-ec-2-makeup-answers", 3): [(4, 6, "Naïve Bayes — employment")],
+    ("jul-2024-mid-sem-ec-2-makeup-answers", 4): [(5, 7, "Discrete PMF find k")],
+    ("jul-2024-mid-sem-ec-2-makeup-answers", 5): [(5, 10, "Joint PDF")],
+    ("jul-2024-mid-sem-ec-2-makeup-answers", 6): [(6, 9, "Normal — employee salaries")],
+    ("jul-2024-mid-sem-ec-2-makeup-answers", 7): [(6, 8, "Sampling vs binomial")],
 }
 
 EC3_TAGS = {
@@ -246,17 +263,18 @@ SOLUTIONS = {
 </div>""",
         2: NAIVE_URGENT_TABLE + """
 <div class="sol-body">
-<div class="sol-step">Laplace α=1. Vocab with α: urgent×2, assignment×1, due×1, tomorrow×1, help×1, lunch×1, plans×1, today×1, exam×1, rescheduled×1, attention×1, thanks×1, notes×1</div>
-<div class="sol-step">\\(P(\\text{Urgent})=2/6\\), \\(P(\\text{Not})=4/6\\). Test "assignment urgent":<br>
-\\(P(\\text{U}|\\text{assign})=2/8\\), \\(P(\\text{U}|\\text{urgent})=3/8\\) vs \\(P(\\text{NU}|\\text{assign})=1/8\\), \\(P(\\text{NU}|\\text{urgent})=1/8\\)</div>
-<div class="sol-step">Posterior Urgent \\(\\propto (2/6)(2/8)(3/8)=12/384\\); Not \\(\\propto (4/6)(1/8)(1/8)=4/384\\) → <strong>Classify Urgent</strong> (3:1 ratio)</div>
+<div class="sol-step">Laplace \\(\\alpha=1\\), \\(|V|=16\\). \\(P(\\text{Urgent})=P(\\text{Not})=0.5\\)</div>
+<div class="sol-step">Smoothed totals: Urgent class 25 words, Not Urgent 23 words</div>
+<div class="sol-step">\\(P(\\text{assign}|U)=2/25\\), \\(P(\\text{urgent}|U)=2/25\\) → posterior \\(\\propto 0.5\\times(2/25)^2=\\mathbf{0.0032}\\)</div>
+<div class="sol-step">\\(P(\\text{assign}|N)=1/23\\), \\(P(\\text{urgent}|N)=1/23\\) → posterior \\(\\propto 0.5/529\\approx\\mathbf{0.000945}\\)</div>
+<div class="sol-step">\\(0.0032 &gt; 0.000945\\) → <strong>Classify as Urgent</strong></div>
 </div>""",
         3: PMF_TABLE + """
 <div class="sol-body">
-<div class="sol-step"><strong>(a)(i)</strong> Sum pmf = 11k + 8k² = 1 → k ≈ 0.083 (check: 8k²+11k-1=0)</div>
-<div class="sol-step"><strong>(ii)</strong> \\(P(X<6)=P(0)+P(1)+P(3)+P(4)+P(5)\\); \\(P(X\\ge6)=P(6)+P(7)\\)</div>
-<div class="sol-step"><strong>(iii)</strong> \\(P(0<X<5)=P(1)+P(3)+P(4)\\)</div>
-<div class="sol-step"><strong>(b)</strong> Poisson λ=np=10×0.002=0.02 per packet. \\(P(0)=e^{-0.02}\\), \\(P(1)=0.02e^{-0.02}\\). Scale to 10,000 packets.</div>
+<div class="sol-step"><strong>(a)(i)</strong> Normalize: \\(11k+8k^2=1\\) → \\(k=\\frac{-11+\\sqrt{153}}{16}\\approx\\mathbf{0.103}\\)</div>
+<div class="sol-step"><strong>(ii)</strong> \\(P(X&lt;6)=p(0)+p(1)+p(3)+p(4)+p(5)\\); \\(P(X\\ge6)=p(6)+p(7)\\) — substitute \\(k\\)</div>
+<div class="sol-step"><strong>(iii)</strong> \\(P(0&lt;X&lt;5)=p(1)+p(3)+p(4)\\)</div>
+<div class="sol-step"><strong>(b)</strong> \\(\\lambda=np=10\\times0.002=0.02\\). \\(P(0)=e^{-0.02}\\approx0.9802\\) → \\(\\approx\\mathbf{9802}\\) packets; \\(P(1)=0.02e^{-0.02}\\approx0.0196\\) → \\(\\approx\\mathbf{196}\\) packets</div>
 </div>""",
         4: """<div class="sol-body">
 <div class="sol-step"><strong>(i)</strong> \\(\\int_0^1\\int_0^1 6x^2y\\,dy\\,dx = \\int_0^1 3x^2\\,dx = 1\\) ✓</div>
@@ -272,30 +290,45 @@ SOLUTIONS = {
 <div class="sol-step"><strong>(b)</strong> Process not fully capable — ~17% scrap/rework expected at current σ.</div>
 </div>""",
         6: """<div class="sol-body">
-<div class="sol-step">Given \\(P(A\\cap B)=P(B\\cap C)=P(C\\cap A)=1/8\\), \\(P(A\\cap B\\cap C)=1/16\\), \\(P(\\text{none})=1/4\\)</div>
-<div class="sol-step">From inclusion–exclusion with equal singles: solve \\(3p - 3/8 + 1/16 = 3/4\\) → \\(P(A)=P(B)=P(C)=\\mathbf{11/32}\\)</div>
-<div class="sol-step">Exactly two: \\(3(1/8)-3(1/16)=3/16\\). At least one: \\(1-1/4=3/4\\). Exactly one: \\(3/4 - 3/16 - 1/16 = 1/2\\)</div>
+<div class="sol-step"><strong>(a)</strong> From \\(P(A^c\\cap B^c\\cap C^c)=1/4\\) and symmetric singles: \\(3p-3/8+1/16=3/4\\) → \\(P(A)=P(B)=P(C)=\\mathbf{11/32}\\)</div>
+<div class="sol-step"><strong>(b)</strong> Exactly two alerts: \\([P(A\\cap B)+P(B\\cap C)+P(C\\cap A)]-3P(A\\cap B\\cap C)\\)</div>
+<div class="sol-step"><strong>(c)</strong> At least one: \\(1-P(A^c\\cap B^c\\cap C^c)\\)</div>
+<div class="sol-step"><strong>(d)</strong> Exactly one: \\(P(\\text{at least one})-P(\\text{exactly two})-P(\\text{all three})\\)</div>
+<div class="sol-step">Given \\(P(A\\cap B)=P(B\\cap C)=P(C\\cap A)=1/8\\), \\(P(A\\cap B\\cap C)=1/16\\), \\(P(\\text{none})=1/4\\) → \\(P(A)=P(B)=P(C)=11/32\\); exactly two \\(=3/16\\); at least one \\(=3/4\\); exactly one \\(=1/2\\)</div>
 </div>""",
     },
     "jan-2026-mid-sem-ec-2-makeup-key": {
         1: """<div class="sol-body">
-<div class="sol-step">Sorted: 190,230,240,245,250,265,270,280,285,380 → Min=190, Q1=240, Med=257.5, Q3=280, Max=380</div>
-<div class="sol-step">IQR=40; fence upper=280+60=340 → <strong>380 is outlier</strong> (possible process shift on day 10)</div>
+<div class="sol-step">Sorted: 190, 230, 240, 245, 250, 265, 270, 280, 285, 380 → Min=190, Q1=240, Med=257.5, Q3=280, Max=380</div>
+<div class="sol-step">IQR=40; upper fence \\(Q3+1.5\\cdot\\text{IQR}=340\\) → <strong>380 is outlier</strong></div>
+<div class="sol-step">Most days cluster 230–285; day 10 spike suggests a <strong>process shift or data-quality issue</strong>, not routine variation.</div>
 </div>""",
         2: """<div class="sol-body">
-<div class="sol-step">Bayes: \\(P(A)=0.5\\), \\(P(B)=0.3\\), \\(P(C)=0.2\\); \\(P(R|A)=0.8\\), \\(P(R|B)=0.6\\), \\(P(R|C)=0.4\\)</div>
-<div class="sol-step">\\(P(R)=0.5(0.8)+0.3(0.6)+0.2(0.4)=0.66\\)</div>
-<div class="sol-step">\\(P(A|R)=0.40/0.66 \\approx \\mathbf{0.606}\\)</div>
+<div class="sol-step">Events: \\(A\\)=academician, \\(B\\)=businessman, \\(C\\)=politician; \\(R\\)=research promoted. \\(P(A)=0.5\\), \\(P(B)=0.3\\), \\(P(C)=0.2\\)</div>
+<div class="sol-step">\\(P(R|A)=0.8\\), \\(P(R|B)=0.6\\), \\(P(R|C)=0.4\\)</div>
+<div class="sol-step">Total probability: \\(P(R)=0.5(0.8)+0.3(0.6)+0.2(0.4)=\\mathbf{0.66}\\)</div>
+<div class="sol-step">Bayes: \\(P(A|R)=\\dfrac{P(R|A)P(A)}{P(R)}=\\dfrac{0.4}{0.66}=\\dfrac{20}{33}\\approx\\mathbf{0.606}\\)</div>
 </div>""",
         3: """<div class="sol-body">
 <div class="sol-step">\\(X\\sim N(73,8^2)\\). (i) \\(P(X<91)=P(Z<2.25)\\approx 0.988\\) → yes, "most" (&gt;97%)</div>
 <div class="sol-step">(ii) \\(P(65<X<89)=P(-1<Z<2)\\approx 0.977-0.159=0.818\\)</div>
 <div class="sol-step">(iii) Dean's List top 5%: \\(P(X>c)=0.05\\) → \\(c=73+1.645(8)\\approx \\mathbf{86.2}\\)</div>
 </div>""",
+        4: """<div class="sol-body">
+<div class="sol-step"><strong>(a)</strong> \\(\\sum_{x,y} c(x^2+y+1)=1\\) over 16 pairs → total weight 80 → \\(\\mathbf{c=1/80}\\)</div>
+<div class="sol-step"><strong>(b)</strong> \\(P(X=1,Y\\ge0)=c(2+3+4)=\\mathbf{9/80}\\)</div>
+<div class="sol-step"><strong>(c)</strong> Marginals do not factor → <strong>not independent</strong></div>
+<div class="sol-step"><strong>(d)</strong> \\(P(Y\\ge0\\mid X\\ge1)=P(Y\\ge0,X\\ge1)/P(X\\ge1)\\) from joint table</div>
+</div>""",
         6: """<div class="sol-body">
 <div class="sol-step"><strong>(a)</strong> Rate 1.2/100 → λ=2.5 per 250 cheques → \\(X\\sim\\text{Poisson}(2.5)\\)</div>
 <div class="sol-step">\\(P(X\\le2)\\approx e^{-2.5}(1+2.5+3.125)\\approx 0.544\\); \\(P(X>4)=1-P(X\\le4)\\approx 0.108\\)</div>
 <div class="sol-step"><strong>(b)</strong> Inclusion–exclusion: at least one defect \\(P(W\\cup C\\cup S)\\approx 0.285\\); defect-free ≈ 7150 discs</div>
+</div>""",
+        5: """<div class="sol-body">
+<div class="sol-step">Overheating index \\(X\\in[0,3]\\): use piecewise CDF from official PDF to find \\(k\\) so \\(F(0)=0\\), \\(F(3)=1\\)</div>
+<div class="sol-step"><strong>(b)</strong> Warning zone: \\(P(1\\le X\\le 2)=F(2)-F(1^-)\\)</div>
+<div class="sol-step"><strong>(c)</strong> \\(f(x)=F'(x)\\) on each interval where \\(F\\) is differentiable</div>
 </div>""",
     },
     "jan-2025-mid-sem-ec-2-regular": {
@@ -310,6 +343,22 @@ SOLUTIONS = {
         3: """<div class="sol-body">
 <div class="sol-step">Naïve Bayes spam filter for "Congratulations! You have won money quickly" — compute \\(P(\\text{Spam}|\\text{words})\\) vs Ham using training counts + Laplace smoothing; high spam-word density → classify <strong>Spam</strong></div>
 </div>""",
+        4: """<div class="sol-body">
+<div class="sol-step">\\(P(D)=0.001\\), \\(P(+|D)=0.98\\), \\(P(+|D^c)=0.03\\)</div>
+<div class="sol-step">\\(P(+)=(0.001)(0.98)+(0.999)(0.03)\\approx 0.031\\)</div>
+<div class="sol-step">\\(P(D|+)=0.00098/0.031\\approx \\mathbf{3.2\\%}\\) — positive test still unlikely to mean disorder (rare disease).</div>
+</div>""",
+        6: """<div class="sol-body">
+<div class="sol-step">Three tosses → sample space 8 outcomes. \\(X\\)=# tails, \\(Y\\)=winnings by first-tail rule.</div>
+<div class="sol-step"><strong>(a)</strong> Joint table: e.g. TTT → (3, −2); HTT → (2, 3); THH → (1, 2); etc.</div>
+<div class="sol-step"><strong>(b)</strong> Marginal of \\(X\\): \\(P(X=0)=1/8\\), \\(P(X=1)=3/8\\), \\(P(X=2)=3/8\\), \\(P(X=3)=1/8\\)</div>
+<div class="sol-step"><strong>(c)</strong> \\(E[X]=0(1/8)+1(3/8)+2(3/8)+3(1/8)=\\mathbf{1.5}\\)</div>
+</div>""",
+        5: """<div class="sol-body">
+<div class="sol-step">Normalize: \\(k+2k+2k+3k+k^2+7k^2+k=8k^2+9k=1\\) → \\(k=\\frac{-9+\\sqrt{113}}{16}\\approx\\mathbf{0.1045}\\)</div>
+<div class="sol-step">\\(E[X]=1k+3(2k)+4(2k)+5(3k)+6k^2+7(7k^2+k)\\approx\\mathbf{4.6}\\) errors per document</div>
+<div class="sol-step">Interpretation: on average the ML model expects ~4–5 errors per document under this PMF.</div>
+</div>""",
     },
     "jun-2025-mid-sem-ec-2-makeup": {
         1: """<div class="sol-body">
@@ -319,8 +368,17 @@ SOLUTIONS = {
         2: """<div class="sol-body">
 <div class="sol-step">Naïve Bayes for "Win free money" — both words appear in spam training → classify <strong>Spam</strong></div>
 </div>""",
+        3: """<div class="sol-body">
+<div class="sol-step"><strong>(a)</strong> 99% CI for mean: \\(n \\ge (z_{0.005}\\,\\sigma/E)^2 = (2.576\\times14/2.5)^2 \\approx \\mathbf{208}\\) workers needed</div>
+<div class="sol-step"><strong>(b)</strong> PMF \\(p(x)=kx^2\\) for \\(x\\in\\{-1,0,1\\}\\): normalize → \\(k=1/2\\); \\(E[X]=0\\); \\(\\text{Var}(X)=3/5\\)</div>
+</div>""",
         4: """<div class="sol-body">
 <div class="sol-step">DNA match Bayes: prior \\(P(\\text{guilty})\\) small; \\(P(\\text{match}|\\text{innocent})=10^{-6}\\) → posterior still depends strongly on base rate — avoid prosecutor's fallacy</div>
+</div>""",
+        6: """<div class="sol-body">
+<div class="sol-step">Piecewise PDF: \\(f(x)=cx^2\\) on \\([0,1]\\), \\(c(2-x)\\) on \\((1,2]\\). Normalize → \\(c=\\mathbf{6/5}\\)</div>
+<div class="sol-step"><strong>(b)</strong> \\(P(1/2&lt;X&lt;3/2)=\\int_{1/2}^{1} cx^2\\,dx+\\int_{1}^{3/2}c(2-x)\\,dx\\)</div>
+<div class="sol-step"><strong>(c)</strong> \\(E[X]=\\int_0^1 cx^3\\,dx+\\int_1^2 cx(2-x)\\,dx\\)</div>
 </div>""",
     },
 }
@@ -441,6 +499,252 @@ CADENCE_TABLE = html_table(
     ],
 )
 
+JUL2024_SUMMARY_TABLE = html_table(
+    ["Stat", "HHV", "WBN", "BNC", "HBCN"],
+    [
+        ("Count", 908, 900, 867, 908),
+        ("Mean", 150, 65, 150, 68),
+        ("S.D", 10, 5, 8, 4),
+        ("25%", 90, 25, 90, 30),
+        ("50% (Median)", 120, 65, 125, 60),
+        ("75%", 130, 70, 135, 63),
+        ("Minimum", 30, 15, 75, 30),
+        ("Maximum", 160, 75, 180, 90),
+    ],
+)
+
+JUL2024_X_PMF = html_table(
+    ["X", "−1", "0", "1", "2"],
+    [("P(X)", 0.25, 0.15, 0.35, 0.25)],
+)
+
+JUL2024_Y_PMF = html_table(
+    ["Y", "0", "1", "2", "3"],
+    [("P(Y)", 0.10, 0.20, 0.30, 0.40)],
+)
+
+# Answer-key PDF only — auto-parse merges Q1 sub-parts; use curated blocks instead
+JUL2024_REGULAR_BLOCKS = [
+    (1, "Statistical summary — three inferences [3M]",
+     f"""<p>Following is the statistical summary of some data sets:</p>
+{JUL2024_SUMMARY_TABLE}
+<p>Write <strong>at least three inferences</strong> based on the above summary that help in understanding the data.</p>""",
+     """<div class="sol-body">
+<div class="sol-step"><strong>Inference 1 — Consistency (CV):</strong> CV = (SD/Mean)×100 → HHV=6.7%, WBN=7.7%, BNC=5.3%, HBCN=5.9%. <strong>BNC</strong> is most consistent (lowest relative spread).</div>
+<div class="sol-step"><strong>Inference 2 — Skewness:</strong> HHV: positive skew (150&gt;120); WBN: <strong>symmetric</strong> (65=65); BNC &amp; HBCN: positive skew. WBN concentrates around the centre; others lean left.</div>
+<div class="sol-step"><strong>Inference 3 — Outliers (1.5×IQR):</strong> Fences — HHV [30, 190], WBN [−50, 145], BNC [22.5, 202.5], HBCN [−19.5, 112.5]. HHV minimum 30 sits on the lower fence; other sets have no clear outliers.</div>
+</div>"""),
+    (2, "Independent events — validate statements [4M]",
+     """<p>Let <em>A</em> and <em>B</em> be two <strong>independent</strong> events with \\(P(A)=0.35\\) and \\(P(B)=0.30\\). Validate each statement and justify:</p>
+<ol type="a">
+<li>\\(P(A \\cup B) = 0\\) because they are independent</li>
+<li>\\(P(A \\cap B) = 0\\) because they are mutually exclusive</li>
+<li>Find \\(P(A^c \\cap B^c)\\)</li>
+</ol>""",
+     """<div class="sol-body">
+<div class="sol-step"><strong>(a)</strong> \\(P(A \\cap B)=0.35 \\times 0.30=0.105\\). \\(P(A \\cup B)=0.35+0.30-0.105=\\mathbf{0.545}\\) → statement is <strong>incorrect</strong>.</div>
+<div class="sol-step"><strong>(b)</strong> Mutually exclusive requires \\(P(A\\cap B)=0\\), but \\(P(A\\cap B)=0.105\\) → statement is <strong>incorrect</strong>.</div>
+<div class="sol-step"><strong>(c)</strong> \\(P(A^c \\cap B^c)=0.65 \\times 0.70=\\mathbf{0.455}\\) (complements of independent events are independent).</div>
+</div>"""),
+    (3, "Conditional probability — three events [4M]",
+     """<p>Given \\(P(A)=0.50\\), \\(P(B)=0.55\\), \\(P(C)=0.45\\), \\(P(A\\cap B)=0.20\\), \\(P(B\\cap C)=0.20\\), \\(P(A\\cap C)=0.15\\), \\(P(A\\cap B\\cap C)=0.05\\), find:</p>
+<ol type="a">
+<li>\\(P(A \\mid A \\cup B)\\)</li>
+<li>\\(P(B \\mid A \\cap B)\\)</li>
+<li>\\(P(A \\cap B \\mid A \\cup B)\\)</li>
+<li>\\(P(A \\cup B \\mid A \\cap B \\cap C)\\)</li>
+</ol>""",
+     """<div class="sol-body">
+<div class="sol-step">\\(P(A\\cup B)=0.50+0.55-0.20=0.85\\)</div>
+<div class="sol-step"><strong>(a)</strong> \\(P(A\\mid A\\cup B)=0.50/0.85\\approx\\mathbf{0.588}\\)</div>
+<div class="sol-step"><strong>(b)</strong> \\(P(B\\mid A\\cap B)=\\mathbf{1}\\)</div>
+<div class="sol-step"><strong>(c)</strong> \\(P(A\\cap B\\mid A\\cup B)=0.20/0.85\\approx\\mathbf{0.235}\\)</div>
+<div class="sol-step"><strong>(d)</strong> \\(P(A\\cup B\\mid A\\cap B\\cap C)=\\mathbf{1}\\)</div>
+</div>"""),
+    (4, "Bayes — cricket captain and match fee [4M]",
+     """<p>Hardik, Rishabh and Surya lead the team with probabilities 0.2, 0.5 and 0.3. Match-fee increase probabilities if captain are 0.3, 0.6 and 0.5. If fee <strong>did</strong> increase, find \\(P\\) (captain is):</p>
+<ol type="a"><li>Hardik</li><li>Rishabh</li><li>Surya Kumar</li></ol>""",
+     """<div class="sol-body">
+<div class="sol-step">\\(P(F)=0.2(0.3)+0.5(0.6)+0.3(0.5)=0.17\\)</div>
+<div class="sol-step"><strong>(a)</strong> \\(P(H|F)=0.06/0.17=6/17\\approx\\mathbf{0.118}\\)</div>
+<div class="sol-step"><strong>(b)</strong> \\(P(R|F)=0.30/0.17=10/17\\approx\\mathbf{0.588}\\)</div>
+<div class="sol-step"><strong>(c)</strong> \\(P(S|F)=0.15/0.17=5/17\\approx\\mathbf{0.294}\\)</div>
+</div>"""),
+    (5, "Continuous PDF — find k, mean, variance [4M]",
+     """<p>\\(X\\) on \\([0,2]\\) with \\(f(x)=k(x+1)/4\\). Find (a) \\(k\\) (b) mean (c) \\(E[X^2]\\) (d) variance (e) \\(P(0.5&lt;X&lt;1.5)\\).</p>""",
+     """<div class="sol-body">
+<div class="sol-step"><strong>(a)</strong> Normalization → \\(\\mathbf{k=1}\\)</div>
+<div class="sol-step"><strong>(b)</strong> \\(E[X]=\\mathbf{7/6}\\)</div>
+<div class="sol-step"><strong>(c)</strong> \\(E[X^2]=\\mathbf{5/3}\\)</div>
+<div class="sol-step"><strong>(d)</strong> \\(\\text{Var}(X)=5/3-(7/6)^2=\\mathbf{11/36}\\)</div>
+<div class="sol-step"><strong>(e)</strong> \\(P(0.5&lt;X&lt;1.5)=\\mathbf{0.5}\\)</div>
+</div>"""),
+    (6, "Independent discrete RVs — joint distribution [4M]",
+     f"""<p>Independent discrete RVs:</p>
+{JUL2024_X_PMF}
+{JUL2024_Y_PMF}
+<ol type="a">
+<li>Joint distribution of \\(X\\) and \\(Y\\) (or justify if impossible)</li>
+<li>\\(P(X&lt;1,\\, Y&lt;2)\\)</li>
+<li>\\(P(X&lt;1 \\mid Y&lt;2)\\)</li>
+</ol>""",
+     """<div class="sol-body">
+<div class="sol-step"><strong>(a)</strong> Independent → \\(P(X=x,Y=y)=P(X=x)P(Y=y)\\) — full 4×4 joint table.</div>
+<div class="sol-step"><strong>(b)</strong> \\(P(X&lt;1,Y&lt;2)=0.25(0.10)+0.15(0.10)+0.15(0.20)=\\mathbf{0.070}\\)</div>
+<div class="sol-step"><strong>(c)</strong> \\(P(X&lt;1\\mid Y&lt;2)=0.070/0.30=\\mathbf{7/30}\\)</div>
+</div>"""),
+    (7, "Binomial — normal approximation [4M]",
+     """<p>\\(X \\sim \\text{Binomial}(150,\\, 0.2)\\). Find \\(P(50 &lt; X &lt; 80)\\).</p>""",
+     """<div class="sol-body">
+<div class="sol-step">\\(\\mu=30\\), \\(\\sigma=\\sqrt{24}\\approx 4.89\\). Continuity correction: \\(P(50.5&lt;X&lt;79.5)\\)</div>
+<div class="sol-step">\\(z\\)-scores 4.19 and 10.12 → \\(P(4.19&lt;Z&lt;10.12)\\approx 1-1=\\mathbf{0}\\)</div>
+</div>"""),
+    (8, "Sampling distribution of mean [3M]",
+     """<p>Supermarket visit time: mean 40 min, SD 5 min. For \\(n=50\\), find \\(P(35&lt;\\bar X&lt;45)\\).</p>""",
+     """<div class="sol-body">
+<div class="sol-step">\\(\\bar X \\sim N(40,\\,25/50)\\), SE \\(=5/\\sqrt{50}\\approx 0.707\\)</div>
+<div class="sol-step">\\(P(35&lt;\\bar X&lt;45)=P(-7.07&lt;Z&lt;7.07)\\approx\\mathbf{1}\\)</div>
+</div>"""),
+]
+
+JUL2024_MAKEUP_EMP_TABLE = html_table(
+    ["Vehicle", "Card", "Travel", "Employment"],
+    [
+        ("BMW", "Credit card", "Flight", "Business"),
+        ("Scooter", "Debit card", "Bus", "Salaried"),
+        ("Bicycle", "None", "Local train", "Business"),
+        ("Verna", "Credit card", "Vande Bharat", "Salaried"),
+        ("Scooter", "Credit card", "Flight", "Salaried"),
+        ("Auto", "None", "Bus", "Business"),
+        ("BMW", "Debit card", "Vande Bharat", "Salaried"),
+        ("—", "—", "Bus", "Salaried"),
+    ],
+)
+
+JUL2024_MAKEUP_BLOCKS = [
+    (1, "Independent events [3M]",
+     """<p>\\(A\\) and \\(B\\) are <strong>independent</strong> with \\(P(A)=0.25\\), \\(P(B)=0.20\\). Find:</p>
+<ol type="a">
+<li>\\(P(A \\cup B)\\)</li>
+<li>\\(P(A \\cap B)\\)</li>
+<li>\\(P(A \\mid B)\\)</li>
+<li>\\(P(B \\mid A)\\)</li>
+<li>\\(P(A^c \\mid B)\\)</li>
+<li>\\(P(A^c \\cap B^c)\\)</li>
+</ol>""",
+     """<div class="sol-body">
+<div class="sol-step"><strong>(a)</strong> \\(P(A\\cup B)=0.25+0.20-0.05=\\mathbf{0.40}\\)</div>
+<div class="sol-step"><strong>(b)</strong> \\(P(A\\cap B)=0.25\\times0.20=\\mathbf{0.05}\\)</div>
+<div class="sol-step"><strong>(c)</strong> \\(P(A|B)=0.05/0.20=\\mathbf{0.25}\\)</div>
+<div class="sol-step"><strong>(d)</strong> \\(P(B|A)=0.05/0.25=\\mathbf{0.20}\\)</div>
+<div class="sol-step"><strong>(e)</strong> \\(P(A^c|B)=1-0.25=\\mathbf{0.75}\\)</div>
+<div class="sol-step"><strong>(f)</strong> \\(P(A^c\\cap B^c)=0.75\\times0.80=\\mathbf{0.60}\\)</div>
+</div>"""),
+    (2, "Binomial from mean and SD [4M]",
+     """<p>Mean and SD of a binomial distribution are 4 and \\(2/\\sqrt{3}\\). Find:</p>
+<ol type="a">
+<li>The PMF (identify \\(n\\), \\(p\\) first)</li>
+<li>\\(E[X^2]\\)</li>
+<li>\\(P(6 &lt; X &lt; 9)\\)</li>
+</ol>""",
+     """<div class="sol-body">
+<div class="sol-step">\\(\\mu=np=4\\), \\(\\sigma=\\sqrt{np(1-p)}=2/\\sqrt{3}\\) → solve: \\(\\mathbf{n=6,\\, p=2/3}\\)</div>
+<div class="sol-step"><strong>(a)</strong> \\(P(X=k)=\\binom{6}{k}(2/3)^k(1/3)^{6-k}\\), \\(k=0,\\ldots,6\\)</div>
+<div class="sol-step"><strong>(b)</strong> \\(E[X^2]=\\text{Var}(X)+[E(X)]^2=4/3+16=\\mathbf{52/3}\\)</div>
+<div class="sol-step"><strong>(c)</strong> Max \\(X=6\\) → no values strictly between 6 and 9 → \\(\\mathbf{0}\\)</div>
+</div>"""),
+    (3, "Naïve Bayes — employment type [8M]",
+     f"""<p>Training data (vehicle, card, travel → employment):</p>
+{JUL2024_MAKEUP_EMP_TABLE}
+<p>Classify: <strong>Vehicle = Scooter; Credit Card = Yes; Travel = Bus</strong> using Naïve Bayes (state assumptions).</p>""",
+     """<div class="sol-body">
+<div class="sol-step">Classes: Salaried (5 rows) vs Business (3 rows) → \\(P(S)=5/8\\), \\(P(B)=3/8\\)</div>
+<div class="sol-step">Likelihoods (with Laplace smoothing if needed): Scooter appears in 2/8 rows (both Salaried); Bus travel in 4/8 (3 Salaried); Credit card in 5/8 (3 Salaried)</div>
+<div class="sol-step">\\(P(S|\\text{features})\\propto (5/8)\\times P(\\text{Scooter}|S)\\times P(\\text{Card}|S)\\times P(\\text{Bus}|S)\\) dominates \\(P(B|\\text{features})\\)</div>
+<div class="sol-step">→ Classify as <strong>Salaried</strong> (assumes conditional independence of features given class)</div>
+</div>"""),
+    (4, "Discrete PMF — find k [4M]",
+     """<p>\\(p(x)=k(x+1)/4\\) for \\(x\\in\\{-1,0,1,2\\}\\). Find (a) \\(k\\) (b) \\(E[X]\\) (c) \\(E[X^2]\\) (d) \\(\\text{Var}(X)\\) (e) \\(P(-1&lt;X&lt;2)\\).</p>""",
+     """<div class="sol-body">
+<div class="sol-step"><strong>(a)</strong> \\(p(-1)=0\\); sum \\(k/4+k/2+3k/4=1\\) → \\(6k/4=1\\) → \\(\\mathbf{k=2/3}\\)</div>
+<div class="sol-step"><strong>(b)</strong> \\(E[X]=0+1/3+1=\\mathbf{4/3}\\)</div>
+<div class="sol-step"><strong>(c)</strong> \\(E[X^2]=\\mathbf{7/3}\\)</div>
+<div class="sol-step"><strong>(d)</strong> \\(\\text{Var}(X)=7/3-(4/3)^2=\\mathbf{5/9}\\)</div>
+<div class="sol-step"><strong>(e)</strong> \\(P(-1&lt;X&lt;2)=p(0)+p(1)=k/4+k/2=\\mathbf{1/2}\\)</div>
+</div>"""),
+    (5, "Joint PDF — find k, marginals [4M]",
+     """<p>\\(f(x,y)=k(x+y)/8\\) on \\(0&lt;X&lt;2\\), \\(0&lt;Y&lt;2\\). Find (a) \\(k\\) (b) \\(f_X(x)\\) (c) \\(f_Y(y)\\) (d) Are \\(X,Y\\) independent?</p>""",
+     """<div class="sol-body">
+<div class="sol-step"><strong>(a)</strong> \\(\\iint k(x+y)/8\\,dx\\,dy=1\\) → \\(\\mathbf{k=1}\\)</div>
+<div class="sol-step"><strong>(b)</strong> \\(f_X(x)=\\int_0^2 (x+y)/8\\,dy=\\mathbf{(x+1)/4}\\)</div>
+<div class="sol-step"><strong>(c)</strong> \\(f_Y(y)=\\mathbf{(y+1)/4}\\)</div>
+<div class="sol-step"><strong>(d)</strong> \\(f(x,y)\\neq f_X(x)f_Y(y)\\) → <strong>not independent</strong></div>
+</div>"""),
+    (6, "Normal — employee salaries [4M]",
+     """<p>Salaries of 500 employees follow \\(N(20, 2^2)\\) (lakhs p.a.). Find <strong>expected number</strong> of employees:</p>
+<ol type="a">
+<li>with salary above 22 lakhs</li>
+<li>with salary below 16 lakhs</li>
+<li>with salary between 16 and 22 lakhs</li>
+<li>Comment on any inconsistencies</li>
+</ol>""",
+     """<div class="sol-body">
+<div class="sol-step"><strong>(a)</strong> \\(P(X&gt;22)=P(Z&gt;1)\\approx0.159\\) → \\(500\\times0.159\\approx\\mathbf{80}\\) employees</div>
+<div class="sol-step"><strong>(b)</strong> \\(P(X&lt;16)=P(Z&lt;-2)\\approx0.023\\) → \\(\\approx\\mathbf{11}\\) employees</div>
+<div class="sol-step"><strong>(c)</strong> \\(P(16&lt;X&lt;22)\\approx0.818\\) → \\(\\approx\\mathbf{409}\\) employees</div>
+<div class="sol-step"><strong>(d)</strong> Counts sum to ~500; bulk in middle 16–22 band — consistent with bell curve</div>
+</div>"""),
+    (7, "Sampling distribution — binomial vs normal [3M]",
+     """<ol type="a">
+<li>Binomial population, \\(n=45\\), \\(\\bar x=10\\), \\(s=2\\). Can the sampling distribution of \\(\\bar X\\) be binomial? Justify.</li>
+<li>Same with \\(n=25\\), \\(\\bar x=10\\), \\(s=2\\).</li>
+<li>Normal population, \\(n=9\\). What distribution does \\(\\bar X\\) follow?</li>
+</ol>""",
+     """<div class="sol-body">
+<div class="sol-step"><strong>(a)</strong> If binomial: \\(p=10/45=2/9\\); then \\(\\sigma=\\sqrt{45\\cdot(2/9)(7/9)}\\approx2.79\\neq2\\) → <strong>cannot be binomial</strong></div>
+<div class="sol-step"><strong>(b)</strong> \\(p=10/25=2/5\\); \\(\\sigma=\\sqrt{25\\cdot0.4\\cdot0.6}\\approx2.45\\neq2\\) → <strong>cannot be binomial</strong></div>
+<div class="sol-step"><strong>(c)</strong> Population normal → \\(\\bar X\\) is <strong>exactly normal</strong> for any \\(n\\) (CLT not needed)</div>
+</div>"""),
+]
+
+CURATED_PAPERS = {
+    "jul-2024-mid-sem-ec-2-regular-answers": JUL2024_REGULAR_BLOCKS,
+    "jul-2024-mid-sem-ec-2-makeup-answers": JUL2024_MAKEUP_BLOCKS,
+}
+
+# Fix stems broken by answer-key PDF parsing (question text merged into prior answer)
+STEM_OVERRIDES = {
+    "jan-2025-mid-sem-ec-2-regular": {
+        5: f"""<p>Suppose a machine learning model predicts the number of errors in a document using a discrete random variable \\(X\\), which takes values \\(0,1,3,4,5,6,7\\). The PMF of \\(X\\) is:</p>
+{PMF_TABLE}
+<ol type="a">
+<li>Find the value of \\(k\\)</li>
+<li>Compute \\(E[X]\\)</li>
+<li>What does the expected value mean in this context?</li>
+</ol>""",
+        6: """<p>A fair coin is tossed three times. Let \\(X\\) = number of tails observed and \\(Y\\) = player&apos;s winnings ($) by the position of the first tail:</p>
+<ul>
+<li>$3 if first tail on toss 1</li>
+<li>$2 if first tail on toss 2</li>
+<li>$1 if first tail on toss 3</li>
+<li>\\(-\\$2\\) if no tail in all three tosses</li>
+</ul>
+<ol type="a">
+<li>Find the joint PMF of \\(X\\) and \\(Y\\)</li>
+<li>Marginal PMF of \\(X\\)</li>
+<li>\\(E[X]\\)</li>
+</ol>""",
+    },
+    "jan-2026-mid-sem-ec-2-makeup-key": {
+        3: """<p>Final exam scores are modeled as \\(X \\sim N(73, 8^2)\\). Verify / compute:</p>
+<ol type="a">
+<li><strong>Most below 91?</strong> Find \\(P(X&lt;91)\\).</li>
+<li><strong>Central majority:</strong> Find \\(P(65&lt;X&lt;89)\\).</li>
+<li><strong>Dean&apos;s List:</strong> Top 5% cut-off score \\(c\\) with \\(P(X&gt;c)=0.05\\).</li>
+</ol>""",
+    },
+}
+
 EC3_QUESTIONS = [
     ("Q1", "Karl Pearson correlation — Delhi electricity [5M]",
      f"""<p>The Delhi Government studies the link between summer temperature and household electricity use (AC-driven load).</p>
@@ -548,6 +852,22 @@ Test at 5% whether Line A has <em>greater</em> thickness variability than Line B
 ]
 
 
+def curated_paper_section(exam, session, year, label, fname, sid, blocks):
+    sec = (
+        f'<section id="{sid}"><h2>{H.escape(label)}</h2>'
+        f'<p class="src">ISM/previous question papers · {H.escape(fname)} · '
+        f'<em>Formatted from answer key (auto-extract merges sub-parts)</em></p>'
+    )
+    for qnum, title, stem, sol in blocks:
+        qtags = render_question_tags(sid, qnum)
+        sec += f"""<div class="q"><div class="badges">{badge(exam, session, year)}{qtags}</div>
+        <h4>Q{qnum} — {H.escape(title)}</h4>
+        <div class="stem"><strong>Question:</strong>{stem}</div>
+        <div class="sol"><strong>Solution</strong>{format_math_in_html(sol)}</div></div>"""
+    sec += "</section>"
+    return sec
+
+
 def ec3_section(exam, session, year, label, fname):
     sid = re.sub(r"[^a-z0-9]+", "-", label.lower()).strip("-")
     sec = f'<section id="{sid}"><h2>{H.escape(label)}</h2><p class="src">ISM/previous question papers · {H.escape(fname)}</p>'
@@ -591,6 +911,20 @@ def june_section():
     return sec
 
 
+def resolve_solution(sols: dict, qnum: int, pdf_sol: str) -> str:
+    """Prefer curated sol-step HTML over raw PDF answer-key text."""
+    if qnum in sols:
+        sol_html = sols[qnum]
+        if isinstance(sol_html, str) and sol_html.lstrip().startswith(("<div", "<table")):
+            return format_math_in_html(sol_html)
+        return esc_sol(sol_html)
+    if pdf_sol and len(pdf_sol) > 80:
+        return format_math_in_html(
+            f'<div class="sol-body"><p>{H.escape(pdf_sol[:4000]).replace(chr(10), "<br>")}</p></div>'
+        )
+    return "<em>See workbook TYPE section or official PDF.</em>"
+
+
 def build():
     sections = [june_section()]
     nav = ['<a href="#june2026">June 2026 Mid Regular</a>']
@@ -601,22 +935,21 @@ def build():
         sid = re.sub(r"[^a-z0-9]+", "-", label.lower()).strip("-")
         short = f"{year} {exam.split()[0]} {session}"
         nav.append(f'<a href="#{sid}">{short}</a>')
+        if sid in CURATED_PAPERS:
+            sections.append(curated_paper_section(exam, session, year, label, fname, sid, CURATED_PAPERS[sid]))
+            continue
         sec = f'<section id="{sid}"><h2>{H.escape(label)}</h2><p class="src">ISM/previous question papers · {H.escape(fname)}</p>'
         sols = SOLUTIONS.get(sid, {})
         for qnum, qid, qtext, pdf_sol in split_questions(text):
-            if pdf_sol and len(pdf_sol) > 80:
-                sol_html = format_math_in_html(
-                    f'<div class="sol-body"><p>{H.escape(pdf_sol[:4000]).replace(chr(10), "<br>")}</p></div>'
-                )
+            overrides = STEM_OVERRIDES.get(sid, {})
+            if qnum in overrides:
+                stem_html = format_math_in_html(overrides[qnum])
             else:
-                sol_html = sols.get(qnum, "<em>See workbook TYPE section or official PDF.</em>")
-                if isinstance(sol_html, str) and sol_html.lstrip().startswith(("<div", "<table")):
-                    sol_html = format_math_in_html(sol_html)
-                else:
-                    sol_html = esc_sol(sol_html)
+                stem_html = esc(qtext)
+            sol_html = resolve_solution(sols, qnum, pdf_sol)
             sec += f"""<div class="q"><div class="badges">{badge(exam,session,year)}{render_question_tags(sid, qnum, qtext)}</div>
             <h4>{H.escape(qid)}</h4>
-            <div class="stem"><strong>Question:</strong><br>{esc(qtext)}</div>
+            <div class="stem"><strong>Question:</strong><br>{stem_html}</div>
             <div class="sol"><strong>Solution</strong>{sol_html}</div></div>"""
         sec += "</section>"
         sections.append(sec)
