@@ -27,6 +27,7 @@ TOPIC_GROUPS = [
         "Data quality issues",
         "Feature scaling (min-max, z-score)",
         "Dataset splitting (train / val / test)",
+        "Normal equation (matrix dimensions)",
     ]),
     ("t5", "Evaluation metrics", [
         "Accuracy",
@@ -57,6 +58,9 @@ TOPICS = {
     "bv": ("Bias–variance tradeoff", "t3"),
     "pre": ("Data preprocessing", "t4"),
     "split": ("Dataset splitting", "t4"),
+    "scale": ("Feature scaling", "t4"),
+    "ne": ("Normal equation", "t4"),
+    "rob": ("Model robustness", "t4"),
     "met": ("Evaluation metrics", "t5"),
     "acc": ("Accuracy", "t5"),
     "prec": ("Precision", "t5"),
@@ -70,9 +74,9 @@ TOPICS = {
 # (paper_slug, question_key) -> list of topic slugs
 QUESTION_TAGS = {
     # June 2026 (image paper)
-    ("june2026", "Q1"): ["gd", "sup"],
+    ("june2026", "Q1"): ["gd"],
     ("june2026", "Q2"): ["dt", "ent", "ig"],
-    ("june2026", "Q3"): ["pre", "lr"],
+    ("june2026", "Q3"): ["scale", "lr", "gd"],
     ("june2026", "Q4"): ["met", "acc", "prec", "rec", "f1"],
     ("june2026", "Q5"): ["bv", "of", "uf"],
     # 2023 Regular
@@ -81,7 +85,7 @@ QUESTION_TAGS = {
     ("2023-midsem-regular-ml", 3): ["lr", "gd", "ce"],
     ("2023-midsem-regular-ml", 4): ["met", "acc", "prec", "rec", "f1"],
     ("2023-midsem-regular-ml", 5): ["dt", "ent", "ig"],
-    ("2023-midsem-regular-ml", 6): ["gd", "reg"],
+    ("2023-midsem-regular-ml", 6): ["ne", "gd"],
     # 2023 Regular Set 2
     ("2023-midsem-regular-ml-2", 1): ["pre", "sup", "uns"],
     ("2023-midsem-regular-ml-2", 2): ["reg", "bv"],
@@ -105,7 +109,7 @@ QUESTION_TAGS = {
     ("dec-2025-ml-midsem-regular-qp-answer-key", 2): ["bv", "of", "uf"],
     ("dec-2025-ml-midsem-regular-qp-answer-key", 3): ["dt", "ent", "ig"],
     ("dec-2025-ml-midsem-regular-qp-answer-key", 4): ["met", "acc", "prec", "rec", "f1"],
-    ("dec-2025-ml-midsem-regular-qp-answer-key", 5): ["sup", "gd"],
+    ("dec-2025-ml-midsem-regular-qp-answer-key", 5): ["gd", "reg"],
     # Jan 2026 Makeup
     ("jan-2026-ml-midsem-makeup-qp-answer-key", 1): ["of", "uf", "bv"],
     ("jan-2026-ml-midsem-makeup-qp-answer-key", 2): ["lr", "split"],

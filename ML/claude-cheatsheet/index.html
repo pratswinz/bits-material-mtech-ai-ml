@@ -10,7 +10,7 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
 .hero{background:linear-gradient(135deg,#ecfdf5,#eff6ff);color:var(--text);padding:2.5rem 1.5rem;text-align:center;border-bottom:1px solid var(--border)}
 .hero h1{font-size:1.75rem;margin-bottom:.4rem;color:var(--navy)}
-.hero p{color:var(--muted);max-width:560px;margin:0 auto;font-size:.95rem}
+.hero p{color:var(--muted);max-width:620px;margin:0 auto;font-size:.95rem}
 .hero code{background:#fff;padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:.85rem}
 .plan-banner{max-width:900px;margin:1.5rem auto 0;padding:0 1rem}
 .plan-banner a{display:block;background:#fff;border:2px solid #059669;color:var(--navy);text-decoration:none;padding:1rem 1.4rem;border-radius:12px;text-align:center;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.04)}
@@ -23,15 +23,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 @media(min-width:640px){.topics-grid{grid-template-columns:repeat(2,1fr)}}
 .topic-card{border-radius:10px;padding:.85rem 1rem;border:1px solid var(--border);background:var(--card)}
 .topic-card h3{font-size:.82rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin:0 0 .5rem;padding-bottom:.35rem;border-bottom:2px solid}
-.topic-card ul{list-style:none;padding:0;margin:0}
-.topic-card li{font-size:.8rem;color:var(--text);padding:.22rem 0 .22rem .85rem;position:relative;line-height:1.35}
-.topic-card li::before{content:"";position:absolute;left:0;top:.55rem;width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.5}
-.t1 h3{color:#059669;border-color:#6ee7b7}.t1 li::before{color:#059669}
-.t2 h3{color:#2563eb;border-color:#93c5fd}.t2 li::before{color:#2563eb}
-.t3 h3{color:#d97706;border-color:#fcd34d}.t3 li::before{color:#d97706}
-.t4 h3{color:#7c3aed;border-color:#c4b5fd}.t4 li::before{color:#7c3aed}
-.t5 h3{color:#db2777;border-color:#f9a8d4}.t5 li::before{color:#db2777}
-.t6 h3{color:#0891b2;border-color:#67e8f9}.t6 li::before{color:#0891b2}
+.topic-card .subtopics{list-style:none;padding:0;margin:0 0 .65rem}
+.topic-card .subtopics li{font-size:.8rem;color:var(--text);padding:.18rem 0 .18rem .85rem;position:relative;line-height:1.35}
+.topic-card .subtopics li::before{content:"";position:absolute;left:0;top:.5rem;width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.5}
+.pyq-group{margin-top:.5rem;padding-top:.55rem;border-top:1px dashed var(--border)}
+.pyq-group .grp-head{font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--purple);letter-spacing:.04em;margin:0 0 .4rem}
+.pyq-list{list-style:none;margin:0;padding:0;font-size:.78rem}
+.pyq-list li{padding:.28rem 0;border-bottom:1px solid #f1f5f9;display:flex;flex-wrap:wrap;gap:.25rem .45rem;align-items:baseline;line-height:1.35}
+.pyq-list li:last-child{border-bottom:none}
+.pyq-meta{color:var(--muted);font-size:.72rem;white-space:nowrap}
+.pyq-list a{font-weight:700;color:var(--blue);text-decoration:none}
+.pyq-list a:hover{text-decoration:underline}
+.pyq-label{color:var(--text);font-size:.75rem}
+.pyq-empty{font-size:.75rem;color:var(--muted);margin:0}
+.t1 h3{color:#059669;border-color:#6ee7b7}.t1 .subtopics li::before{color:#059669}
+.t2 h3{color:#2563eb;border-color:#93c5fd}.t2 .subtopics li::before{color:#2563eb}
+.t3 h3{color:#d97706;border-color:#fcd34d}.t3 .subtopics li::before{color:#d97706}
+.t4 h3{color:#7c3aed;border-color:#c4b5fd}.t4 .subtopics li::before{color:#7c3aed}
+.t5 h3{color:#db2777;border-color:#f9a8d4}.t5 .subtopics li::before{color:#db2777}
+.t6 h3{color:#0891b2;border-color:#67e8f9}.t6 .subtopics li::before{color:#0891b2}
 .grid{max-width:900px;margin:1.5rem auto 2rem;padding:0 1rem;display:grid;gap:1.2rem}
 @media(min-width:700px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
@@ -53,70 +63,69 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 <body>
 <div class="hero">
 <h1>Machine Learning — Mid-Sem Hub</h1>
-<p>AIMLCZG565 · Important topics + PYQs tagged · All files in <code>ML/claude-cheatsheet/</code></p>
+<p>AIMLCZG565 · Topic-wise PYQs linked to <code>ML/questions/</code> · All files in <code>ML/claude-cheatsheet/</code></p>
 </div>
 <div class="plan-banner">
 <a href="ML_3Day_Plan.html">📅 Start with the 3-Day Plan<span>Theory → PYQs → revision · ~6–7 hrs/day</span></a>
 </div>
 
 <div class="topics-wrap">
-<h2>Mid-sem important topics</h2>
-<p class="topics-note">Syllabus focus · Every question in <a href="ML_Past_Papers.html">Past Papers</a> is tagged to these topics from <code>ML/questions/</code></p>
+<h2>Important topics &amp; past-paper PYQs</h2>
+<p class="topics-note">Every link opens the question in <a href="ML_Past_Papers.html">Past Papers</a> (2023–2026 mid + end sem from <code>ML/questions/MidSem/</code> &amp; <code>EndSem/</code>)</p>
 <div class="topics-grid">
 
 <div class="topic-card t1">
 <h3>Learning paradigms</h3>
-<ul>
-<li>Supervised learning</li>
-<li>Unsupervised learning</li>
-<li>Reinforcement learning</li>
-</ul>
+<ul class="subtopics"><li>Supervised learning</li><li>Unsupervised learning</li><li>Reinforcement learning</li><li>Mitchell definition (E, T, P)</li></ul>
+<div class="pyq-group">
+<p class="grp-head">Past paper PYQs · <code>ML/questions/</code></p>
+<ul class="pyq-list"><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q7">Q7</a><span class="pyq-label">— Supervised</span></li><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q5">Q5</a><span class="pyq-label">— Unsupervised</span></li><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q4">Q4</a><span class="pyq-label">— Supervised</span></li><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q2">Q2</a><span class="pyq-label">— Supervised</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q6">Q6</a><span class="pyq-label">— Unsupervised</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q5">Q5</a><span class="pyq-label">— Supervised</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q2">Q2</a><span class="pyq-label">— Supervised</span></li><li><span class="pyq-meta">Dec 2025 Reg</span><a href="ML_Past_Papers.html#dec-2025-ml-midsem-regular-qp-answer-key-q1">Q1</a><span class="pyq-label">— Supervised</span></li><li><span class="pyq-meta">2024 Mid Makeup</span><a href="ML_Past_Papers.html#2024-midsem-makeup-ml-q1">Q1</a><span class="pyq-label">— Learning paradigms</span></li><li><span class="pyq-meta">2023 Mid Reg</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-q1">Q1</a><span class="pyq-label">— Learning paradigms</span></li><li><span class="pyq-meta">2023 Reg (Set 2)</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-2-q1">Q1</a><span class="pyq-label">— Supervised</span></li></ul>
+</div>
 </div>
 
 <div class="topic-card t2">
 <h3>Logistic regression &amp; optimization</h3>
-<ul>
-<li>Logistic regression</li>
-<li>Gradient descent</li>
-<li>Cross entropy loss</li>
-</ul>
+<ul class="subtopics"><li>Logistic regression</li><li>Gradient descent</li><li>Cross entropy loss</li><li>Sigmoid / log-odds</li></ul>
+<div class="pyq-group">
+<p class="grp-head">Past paper PYQs · <code>ML/questions/</code></p>
+<ul class="pyq-list"><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q6">Q6</a><span class="pyq-label">— Gradient descent</span></li><li><span class="pyq-meta">Jan 2026 Makeup</span><a href="ML_Past_Papers.html#jan-2026-ml-midsem-makeup-qp-answer-key-q5">Q5</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q4">Q4</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">Jan 2026 Makeup</span><a href="ML_Past_Papers.html#jan-2026-ml-midsem-makeup-qp-answer-key-q3">Q3</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q3">Q3</a><span class="pyq-label">— Gradient descent</span></li><li><span class="pyq-meta">Jan 2026 Makeup</span><a href="ML_Past_Papers.html#jan-2026-ml-midsem-makeup-qp-answer-key-q2">Q2</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q4">Q4</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">June 2026</span><a href="ML_Past_Papers.html#june2026-q3">Q3</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q2">Q2</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">June 2026</span><a href="ML_Past_Papers.html#june2026-q1">Q1</a><span class="pyq-label">— Gradient descent</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q1">Q1</a><span class="pyq-label">— Gradient descent</span></li><li><span class="pyq-meta">Dec 2025 Reg</span><a href="ML_Past_Papers.html#dec-2025-ml-midsem-regular-qp-answer-key-q5">Q5</a><span class="pyq-label">— Gradient descent</span></li><li><span class="pyq-meta">Dec 2025 Reg</span><a href="ML_Past_Papers.html#dec-2025-ml-midsem-regular-qp-answer-key-q1">Q1</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">2024 Mid Makeup</span><a href="ML_Past_Papers.html#2024-midsem-makeup-ml-q5">Q5</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">2024 Mid Makeup</span><a href="ML_Past_Papers.html#2024-midsem-makeup-ml-q3">Q3</a><span class="pyq-label">— Gradient descent</span></li><li><span class="pyq-meta">2024 Mid Reg</span><a href="ML_Past_Papers.html#2024-midsem-regular-ml-q4">Q4</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">2024 Mid Reg</span><a href="ML_Past_Papers.html#2024-midsem-regular-ml-q3">Q3</a><span class="pyq-label">— Gradient descent</span></li><li><span class="pyq-meta">2023 Mid Reg</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-q6">Q6</a><span class="pyq-label">— Gradient descent</span></li><li><span class="pyq-meta">2023 Mid Reg</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-q3">Q3</a><span class="pyq-label">— Logistic regression</span></li><li><span class="pyq-meta">2023 Reg (Set 2)</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-2-q3">Q3</a><span class="pyq-label">— Logistic regression</span></li></ul>
+</div>
 </div>
 
 <div class="topic-card t3">
 <h3>Model fit &amp; regularization</h3>
-<ul>
-<li>Overfitting</li>
-<li>Underfitting</li>
-<li>Regularization</li>
-<li>Bias–variance tradeoff</li>
-</ul>
+<ul class="subtopics"><li>Overfitting</li><li>Underfitting</li><li>Regularization (Ridge / Lasso)</li><li>Bias–variance tradeoff</li></ul>
+<div class="pyq-group">
+<p class="grp-head">Past paper PYQs · <code>ML/questions/</code></p>
+<ul class="pyq-list"><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q8">Q8</a><span class="pyq-label">— Overfitting</span></li><li><span class="pyq-meta">Jan 2026 Makeup</span><a href="ML_Past_Papers.html#jan-2026-ml-midsem-makeup-qp-answer-key-q1">Q1</a><span class="pyq-label">— Overfitting</span></li><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q1">Q1</a><span class="pyq-label">— Regularization</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q7">Q7</a><span class="pyq-label">— Bias–variance tradeoff</span></li><li><span class="pyq-meta">June 2026</span><a href="ML_Past_Papers.html#june2026-q5">Q5</a><span class="pyq-label">— Bias–variance tradeoff</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q5">Q5</a><span class="pyq-label">— Overfitting</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q1">Q1</a><span class="pyq-label">— Regularization</span></li><li><span class="pyq-meta">Dec 2025 Reg</span><a href="ML_Past_Papers.html#dec-2025-ml-midsem-regular-qp-answer-key-q5">Q5</a><span class="pyq-label">— Regularization</span></li><li><span class="pyq-meta">Dec 2025 Reg</span><a href="ML_Past_Papers.html#dec-2025-ml-midsem-regular-qp-answer-key-q2">Q2</a><span class="pyq-label">— Bias–variance tradeoff</span></li><li><span class="pyq-meta">2024 Mid Makeup</span><a href="ML_Past_Papers.html#2024-midsem-makeup-ml-q4">Q4</a><span class="pyq-label">— Bias–variance tradeoff</span></li><li><span class="pyq-meta">2024 Mid Makeup</span><a href="ML_Past_Papers.html#2024-midsem-makeup-ml-q3">Q3</a><span class="pyq-label">— Regularization</span></li><li><span class="pyq-meta">2024 Mid Reg</span><a href="ML_Past_Papers.html#2024-midsem-regular-ml-q3">Q3</a><span class="pyq-label">— Regularization</span></li><li><span class="pyq-meta">2024 Mid Reg</span><a href="ML_Past_Papers.html#2024-midsem-regular-ml-q1">Q1</a><span class="pyq-label">— Overfitting</span></li><li><span class="pyq-meta">2023 Reg (Set 2)</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-2-q2">Q2</a><span class="pyq-label">— Regularization</span></li></ul>
+</div>
 </div>
 
 <div class="topic-card t4">
 <h3>Data &amp; preprocessing</h3>
-<ul>
-<li>Data preprocessing</li>
-<li>Dataset splitting</li>
-</ul>
+<ul class="subtopics"><li>Data preprocessing</li><li>Data quality issues</li><li>Feature scaling (min-max, z-score)</li><li>Dataset splitting (train / val / test)</li><li>Normal equation (matrix dimensions)</li></ul>
+<div class="pyq-group">
+<p class="grp-head">Past paper PYQs · <code>ML/questions/</code></p>
+<ul class="pyq-list"><li><span class="pyq-meta">Jan 2026 Makeup</span><a href="ML_Past_Papers.html#jan-2026-ml-midsem-makeup-qp-answer-key-q6">Q6</a><span class="pyq-label">— Data preprocessing</span></li><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q3">Q3</a><span class="pyq-label">— Data preprocessing</span></li><li><span class="pyq-meta">Jan 2026 Makeup</span><a href="ML_Past_Papers.html#jan-2026-ml-midsem-makeup-qp-answer-key-q2">Q2</a><span class="pyq-label">— Dataset splitting</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q5">Q5</a><span class="pyq-label">— Dataset splitting</span></li><li><span class="pyq-meta">June 2026</span><a href="ML_Past_Papers.html#june2026-q3">Q3</a><span class="pyq-label">— Feature scaling</span></li><li><span class="pyq-meta">2024 Mid Makeup</span><a href="ML_Past_Papers.html#2024-midsem-makeup-ml-q2">Q2</a><span class="pyq-label">— Data preprocessing</span></li><li><span class="pyq-meta">2024 Mid Reg</span><a href="ML_Past_Papers.html#2024-midsem-regular-ml-q2">Q2</a><span class="pyq-label">— Data preprocessing</span></li><li><span class="pyq-meta">2023 Mid Reg</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-q6">Q6</a><span class="pyq-label">— Normal equation</span></li><li><span class="pyq-meta">2023 Mid Reg</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-q2">Q2</a><span class="pyq-label">— Data preprocessing</span></li><li><span class="pyq-meta">2023 Reg (Set 2)</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-2-q1">Q1</a><span class="pyq-label">— Data preprocessing</span></li></ul>
+</div>
 </div>
 
 <div class="topic-card t5">
 <h3>Evaluation metrics</h3>
-<ul>
-<li>Accuracy</li>
-<li>Precision</li>
-<li>Recall</li>
-<li>F1 score</li>
-</ul>
+<ul class="subtopics"><li>Accuracy</li><li>Precision</li><li>Recall</li><li>F1 score</li><li>Confusion matrix</li></ul>
+<div class="pyq-group">
+<p class="grp-head">Past paper PYQs · <code>ML/questions/</code></p>
+<ul class="pyq-list"><li><span class="pyq-meta">Jan 2026 Makeup</span><a href="ML_Past_Papers.html#jan-2026-ml-midsem-makeup-qp-answer-key-q4">Q4</a><span class="pyq-label">— Evaluation metrics</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q5">Q5</a><span class="pyq-label">— Accuracy</span></li><li><span class="pyq-meta">June 2026</span><a href="ML_Past_Papers.html#june2026-q4">Q4</a><span class="pyq-label">— Evaluation metrics</span></li><li><span class="pyq-meta">Dec 2025 Reg</span><a href="ML_Past_Papers.html#dec-2025-ml-midsem-regular-qp-answer-key-q4">Q4</a><span class="pyq-label">— Evaluation metrics</span></li><li><span class="pyq-meta">2024 Mid Makeup</span><a href="ML_Past_Papers.html#2024-midsem-makeup-ml-q4">Q4</a><span class="pyq-label">— Evaluation metrics</span></li><li><span class="pyq-meta">2023 Mid Reg</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-q4">Q4</a><span class="pyq-label">— Evaluation metrics</span></li><li><span class="pyq-meta">2023 Reg (Set 2)</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-2-q4">Q4</a><span class="pyq-label">— Evaluation metrics</span></li></ul>
+</div>
 </div>
 
 <div class="topic-card t6">
 <h3>Decision trees</h3>
-<ul>
-<li>Decision trees</li>
-<li>Entropy</li>
-<li>Information gain</li>
-</ul>
+<ul class="subtopics"><li>Decision trees (ID3 / CART)</li><li>Entropy</li><li>Information gain</li></ul>
+<div class="pyq-group">
+<p class="grp-head">Past paper PYQs · <code>ML/questions/</code></p>
+<ul class="pyq-list"><li><span class="pyq-meta">Mar 2026 Makeup</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-makeup-qp-answer-key-q8">Q8</a><span class="pyq-label">— Decision trees</span></li><li><span class="pyq-meta">Jan 2026 Makeup</span><a href="ML_Past_Papers.html#jan-2026-ml-midsem-makeup-qp-answer-key-q6">Q6</a><span class="pyq-label">— Decision trees</span></li><li><span class="pyq-meta">Mar 2026 Reg</span><a href="ML_Past_Papers.html#mar-2026-ml-endsem-regular-qp-answer-key-q3">Q3</a><span class="pyq-label">— Decision trees</span></li><li><span class="pyq-meta">June 2026</span><a href="ML_Past_Papers.html#june2026-q2">Q2</a><span class="pyq-label">— Decision trees</span></li><li><span class="pyq-meta">Dec 2025 Reg</span><a href="ML_Past_Papers.html#dec-2025-ml-midsem-regular-qp-answer-key-q3">Q3</a><span class="pyq-label">— Decision trees</span></li><li><span class="pyq-meta">2024 Mid Makeup</span><a href="ML_Past_Papers.html#2024-midsem-makeup-ml-q6">Q6</a><span class="pyq-label">— Decision trees</span></li><li><span class="pyq-meta">2023 Mid Reg</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-q5">Q5</a><span class="pyq-label">— Decision trees</span></li><li><span class="pyq-meta">2023 Reg (Set 2)</span><a href="ML_Past_Papers.html#2023-midsem-regular-ml-2-q5">Q5</a><span class="pyq-label">— Decision trees</span></li></ul>
+</div>
 </div>
 
 </div>
@@ -157,7 +166,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 <li><code>ML/questions/EndSem/</code> — end-sem papers (2021, 2026)</li>
 <li><code>ML/questions/_Resources/</code> — practice QPs, study guides, sample papers</li>
 <li><code>ML/mid sem/</code> — Ridge/Lasso numerical</li>
-<li><code>ML/claude-cheatsheet/assets/</code> — SVG diagrams (inlined in HTML — works offline)</li>
+<li>Rebuild: <code>python3 build_all.py</code> in <code>ML/claude-cheatsheet/</code></li>
 </ul>
 </div>
 </body>

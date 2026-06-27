@@ -223,7 +223,8 @@ def june_section():
     sec = '<section id="june2026"><h2>June 2026 EC-2 Regular</h2><p class="src">ML/questions/MidSem/2026-06_Regular/</p>'
     for qid, title, img, body in JUNE2026_BLOCKS:
         topic_badges = render_question_tags("june2026", qid)
-        sec += f'''<div class="q"><div class="badges">{badge("Mid Sem","Regular","2026")}{topic_badges}</div>
+        qnum = int(re.search(r"\d+", qid).group()) if re.search(r"\d+", qid) else qid
+        sec += f'''<div class="q" id="june2026-q{qnum}"><div class="badges">{badge("Mid Sem","Regular","2026")}{topic_badges}</div>
         <h4>{H.escape(qid)} — {H.escape(title)}</h4>
         <img class="exam-img" src="{img}" alt="{H.escape(qid)}">
         <div class="sol"><strong>Solution:</strong>{body}</div></div>'''
@@ -266,7 +267,7 @@ def build():
             qnum = re.search(r"\d+", qid)
             qkey = int(qnum.group()) if qnum else qid
             topic_badges = render_question_tags(sid, qkey, qtext)
-            sec += f'''<div class="q"><div class="badges">{badge(exam,session,year)}{topic_badges}</div>
+            sec += f'''<div class="q" id="{sid}-q{qkey}"><div class="badges">{badge(exam,session,year)}{topic_badges}</div>
             <h4>{H.escape(qid)}</h4>
             <div class="stem"><strong>Question:</strong><br>{esc(qtext)}</div>
             {extra}

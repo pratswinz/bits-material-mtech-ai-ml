@@ -14,7 +14,7 @@ def run(script: str) -> None:
 
 def main() -> None:
     run("build_past_papers.py")
-    run("enrich_workbook.py")
+    run("build_index.py")
     run("build_workbook.py")
     print("\nAll done. Open index.html in ML/claude-cheatsheet/")
 

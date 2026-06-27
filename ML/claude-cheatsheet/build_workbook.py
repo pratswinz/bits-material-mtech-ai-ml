@@ -1,305 +1,268 @@
 #!/usr/bin/env python3
-"""Rebuild ML_PYQ_Workbook.html — detailed questions + collapsible solutions."""
+"""Build ML_PYQ_Workbook.html — ISM-style TYPE sections + PYQ links."""
+import html as H
 import re
-import shutil
 from pathlib import Path
 
-from workbook_format import TOGGLE_CSS, TOGGLE_JS, apply_prompts, extract_q_blocks, wrap_q_block
+from ml_workbook_catalog import collect_by_type
+from svg_inline import SVG_WRAP_CSS, reset_uid, svg_figure
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "ML_PYQ_Workbook.html"
-JUNE_SRC = Path("/Volumes/disc 2/bits pilani/ML/questions/MidSem/2026-06_Regular")
-EXAM_IMG = ROOT / "assets/exam-2026-06"
 
-HEADER_CSS = """
-header{background:#fff;color:var(--text);border-bottom:1px solid var(--border);padding:1.4rem 1.5rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-header h1{color:var(--navy);font-size:1.35rem;margin:0 0 .25rem}
-header p{color:var(--muted);margin:0;font-size:.88rem}
-header a{color:var(--blue)}
+SHARED_HEAD = """
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['\\\\(','\\\\)']], displayMath: [['\\\\[','\\\\]']], processEscapes: true },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
 """
 
-IMG_MAP = [
-    ("Q1.jpeg", "Q1.jpeg"),
-    ("Q2.jpeg", "Q2.jpeg"),
-    ("Q3.jpeg", "Q3.jpeg"),
-    ("Q4.jpeg", "Q4.jpeg"),
-    ("Q5.jpeg", "Q5.jpeg"),
+SHARED_CSS = """
+:root{--navy:#1e3a5f;--blue:#2563eb;--green:#059669;--purple:#7c3aed;--amber:#d97706;--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,"Segoe UI",serif;background:var(--bg);color:var(--text);line-height:1.65}
+header{background:#fff;color:var(--text);border-bottom:1px solid var(--border);padding:1.4rem 1.5rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+header h1{color:var(--navy);margin:0 0 .25rem;font-size:1.35rem}
+header p{color:var(--muted);margin:0;font-size:.88rem}
+header a{color:var(--blue);text-decoration:none}
+header a:hover{text-decoration:underline}
+.shell{display:flex;max-width:1280px;margin:0 auto;width:100%}
+aside{width:260px;flex-shrink:0;background:var(--card);border-right:1px solid var(--border);padding:.8rem;position:sticky;top:0;height:100vh;overflow-y:auto;font-size:.72rem}
+aside a{display:block;padding:.28rem .45rem;color:var(--navy);text-decoration:none;border-radius:4px}
+aside a.nav-type{line-height:1.4;padding:.35rem .5rem}
+aside a.nav-type .nav-num{font-weight:600;display:block}
+aside a.nav-type .nav-topic{color:var(--muted);font-size:.68rem;display:block;margin-top:.05rem}
+aside a.nav-type .nav-exam{color:var(--blue);font-weight:600;font-size:.64rem;margin-left:.25rem}
+aside a:hover{background:#eff6ff}
+aside .grp{font-weight:700;color:var(--purple);font-size:.62rem;text-transform:uppercase;margin:.7rem 0 .15rem}
+.pyq-group{margin:1rem 0 0;padding:.85rem 0 0;border-top:1px dashed var(--border)}
+.pyq-group .grp-head{font-size:.72rem;font-weight:700;text-transform:uppercase;color:var(--purple);letter-spacing:.04em;margin:0 0 .5rem}
+.pyq-list{list-style:none;margin:0;padding:0;font-size:.82rem}
+.pyq-list li{padding:.35rem 0;border-bottom:1px solid #f1f5f9;display:flex;flex-wrap:wrap;gap:.35rem .5rem;align-items:baseline}
+.pyq-list li:last-child{border-bottom:none}
+.pyq-paper{font-weight:600;color:var(--navy)}
+.pyq-q{color:var(--muted)}
+.pyq-label{color:var(--text)}
+.pyq-list a{font-size:.75rem;color:var(--blue);text-decoration:none;white-space:nowrap}
+.pyq-list a:hover{text-decoration:underline}
+.tag.mid{background:#dbeafe;color:#1d4ed8}
+main{flex:1;min-width:0;max-width:920px;padding:1.5rem 2rem}
+section{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:2px solid var(--border)}
+h2{color:var(--navy);font-size:1.15rem;margin-bottom:.6rem}
+.q{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:10px;padding:1.2rem;margin:1rem 0}
+.formula{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.85rem 1rem;margin:.75rem 0;font-size:.95rem;text-align:center}
+.formula h5{margin:0 0 .4rem;font-size:.72rem;text-transform:uppercase;color:var(--blue);letter-spacing:.04em;text-align:left}
+.src{font-size:.78rem;color:var(--muted);margin-bottom:.5rem}
+.step{background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;margin:.5rem 0;font-size:.92rem}
+.step strong{color:var(--navy)}
+.ans{background:#ecfdf5;border:1px solid #bbf7d0;border-radius:8px;padding:.65rem 1rem;margin:.65rem 0;font-weight:600;color:#047857}
+.data-table{border-collapse:collapse;width:100%;margin:.75rem 0;font-size:.82rem}
+.data-table th,.data-table td{border:1px solid var(--border);padding:.35rem .5rem}
+.data-table thead th{background:#eff6ff;font-weight:600}
+.diagram{margin:.75rem 0;text-align:center}
+.tag{display:inline-block;font-size:.68rem;background:#f3e8ff;color:var(--purple);padding:2px 8px;border-radius:99px;margin-right:4px}
+.exam-img{max-width:100%;border:1px solid var(--border);border-radius:8px;margin:.5rem 0}
+""" + SVG_WRAP_CSS
+
+# (id, title, exam, svg, formula, solution_html)
+TYPES = [
+    ("type1", "TYPE 1 — Mitchell & Learning Paradigms", "Mid EC-2", "mitchell-etp.svg",
+     r"\text{Learn from } E \text{ to improve } P \text{ on task } T",
+     r"""<p><strong>PYQ:</strong> 2023 Regular Q1 — AlphaGo supervised → reinforcement</p>
+<div class="step">(a) Self-driving + rewards → <strong>Reinforcement learning</strong></div>
+<div class="step">(b) Labelled review sentiment → <strong>Supervised classification</strong></div>
+<div class="step">(c) Unlabelled DNA clusters → <strong>Unsupervised clustering</strong></div>
+<div class="step">(d) Predict claim amount → <strong>Supervised regression</strong></div>
+<div class="step">Weather: E = history · T = predict rainfall · P = RMSE → <strong>regression</strong></div>
+<div class="ans">AlphaGo v1: supervised on human games → v2: self-play reinforcement</div>"""),
+    ("type2", "TYPE 2 — Data Quality & Preprocessing", "Mid EC-2", None,
+     r"\text{Detect: missing, duplicate, outlier, inconsistent format, invalid type}",
+     r"""<p><strong>PYQ:</strong> 2023 Regular Q2 — student admission table</p>
+<div class="step">Duplicate Bhargav · CGPA 12.3 / −1.5 · Missing CGPA/DOB · Mixed date formats · Branch casing · Invalid Feb 30</div>
+<div class="step">Fix: dedupe, impute missing, standardize dates/categories, cap invalid CGPA, parse DOB → derive age</div>
+<div class="ans">List 5–6 issues + fix for each (0.25 marks each in official rubric)</div>"""),
+    ("type3", "TYPE 3 — Gradient Descent", "Mid EC-2", "gd-flow.svg",
+     r"\theta_j \leftarrow \theta_j - \alpha\frac{\partial J}{\partial\theta_j} \quad \text{Ridge: } +\frac{\lambda}{m}\theta_j",
+     r"""<p><strong>PYQ:</strong> Dec 2025 Q5 — \(x=[1,2,3], y=[2,5,7], \theta_0=0, \theta_1=1, \alpha=0.05, \lambda=2, m=3\)</p>
+<div class="step">Predictions \(h=[1,2,3]\), errors \(e=[-1,-3,-4]\)</div>
+<div class="step">\(\partial J/\partial\theta_0 = -8/3\), \(\partial J/\partial\theta_1 = -19/3 + 2/3\) (Ridge on \(\theta_1\))</div>
+<div class="step">Update: \(\theta_0=0.133, \theta_1=1.283\) · Cost drops 4.667 → 3.006 ✓</div>
+<div class="ans">Negative gradient on \(\theta_j\) → increase that weight in GD update</div>"""),
+    ("type4", "TYPE 4 — Confusion Matrix & Metrics", "Mid EC-2", "confusion-matrix.svg",
+     r"\text{Acc}=\frac{TP+TN}{N} \quad \text{Prec}=\frac{TP}{TP+FP} \quad \text{Rec}=\frac{TP}{TP+FN} \quad F_1=\frac{2PR}{P+R}",
+     r"""<p><strong>PYQ:</strong> June 2026 Q4 — fraud detection (imbalanced)</p>
+<div class="step">Model A: Acc=98.55% but Prec=33.3%, Rec=45% — accuracy misleading</div>
+<div class="step">Model B: lower accuracy, TPR=80% — better for catching fraud</div>
+<div class="step">Dec 2025 medical: FN cost \$10,000 vs FP \$500 → prioritize <strong>recall</strong></div>
+<div class="ans">Pick metric to match business cost of FN vs FP</div>"""),
+    ("type5", "TYPE 5 — Bias–Variance Tradeoff", "Mid EC-2", "bias-variance.svg",
+     r"R^2 = 1 - \frac{SS_{res}}{SS_{tot}} \quad \text{Train}\approx\text{Test high} \Rightarrow \text{bias}",
+     r"""<p><strong>PYQ:</strong> June 2026 Q5 — spam classifier learning curves</p>
+<div class="step">Model A: train 61%, val 60% → <strong>high bias</strong> (underfit); more data won't help</div>
+<div class="step">Model B: train 99%, val 67% → <strong>high variance</strong> (overfit); use L1/L2, fewer features</div>
+<div class="ans">Improved: logistic + moderate features + L2 + cross-validation</div>"""),
+    ("type6", "TYPE 6 — Regularization (Ridge / Lasso)", "Mid EC-2", "ridge-lasso.svg",
+     r"J_{Ridge}=MSE+\lambda\sum\theta_j^2 \quad J_{Lasso}=MSE+\lambda\sum|\theta_j|",
+     r"""<p><strong>PYQ:</strong> 2024 Regular Q1 — overfitting with many features</p>
+<div class="step">(a) Many irrelevant features → <strong>Lasso (L1)</strong> zeros weights (feature selection)</div>
+<div class="step">(b) Large logistic weights → L2/L1 penalty shrinks them; tune \(\lambda\) via CV</div>
+<div class="step">Ridge update: \(\theta_j \leftarrow (1-\alpha\lambda/m)\theta_j - \alpha\partial MSE\) · Lasso subtracts \(\alpha\lambda\,\mathrm{sign}(\theta_j)\)</div>
+<div class="ans">See also <a href="#practice-ridge">Ridge/Lasso numerical</a> (2 iterations)</div>"""),
+    ("type7", "TYPE 7 — Decision Trees / Entropy / IG", "Mid EC-2", "entropy-ig-tree.svg",
+     r"H(S)=-\sum_k p_k\log_2 p_k \quad IG=H(S)-\sum_v\frac{|S_v|}{|S|}H(S_v)",
+     r"""<p><strong>PYQ:</strong> June 2026 Q2 — loan approval (10 applicants)</p>
+<div class="step">Parent: 5 Yes / 5 No → \(H(S)=1.0\) bit</div>
+<div class="step">Split <em>Existing Loan</em>: No branch 5Y/0N (H=0), Yes branch 0Y/5N (H=0) → <strong>IG = 1.0</strong></div>
+<div class="step">Tree: Existing Loan=No → Approve; Yes → Deny (pure leaves)</div>
+<div class="ans">Always pick attribute with maximum information gain at each node</div>"""),
+    ("type8", "TYPE 8 — Logistic Regression", "Mid EC-2", "logistic-sigmoid.svg",
+     r"\sigma(z)=\frac{1}{1+e^{-z}} \quad z=\theta^T x \quad \text{BCE: } -[y\log\hat p+(1-y)\log(1-\hat p)]",
+     r"""<p><strong>PYQ:</strong> June 2026 Q3 — min-max + logistic default prediction</p>
+<div class="step">Min-max credit scores → \(x'\in[0,1]\) · Sigmoid probabilities for each student</div>
+<div class="step">BCE loss \(L=0.864\) · One GD step: \(w_0^*=0.006, w_1^*=0.393, w_2^*=-0.424\)</div>
+<div class="step">Large positive coef ≠ guaranteed class (probability, not deterministic)</div>
+<div class="ans">Decision boundary: set \(\theta^T x=0\) (or \(p=0.5\))</div>"""),
+    ("type9", "TYPE 9 — Feature Scaling", "Mid EC-2", "min-max-scaling.svg",
+     r"x'=\frac{x-x_{min}}{x_{max}-x_{min}} \quad x'=\frac{x-\mu}{\sigma}",
+     r"""<p><strong>PYQ:</strong> Practice T/F — scaling &amp; trees</p>
+<div class="step">(a) GD needs scaling for fast convergence → <strong>TRUE</strong></div>
+<div class="step">(b) Decision trees need scaling → <strong>FALSE</strong> (split-invariant)</div>
+<div class="step">(c) Min-max sensitive to outliers → <strong>TRUE</strong></div>
+<div class="step">(d) Z-score maps to [0,1] → <strong>FALSE</strong></div>
+<div class="ans">Scale before GD/logistic; trees &amp; Naïve Bayes often unaffected</div>"""),
+    ("type10", "TYPE 10 — Model Robustness", "Mid EC-2", "bias-variance.svg",
+     r"\text{LR: sensitive to outliers} \quad \text{Tree: isolates outliers} \quad \text{RF: bagging smooths}",
+     r"""<p><strong>PYQ:</strong> ML/questions/_Resources/ML_MidSem_Practice_PastPapers_Mock.pdf</p>
+<div class="step">Linear regression + noise/outliers → <strong>Affected</strong> (squared error)</div>
+<div class="step">Decision tree + outliers → often <strong>Less affected</strong> (isolated leaf)</div>
+<div class="step">Random forest → <strong>Less affected</strong> on both (averaging)</div>
+<div class="ans">Match model inductive bias to data noise profile</div>"""),
+    ("type11", "TYPE 11 — Normal Equation / Dimensions", "Mid EC-2", None,
+     r"\theta=(X^TX)^{-1}X^Ty \quad X\in\mathbb{R}^{m\times(n+1)},\ y\in\mathbb{R}^{m\times 1}",
+     r"""<p><strong>PYQ:</strong> 2023 Regular Q6 — \(m=28\) samples, \(n=4\) features + bias</p>
+<div class="step">\(\mathbf{X}\in\mathbb{R}^{28\times 5}\), \(\mathbf{y}\in\mathbb{R}^{28\times 1}\), \(\boldsymbol{\theta}\in\mathbb{R}^{5\times 1}\)</div>
+<div class="step">\(X^TX\in\mathbb{R}^{5\times 5}\) · wrong dimension on any axis → 0 marks</div>
+<div class="ans">Add column of 1s for intercept before matrix multiply</div>"""),
 ]
 
+PRACTICE = r"""
+<section id="practice-ridge"><h2>Practice — Ridge &amp; Lasso (2 iterations)</h2>
+<span class="tag mid">Mid</span>
+<p class="src"><code>ML/mid sem/ML_LinReg_Regularization_Solution.pdf</code></p>
+<div class="q"><p><strong>RR-CHD:</strong> Diastolic BP \(x_1\), BMI \(x_2\). \(w_0=5, w_1=w_2=-0.03, \alpha=0.02, \lambda=5, m=3\).</p>
+<div class="step"><strong>Ridge iter 1:</strong> \(1-\alpha\lambda=0.9\) → \(w_0=5.0016, w_1=0.1823, w_2=0.0507\)</div>
+<div class="step"><strong>Lasso:</strong> subtract \(\alpha\lambda\,\mathrm{sign}(w_j)\) each step — can zero weights</div>
+<div class="ans">Show matrix dimensions + one full iteration with cost decrease (exam rubric)</div></div></section>
 
-def sync_images():
-    EXAM_IMG.mkdir(parents=True, exist_ok=True)
-    for src_name, dst_name in IMG_MAP:
-        src = JUNE_SRC / src_name
-        if src.exists():
-            shutil.copy2(src, EXAM_IMG / dst_name)
+<section id="practice-mock"><h2>Practice — Mock Exam (6 questions)</h2>
+<span class="tag mid">Mid</span>
+<p class="src"><code>ML/questions/_Resources/ML_MidSem_Practice_PastPapers_Mock.pdf</code></p>
+<div class="q"><p><strong>Mock Q1:</strong> Hospital readmission — Mitchell E/T/P, classification, overfitting fixes</p>
+<div class="step">E = records · T = 30-day readmission · P = F1/AUC · Fix overfit: L2 + early stopping</div></div>
+<div class="q"><p><strong>Mock Q3:</strong> GD one step — \(x=[2,4,6], y=[3,7,11], \theta_0=\theta_1=0.5, \alpha=0.1, \lambda=1\)</p>
+<div class="ans">\(\theta_0=0.933, \theta_1=0.9\) after one iteration</div></div>
+<div class="q"><p><strong>Mock Q4:</strong> Spam 2000 emails — precision/recall/F1; FN \$50 vs FP \$5 → lower threshold if FN costly</p></div></section>
 
-
-def unwrap_wrapped_inner(inner: str) -> str:
-    """Strip q-stem / sol-toggle wrapper back to flat question content."""
-    s = inner.strip()
-    if s.startswith('<div class="q-stem">') and "sol-toggle" not in s and s.endswith("</div>"):
-        return s[len('<div class="q-stem">') : -len("</div>")]
-    if "sol-toggle" not in s:
-        return inner
-    if not s.startswith('<div class="q-stem">'):
-        return inner
-    det = s.find('<details class="sol-toggle">')
-    if det == -1:
-        return inner
-    stem_part = s[:det].rstrip()
-    if not stem_part.endswith("</div>"):
-        return inner
-    stem = stem_part[len('<div class="q-stem">') : -len("</div>")]
-    body_open = s.find('<div class="sol-body">', det)
-    if body_open == -1:
-        return inner
-    body_open += len('<div class="sol-body">')
-    det_close = s.rfind("</details>")
-    if det_close == -1:
-        return inner
-    body_close = s.rfind("</div>", body_open, det_close)
-    if body_close == -1:
-        return inner
-    sol = s[body_open:body_close]
-    return stem + sol
-
-
-def flatten_toggles(html: str) -> str:
-    """Unwrap prior build so rebuild is idempotent."""
-    if "sol-toggle" not in html:
-        return html
-    blocks = extract_q_blocks(html)
-    if not blocks:
-        return html
-    out = []
-    last = 0
-    for start, end, inner in blocks:
-        flat = unwrap_wrapped_inner(inner)
-        out.append(html[last:start] + f'<div class="q">{flat}</div>')
-        last = end
-    out.append(html[last:])
-    return "".join(out)
-
-
-def fix_images(html: str) -> str:
-    replacements = [
-        ("../questions/MidSem/2026-06_Regular/Q1.jpeg", "assets/exam-2026-06/Q1.jpeg"),
-        ("../questions/june mid sem regular 2026/WhatsApp Image 2026-06-21 at 11.43.21.jpeg", "assets/exam-2026-06/Q1.jpeg"),
-        ("../questions/june mid sem regular 2026/WhatsApp Image 2026-06-21 at 11.43.22.jpeg", "assets/exam-2026-06/Q2.jpeg"),
-        ("../questions/june mid sem regular 2026/WhatsApp Image 2026-06-21 at 11.43.23.jpeg", "assets/exam-2026-06/Q3.jpeg"),
-        ("../questions/june mid sem regular 2026/WhatsApp Image 2026-06-21 at 11.43.24.jpeg", "assets/exam-2026-06/Q4.jpeg"),
-        ("../questions/june mid sem regular 2026/WhatsApp Image 2026-06-21 at 11.43.21 (1).jpeg", "assets/exam-2026-06/Q5.jpeg"),
-    ]
-    for old, new in replacements:
-        html = html.replace(old, new)
-    return html
-
-
-def fix_theta(html: str) -> str:
-    return html.replace("\t" + "heta", r"\theta")
-
-
-def inject_sol_css(html: str) -> str:
-    """Patch solution formatting CSS into existing workbook."""
-    marker = ".sol-body .sol-part{"
-    if marker in html:
-        return html
-    block = """
-.sol-body{line-height:1.75}
-.sol-body p{margin:.45rem 0}
-.sol-body .sol-part{margin:1.1rem 0;padding:.85rem 0 .5rem;border-bottom:1px dashed var(--border)}
-.sol-body .sol-part:last-child{border-bottom:none;margin-bottom:0}
-.sol-body .part-head{font-weight:700;color:var(--navy);font-size:.92rem;margin:0 0 .55rem}
-.sol-body .sol-lines{margin:.35rem 0 .5rem 1.35rem}
-.sol-body .sol-lines li{margin:.35rem 0}
-.sol-body .calc-block{background:#f8fafc;border-left:3px solid var(--blue);padding:.55rem .85rem;margin:.55rem 0;border-radius:0 6px 6px 0}
-.sol-body .calc-line{margin:.25rem 0}
-.sol-body .sol-table{margin:.65rem 0}
-.sol-body .ans p{margin:.35rem 0}
+<section id="practice-june"><h2>June 2026 — Full Paper</h2>
+<span class="tag mid">Mid</span>
+<p class="src"><code>ML/questions/MidSem/2026-06_Regular/</code> · detailed solutions with exam images</p>
+<div class="q"><p>Q1–Q5 covered across TYPE 3, 4, 5, 7, 8 above. Full stems + images:</p>
+<div class="ans"><a href="ML_Past_Papers.html#june2026">Open June 2026 in Past Papers →</a></div></div></section>
 """
-    anchor = ".sol-body .step,.sol-body .ans"
-    if anchor in html:
-        return html.replace(anchor, block.strip() + "\n" + anchor)
-    return html.replace(".sol-body{padding:1rem 1.15rem 1.2rem}", block.strip())
 
 
-def inject_css_js(html: str) -> str:
-    if ".sol-toggle" not in html:
-        html = html.replace(
-            ".tag{display:inline-block",
-            TOGGLE_CSS + ".tag{display:inline-block",
+def _type_parts(title: str) -> tuple[str, str]:
+    if "—" in title:
+        num, topic = title.split("—", 1)
+        return num.strip(), topic.strip()
+    return title.strip(), ""
+
+
+def _render_pyq_group(type_num: int, catalog: dict) -> str:
+    items = catalog.get(type_num, [])
+    if not items:
+        return ""
+    rows = []
+    for row in items:
+        q = row["qid"]
+        sess = "Makeup" if row["session"] == "Makeup" else "Reg"
+        rows.append(
+            f'<li><span class="pyq-paper">{H.escape(row["label"])}</span>'
+            f'<span class="pyq-q">{H.escape(q)}</span>'
+            f'<span class="pyq-label">— {H.escape(row["brief"])}</span>'
+            f'<span class="pyq-q">({row["year"]} {sess})</span>'
+            f'<a href="{row["href"]}">Past paper →</a></li>'
         )
-    html = re.sub(
-        r"header\{[^}]+\}\s*header h1\{[^}]+\}\s*header p\{[^}]+\}\s*header a\{[^}]+\}",
-        HEADER_CSS.strip(),
-        html,
-        count=1,
+    return (
+        '<div class="pyq-group"><p class="grp-head">Mid-sem PYQs of this type</p>'
+        f'<ul class="pyq-list">{"".join(rows)}</ul></div>'
     )
-    html = re.sub(
-        r"header h1\{font-size:1\.4rem\}\s*header p\{font-size:[^}]+\}\s*header a\{color:#93c5fd\}\s*",
-        "",
-        html,
-    )
-    if "toggleAllSolutions" not in html:
-        html = html.replace("</body>", TOGGLE_JS + "\n</body>")
-    if "Expand all solutions" not in html:
-        html = html.replace(
-            "<h1>ML PYQ Workbook",
-            '<div class="toolbar">'
-            '<button type="button" onclick="toggleAllSolutions(true)">Expand all solutions</button>'
-            '<button type="button" onclick="toggleAllSolutions(false)">Collapse all</button>'
-            "</div>\n<h1>ML PYQ Workbook",
-        )
-    return html
-
-
-def wrap_midsem_section(html: str) -> str:
-    m = re.search(r'(<section id="midsem">)(.*?)(</section>)', html, re.S)
-    if not m:
-        return html
-    body = m.group(2)
-    if "Ridge &amp; Lasso for RR-CHD" in body:
-        return html
-    if "<h3>Ridge — Iteration 1</h3>" not in body:
-        return html
-
-    head, _, tail = body.partition("<h3>Ridge — Iteration 1</h3>")
-    r1, _, rest = tail.partition("<h3>Ridge — Iteration 2")
-    r2, _, rest2 = rest.partition("<h3>Lasso — Final")
-    lasso = rest2
-
-    prompt = r"""<div class="q-prompt"><p><strong>Question.</strong> Ridge &amp; Lasso for RR-CHD risk from Diastolic BP (\(x_1\)) and BMI (\(x_2\)). Initial \(w_0=5\), \(w_1=w_2=-0.03\), \(\alpha=0.02\), \(\lambda=5\), \(m=3\). Using the patient table below, perform <strong>2 Ridge iterations</strong> then <strong>2 Lasso iterations</strong>.</p></div>"""
-
-    new_body = (
-        head
-        + prompt
-        + wrap_q_block("<h3>Ridge — Iteration 1</h3>" + r1)
-        + wrap_q_block("<h3>Ridge — Iteration 2 → final</h3>" + r2)
-        + wrap_q_block("<h3>Lasso — Final after 2 iter</h3>" + lasso)
-    )
-    return html[: m.start()] + m.group(1) + new_body + m.group(3) + html[m.end() :]
-
-
-def clean_workbook_source(html: str) -> str:
-    """Move answer leaks out of question stems into solution bodies."""
-    html = html.replace(
-        '<p class="src">L1 vs L2 — many irrelevant features → <strong>Lasso (L1)</strong> zeros them out</p>',
-        '<p class="src">Regularization — L1 vs L2 (practice)</p>',
-    )
-    html = html.replace(
-        '<p class="src">Overfit logistic with large weights → add L2/L1, reduce features, tune λ via CV</p>',
-        '<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. '
-        "Ridge shrinks but rarely zeros.</div>\n"
-        '<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>',
-    )
-    html = html.replace(
-        '<p class="src">4 equal classes → H = log₂(4) = <strong>2 bits</strong></p>',
-        '<p class="src">Practice — entropy &amp; leaf labelling</p>',
-    )
-    html = re.sub(
-        r'(<section id="type6">.*?<div class="q-prompt">.*?</div>\s*)'
-        r'(<figure class="diagram"><div class="svg-wrap" role="img" aria-label="Ridge vs Lasso">)',
-        r'\1<div class="step">(a) <strong>Lasso (L1)</strong> zeros irrelevant weights → feature selection. '
-        r"Ridge shrinks but rarely zeros.</div>\n"
-        r'<div class="step">(b) L2/L1 penalize large weights → smoother boundary; tune λ via cross-validation.</div>\n\2',
-        html,
-        count=1,
-        flags=re.S,
-    )
-    html = re.sub(
-        r'(<p class="src">Practice — entropy &amp; leaf labelling</p>\s*<div class="q-prompt">.*?</div>\s*)'
-        r'<div class="step">Leaf 3 Yes',
-        r'\1<div class="step">(a) 4 equal classes → H = log₂(4) = <strong>2 bits</strong></div>\n'
-        r'<div class="step">(b) Leaf 3 Yes',
-        html,
-        count=1,
-        flags=re.S,
-    )
-    html = re.sub(
-        r'(<section id="type10">.*?<div class="q-prompt">.*?</div>)\s*'
-        r'<p>Three models on two datasets.*?</p>\s*',
-        r"\1\n",
-        html,
-        count=1,
-        flags=re.S,
-    )
-    html = re.sub(
-        r'(<section id="type11">.*?<div class="q-prompt">.*?</div>)\s*'
-        r'<p>\\\(m=28\\\) samples.*?</p>\s*',
-        r"\1\n",
-        html,
-        count=1,
-        flags=re.S,
-    )
-    html = html.replace("6 Approved, 4 Denied", "5 Approved, 5 Denied")
-    html = html.replace("6 Approved / 4 Denied", "5 Approved / 5 Denied")
-    html = html.replace("p_{Yes}=0.6,\\ p_{No}=0.4", "p_{Yes}=0.5,\\ p_{No}=0.5")
-    html = html.replace("Entropy ≈ 0.971 bits", "Entropy = 1.0 bit")
-    html = html.replace("Entropy ≈ 0.971", "Entropy = 1.0")
-    html = html.replace("\\partial J/\\partial\\theta_3 = -12", "\\partial J/\\partial\\theta_2 = -12")
-    html = html.replace("\\partial J/\\partial\\theta_3=-12", "\\partial J/\\partial\\theta_2=-12")
-    html = html.replace("\\theta_3 \\leftarrow \\theta_3 + 12\\alpha", "\\theta_2 \\leftarrow \\theta_2 + 12\\alpha")
-    html = html.replace("increasing \\(\\theta_3\\)", "increasing \\(\\theta_2\\)")
-    html = html.replace("(Bonus) Split on", "(ii) Split on")
-    html = html.replace(
-        r"\(H = -0.6\log_2(0.6) - 0.4\log_2(0.4) = 0.442 + 0.529\)",
-        r"\(H = -0.5\log_2(0.5) - 0.5\log_2(0.5) = 1.0\) bit",
-    )
-    html = html.replace("IG = 1.0 − 0.361 = 0.639", "IG = 1.0 − 0 = 1.0")
-    html = html.replace("No loan branch: 5 Yes, 0 No → H=0 · Has loan: 1 Yes, 4 No → H≈0.722", "No loan: 5 Yes, 0 No → H=0 · Has loan: 0 Yes, 5 No → H=0")
-    html = html.replace("Weighted H = 0.361 · <strong>IG = 1.0 − 0.361 = 0.639</strong>", "<strong>IG = 1.0 − 0 = 1.0 bit</strong> (perfect split)")
-    return html
-
-
-def fix_malformed_html(html: str) -> str:
-    """Repair known bad patterns from older workbook versions."""
-    html = re.sub(
-        r'<p class="src">([^<]*(?:<strong>[^<]*</strong>[^<]*)*)</div>',
-        r'<p class="src">\1</p>',
-        html,
-    )
-    html = html.replace("\boldsymbol", r"\boldsymbol")
-    return html
-
-
-def validate_html(html: str) -> list[str]:
-    issues = []
-    if html.count('<div class="q">') != html.count('</details>') + html.count('<div class="q"><div class="q-stem">') - html.count("sol-toggle"):
-        pass  # rough check only
-    if re.search(r'<div class="q-stem">(?!.*?<div class="q-prompt">).*?<table\b', html, re.S):
-        issues.append("answer table visible in q-stem (outside q-prompt)")
-    if re.search(r'<div class="q-stem">(?!.*?<div class="q-prompt">).*?<div class="(?:step|ans)"', html, re.S):
-        issues.append("solution step visible in q-stem (outside q-prompt)")
-    if re.search(r'<div class="q-stem"><p\s*$', html, re.M):
-        issues.append("unclosed <p> in q-stem")
-    if 'class="src">' in html and re.search(r'class="src">[^<]*</div>', html):
-        issues.append("src paragraph closed with </div>")
-    if re.search(r"<div class=\"q-stem\"><p\s*\n<div class=\"q-prompt\">", html):
-        issues.append("broken q-stem/p before q-prompt")
-    return issues
 
 
 def build():
-    sync_images()
-    html = OUT.read_text(encoding="utf-8")
-    html = fix_malformed_html(html)
-    html = flatten_toggles(html)
-    html = fix_theta(html)
-    html = fix_images(html)
-    html = clean_workbook_source(html)
-    html = apply_prompts(html)
-    html = fix_theta(html)
-    html = wrap_midsem_section(html)
-    html = inject_sol_css(html)
-    html = inject_css_js(html)
-    issues = validate_html(html)
-    if issues:
-        print("WARNING:", "; ".join(issues))
+    reset_uid()
+    catalog = collect_by_type(mid_sem_only=True)
+    nav = ['<a href="#overview">Overview</a>']
+    overview_rows = ""
+
+    for tid, title, exam, svg, formula, solution in TYPES:
+        num, topic = _type_parts(title)
+        type_num = int(re.search(r"\d+", num).group())
+        overview_rows += (
+            f"<tr><td><strong>{H.escape(num)}</strong></td>"
+            f"<td>{H.escape(topic)}</td><td>Mid</td></tr>\n"
+        )
+        nav.append(
+            f'<a href="#{tid}" class="nav-type">'
+            f'<span class="nav-num">{H.escape(num)}</span>'
+            f'<span class="nav-topic">{H.escape(topic)} '
+            f'<span class="nav-exam">Mid</span></span></a>'
+        )
+
+    nav.extend([
+        '<div class="grp">Practice</div>',
+        '<a href="#practice-june">June 2026 Full Paper</a>',
+        '<a href="#practice-ridge">Ridge / Lasso Numerical</a>',
+        '<a href="#practice-mock">Mock Exam</a>',
+        '<div class="grp">Also</div>',
+        '<a href="ML_Past_Papers.html">Past Papers</a>',
+        '<a href="ML_Theory_Guide.html">Theory</a>',
+        '<a href="index.html">Hub</a>',
+    ])
+
+    body = f"""<section id="overview"><h2>Question Type Index</h2>
+<p class="src">Organised by exam pattern · Sources: <code>ML/questions/MidSem/</code> + practice mock</p>
+<p>Each TYPE has the core formula, a diagram where helpful, a worked PYQ, and links to all matching past-paper questions.</p>
+<table class="data-table"><thead><tr><th>Type</th><th>Problem type</th><th>Exam</th></tr></thead><tbody>
+{overview_rows}</tbody></table></section>"""
+
+    for tid, title, exam, svg, formula, solution in TYPES:
+        type_num = int(re.search(r"\d+", tid).group())
+        diag = svg_figure(svg, title) if svg else ""
+        pyq_block = _render_pyq_group(type_num, catalog)
+        body += f"""<section id="{tid}"><h2>{H.escape(title)}</h2>
+<span class="tag mid">Mid</span>
+<span class="tag">{H.escape(exam)}</span>
+<div class="formula"><h5>Core formula</h5>\\[{formula}\\]</div>
+{diag}
+<div class="q">{solution}</div>
+{pyq_block}</section>"""
+
+    body += PRACTICE
+
+    html = f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ML PYQ Workbook — By Question Type</title>{SHARED_HEAD}
+<style>{SHARED_CSS}</style></head><body>
+<header><h1>ML PYQ Workbook</h1><p><a href="index.html">← Hub</a> · 11 question types · AIMLCZG565</p></header>
+<div class="shell"><aside><div class="grp">Types</div>{"".join(nav)}
+</aside><main>{body}</main></div></body></html>"""
     OUT.write_text(html, encoding="utf-8")
-    n_q = html.count('<div class="q">')
-    n_t = html.count("sol-toggle")
-    print(f"Wrote {OUT} — {n_q} questions, {n_t} toggles")
+    linked = sum(len(catalog.get(i, [])) for i in range(1, 12))
+    print(f"Wrote {OUT} — {len(TYPES)} types, {linked} PYQ links")
 
 
 if __name__ == "__main__":
